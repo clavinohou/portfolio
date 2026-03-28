@@ -1,0 +1,120 @@
+.experience {
+  background-color: var(--color-bg);
+}
+
+.experience-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.experience-item {
+  background-color: var(--color-white);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-md);
+  border-radius: 4px;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.experience-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.experience-type {
+  padding: 0.25rem 0.75rem;
+  background: 
+    linear-gradient(135deg, 
+      rgba(200, 200, 200, 0.1) 0%,
+      rgba(255, 255, 255, 0.2) 25%,
+      rgba(180, 180, 180, 0.1) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      rgba(200, 200, 200, 0.1) 100%
+    ),
+    linear-gradient(90deg,
+      #E8E8E8 0%,
+      #F0F0F0 20%,
+      #E8E8E8 40%,
+      #F5F5F5 60%,
+      #E8E8E8 80%,
+      #F0F0F0 100%
+    );
+  background-size: 200% 200%, 100% 100%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.experience-date {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.experience-title {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-black);
+}
+
+.experience-company {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.experience-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.experience-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.experience-tag {
+  padding: 0.25rem 0.75rem;
+  background-color: var(--color-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .experience-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .experience-item {
+    padding: var(--spacing-sm);
+  }
+}
+
+

@@ -1,0 +1,123 @@
+.contact {
+  background-color: var(--color-white);
+}
+
+.contact-content {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-description {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  line-height: 1.8;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-text);
+}
+
+.social-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.social-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  color: var(--color-text);
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+}
+
+.social-link.aluminum {
+  background: 
+    linear-gradient(135deg, 
+      rgba(200, 200, 200, 0.1) 0%,
+      rgba(255, 255, 255, 0.2) 25%,
+      rgba(180, 180, 180, 0.1) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      rgba(200, 200, 200, 0.1) 100%
+    ),
+    linear-gradient(90deg,
+      #E8E8E8 0%,
+      #F0F0F0 20%,
+      #E8E8E8 40%,
+      #F5F5F5 60%,
+      #E8E8E8 80%,
+      #F0F0F0 100%
+    );
+  background-size: 200% 200%, 100% 100%;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.social-link.aluminum::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.03) 2px,
+      rgba(255, 255, 255, 0.03) 4px
+    );
+  pointer-events: none;
+}
+
+.social-link.aluminum:hover {
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 6px 12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.3);
+  color: var(--color-accent);
+}
+
+.social-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.social-name {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .social-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+  
+  .social-link {
+    padding: var(--spacing-md);
+    min-height: 120px;
+  }
+  
+  .social-icon {
+    font-size: 2rem;
+  }
+}
+
+

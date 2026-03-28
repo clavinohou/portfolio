@@ -1,0 +1,120 @@
+# Decap CMS — edit `repo` + `branch` to match your GitHub repo (see DECAP_SETUP.md)
+# For local editing without GitHub: run `npm run cms` in a second terminal (with `local_backend: true` below).
+
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
+  branch: main
+
+# Uncomment for local development (run `npm run cms` alongside `npm run dev`):
+local_backend: true
+
+media_folder: public/uploads
+public_folder: /uploads
+
+site_url: https://YOUR_USERNAME.github.io
+# If GitHub Pages uses a project URL, set e.g. https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/
+# And set the same in vite.config.js `base`
+
+collections:
+  - name: site
+    label: Portfolio content
+    files:
+      - label: Site data
+        name: site
+        file: src/content/cms/site.json
+        format: json
+        fields:
+          - label: Profile
+            name: profile
+            widget: object
+            collapsed: false
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Title / headline, name: title, widget: string }
+              - {
+                  label: Scope brief (CRT subtitle text),
+                  name: scopeBrief,
+                  widget: text,
+                  required: false,
+                }
+              - { label: School, name: school, widget: string }
+              - { label: Location, name: location, widget: string }
+              - { label: Year, name: year, widget: string }
+              - label: Interests
+                name: interests
+                widget: list
+                summary: '{{fields.interest}}'
+                fields:
+                  - { label: Interest, name: interest, widget: string }
+              - label: About paragraphs
+                name: about
+                widget: list
+                summary: '{{fields.paragraph}}'
+                fields:
+                  - { label: Paragraph, name: paragraph, widget: text }
+          - label: Projects
+            name: projects
+            widget: list
+            summary: '{{fields.title}}'
+            fields:
+              - { label: ID (slug, no spaces), name: id, widget: string, hint: e.g. my-project }
+              - { label: Title, name: title, widget: string }
+              - { label: Description, name: description, widget: text }
+              - label: Tags
+                name: tags
+                widget: list
+                summary: '{{fields.tag}}'
+                fields:
+                  - { label: Tag, name: tag, widget: string }
+              - { label: Link (optional), name: link, widget: string, required: false, hint: Full URL or leave empty }
+              - {
+                  label: Image,
+                  name: imageUrl,
+                  widget: image,
+                  required: false,
+                  choose_url: true,
+                  hint: Upload, or paste /images/... or /uploads/... path,
+                }
+          - label: Experience
+            name: experience
+            widget: list
+            summary: '{{fields.title}} — {{fields.company}}'
+            fields:
+              - { label: ID (slug), name: id, widget: string }
+              - { label: Type, name: type, widget: string, hint: e.g. Internship }
+              - { label: Title, name: title, widget: string }
+              - { label: Company, name: company, widget: string }
+              - { label: Location, name: location, widget: string }
+              - { label: Date, name: date, widget: string }
+              - { label: Description, name: description, widget: text }
+              - label: Tags
+                name: tags
+                widget: list
+                fields:
+                  - { label: Tag, name: tag, widget: string }
+          - label: Links & social
+            name: links
+            widget: object
+            fields:
+              - { label: Email, name: email, widget: string }
+              - { label: GitHub URL, name: github, widget: string }
+              - { label: LinkedIn URL, name: linkedin, widget: string }
+              - { label: Instagram URL, name: instagram, widget: string }
+          - label: Resume
+            name: resume
+            widget: object
+            fields:
+              - { label: Download button label, name: downloadLabel, widget: string }
+              - {
+                  label: Resume PDF,
+                  name: downloadUrl,
+                  widget: file,
+                  choose_url: true,
+                  hint: Upload PDF or keep path like /resume/CalvinHouResume.pdf,
+                }
+              - label: Highlight bullets
+                name: highlights
+                widget: list
+                fields:
+                  - { label: Highlight, name: highlight, widget: string }
