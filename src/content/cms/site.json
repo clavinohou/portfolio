@@ -1,64 +1,73 @@
 {
   "profile": {
     "name": "Calvin Hou",
-    "title": "Electrical Engineer • Robotics",
+    "title": "Electrical Engineering major",
     "scopeBrief": "EE @ Georgia Tech · robotics · PCBs · embedded control. Pick a channel below.",
     "school": "Georgia Institute of Technology",
-    "location": "Washington, USA",
-    "year": "Sophomore",
+    "location": "From Seattle, WA",
+    "year": "Sophomore (Graduating May 2028)",
     "interests": [
-      { "interest": "Robotics" },
-      { "interest": "PCB Design" },
-      { "interest": "Embedded Systems" },
-      { "interest": "Control Systems" },
-      { "interest": "FIRST Robotics" },
-      { "interest": "EV Systems" }
+      {
+        "interest": "Robotics + Automation"
+      },
+      {
+        "interest": "PCB Design"
+      },
+      {
+        "interest": "Embedded Systems"
+      },
+      {
+        "interest": "FPGA's & ASIC's"
+      },
+      {
+        "interest": "Rocketry + Space"
+      }
     ],
     "about": [
       {
-        "paragraph": "I'm an Electrical Engineering student focused on building reliable robotics + hardware systems. I enjoy bridging design and implementation—from PCB layout to embedded control."
+        "paragraph": "I'm an Electrical Engineering student with a strong background in building reliable robotics + hardware systems. My passion mostly lies in building self-sufficient autonomous systems. My technical background consists mostly of various hardware projects, designing, building, debugging, and validating."
       },
       {
-        "paragraph": "My work includes thermal analysis for AI hardware, inverse-kinematics research, and electrical system design for competition and racing."
+        "paragraph": "My work background includes the validation and assembly of cutting-edge AI server hardware, robot design and development, and electrical system design for various on-campus competition teams, such as our FSAE and Rocketry Teams."
       }
     ]
   },
   "projects": [
     {
-      "id": "pulse-frc",
-      "title": "Pulse FRC Pit Display",
-      "description": "Designed and optimized UX/UI for a multi-functional pit display supporting FRC teams during competition. Reached 4,000+ users in the first week.",
-      "tags": [
-        { "tag": "UI/UX" },
-        { "tag": "Web Development" },
-        { "tag": "FRC" }
-      ],
-      "link": "https://pulsefrc.app",
-      "imageUrl": "/images/project-pulse.jpg"
-    },
-    {
       "id": "media-controller-keyboard",
       "title": "Custom Media Controller & Keyboard",
-      "description": "Designed and fabricated a custom PCB using KiCad and STM32. Built a keyboard with diode matrix scanning and Teensy USB keyscanning.",
+      "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning.",
       "tags": [
-        { "tag": "PCB Design" },
-        { "tag": "Hardware" },
-        { "tag": "Embedded Systems" }
+        {
+          "tag": "PCB Design"
+        },
+        {
+          "tag": "Hardware"
+        },
+        {
+          "tag": "Embedded Systems"
+        }
       ],
       "link": "",
       "imageUrl": "/images/project-keyboard.jpg"
     },
     {
-      "id": "3dof-arm-controller",
-      "title": "3DOF Robotic Arm Controller",
-      "description": "Implemented a custom controller for a 3DOF arm with inverse kinematics to move the end effector to target coordinates.",
+      "id": "pulse-frc",
+      "title": "Pulse FRC Pit Display",
+      "description": "Designed and optimized UX/UI for a multi-functional pit display supporting FRC teams during competition. Reached 4,000+ users in the first week.",
       "tags": [
-        { "tag": "Robotics" },
-        { "tag": "Control Systems" },
-        { "tag": "Inverse Kinematics" }
+        {
+          "tag": "UI/UX"
+        },
+        {
+          "tag": "Web Development"
+        },
+        {
+          "tag": "FRC"
+        }
       ],
-      "link": "",
-      "imageUrl": "/images/project-arm.jpg"
+      "link": "https://pulsefrc.app",
+      "imageUrl": "/images/project-pulse.jpg"
     }
   ],
   "experience": [
@@ -69,11 +78,17 @@
       "company": "Asia Vital Components",
       "location": "New Taipei City, Taiwan",
       "date": "Aug 2024",
-      "description": "Assembled and validated liquid-to-air cooling solutions for high-performance AI hardware. Conducted thermal analysis and optimized parameters for deployment.",
+      "description": "Engineered and validated a next-generation (V2) liquid cooling system by leading testing and integration efforts on the Liquid Pump Unit (LPU), and Coolant Distribution Unit (CDU). Conducted rigorous pressure and leak testing to ensure system integrity, achieving a 100% pass rate across validation cycles. Assembled and wired multiple CDU units, integrating distributed leak detection sensors and verifying functionality through controlled fault injection and response testing.\n\nDesigned and implemented temperature monitoring solutions using welded thermistors, collecting and analyzing large datasets to benchmark V2 performance against prior V1 systems. Identified thermal inefficiencies and introduced targeted airflow optimizations—including custom air guides, which improved radiator cooling uniformity and reduced temperature variance across critical components.",
       "tags": [
-        { "tag": "Thermal Analysis" },
-        { "tag": "Hardware Validation" },
-        { "tag": "AI Systems" }
+        {
+          "tag": "Thermal Analysis"
+        },
+        {
+          "tag": "Hardware Validation"
+        },
+        {
+          "tag": "AI Systems"
+        }
       ]
     },
     {
@@ -83,27 +98,39 @@
       "company": "NUS College of Design & Engineering",
       "location": "Singapore",
       "date": "Sep 2024",
-      "description": "Built and implemented a custom controller for a 3DOF arm, applying inverse kinematics to move an end effector to 3D targets.",
+      "description": "Worked under researcher Marcelo Ang to explore emerging applications in humanoid and soft robotics, contributing to early-stage research on automating cargo lashing operations in high-throughput maritime ports such as Singapore. The project aimed to replace a traditionally manual, labor-intensive process with a scalable robotic solution.\n\nDeveloped a functional proof-of-concept system using a custom-built 3DOF robotic arm to simulate automated lashing and unlashing tasks. Self-taught C++ to implement low-level servo control, and engineered a custom hardware controller to interface with the system. Designed and deployed inverse kinematics and velocity control algorithms, improving end-effector positioning accuracy and motion smoothness by an estimated 40% compared to initial direct-control methods.\n\nDemonstrated the feasibility of automating repetitive port operations using cost-effective, widely accessible components, validating that robust performance could be achieved without specialized hardware. This work established a foundation for scaling toward higher-DOF systems and more complex real-world deployment scenarios, supporting broader efforts in industrial robotics automation.",
       "tags": [
-        { "tag": "Robotics" },
-        { "tag": "Control Systems" },
-        { "tag": "Inverse Kinematics" }
+        {
+          "tag": "Robotics"
+        },
+        {
+          "tag": "Control Systems"
+        },
+        {
+          "tag": "Inverse Kinematics"
+        }
       ]
     }
   ],
   "links": {
     "email": "clavin@gatech.edu",
-    "github": "https://github.com/calvinhou",
-    "linkedin": "https://linkedin.com/in/calvinhou",
-    "instagram": "https://instagram.com/calvinhou"
+    "github": "https://github.com/clavinohou",
+    "linkedin": "https://www.linkedin.com/in/houcalvin/",
+    "instagram": "https://instagram.com/clavinohou"
   },
   "resume": {
     "downloadLabel": "Download Resume",
-    "downloadUrl": "/resume/CalvinHouResume.pdf",
+    "downloadUrl": "/uploads/calvinresume21326b.pdf",
     "highlights": [
-      { "highlight": "Electrical Engineering (B.S.) — Georgia Tech" },
-      { "highlight": "Robotics + embedded systems experience" },
-      { "highlight": "PCB design and hardware validation" }
+      {
+        "highlight": "Electrical Engineering (B.S.) — Georgia Tech"
+      },
+      {
+        "highlight": "Robotics + embedded systems experience"
+      },
+      {
+        "highlight": "PCB design and hardware validation"
+      }
     ]
   }
 }

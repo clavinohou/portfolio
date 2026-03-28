@@ -301,6 +301,8 @@
   stroke-width: calc(1.5 + var(--scope-glow) * 1.5);
   stroke-linecap: butt;
   stroke-linejoin: miter;
+  /* Keep beam thickness constant when timebase / volts scale the trace (real scope behavior). */
+  vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 8px rgba(80, 255, 140, 0.45));
 }
 
