@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
+import { publicUrl } from '../utils/publicUrl'
+import { ImageCarousel } from './ImageCarousel'
 import './Oscilloscope.css'
 
 const fallbackImageUrl =
@@ -255,19 +257,13 @@ const ProjectsModule = () => {
     <ModuleCard title="PROJECTS" subtitle="Selection (clickable)">
       <div className="project-grid">
         {projects.map((p) => (
-          <motion.a
-            key={p.id}
-            href={p.link ?? '#'}
-            target={p.link ? '_blank' : undefined}
-            rel={p.link ? 'noopener noreferrer' : undefined}
-            className="project-card"
-            whileHover={p.link ? { y: -6 } : undefined}
-            onClick={(e) => {
-              if (!p.link) e.preventDefault()
-            }}
-          >
+          <motion.div key={p.id} className="project-card" whileHover={{ y: -4 }}>
             <div className="project-image">
-              <img src={p.imageUrl} alt={p.title} onError={(e) => (e.currentTarget.src = fallbackImageUrl)} />
+              {p.images.length > 0 ? (
+                <ImageCarousel images={p.images} altPrefix={p.title} />
+              ) : (
+                <img src={fallbackImageUrl} alt="" />
+              )}
             </div>
             <div className="project-content">
               <div className="project-title">{p.title}</div>
@@ -279,8 +275,13 @@ const ProjectsModule = () => {
                   </span>
                 ))}
               </div>
+              {p.link ? (
+                <a className="project-external-link" href={p.link} target="_blank" rel="noopener noreferrer">
+                  View project →
+                </a>
+              ) : null}
             </div>
-          </motion.a>
+          </motion.div>
         ))}
       </div>
     </ModuleCard>
@@ -289,6 +290,7 @@ const ProjectsModule = () => {
 
 const ResumeModule = () => {
   const { resume } = siteContent
+  const pdfSrc = publicUrl(resume.downloadUrl)
   return (
     <ModuleCard title="RESUME" subtitle="Spec sheet view">
       <div className="resume-grid">
@@ -301,23 +303,30 @@ const ResumeModule = () => {
               </div>
             ))}
           </div>
-          <a className="module-cta" href={resume.downloadUrl} download>
+          <a className="module-cta" href={pdfSrc || resume.downloadUrl || '#'} {...(pdfSrc ? { download: true } : {})}>
             {resume.downloadLabel} →
           </a>
         </div>
         <div className="resume-right">
-          <div className="resume-mock">
-            <div className="resume-mock-header">DOCUMENT PREVIEW</div>
-            <div className="resume-mock-lines">
-              <div className="resume-line" />
-              <div className="resume-line small" />
-              <div className="resume-line" />
-              <div className="resume-line small" />
-              <div className="resume-line" />
-              <div className="resume-line small" />
-              <div className="resume-line" />
+          {pdfSrc ? (
+            <div className="resume-preview">
+              <div className="resume-preview-header mono">Document preview</div>
+              <div className="resume-preview-frame">
+                <iframe title="Resume PDF preview" src={`${pdfSrc}#toolbar=0`} />
+              </div>
+              <p className="resume-preview-hint">
+                Preview not loading?{' '}
+                <a href={pdfSrc} target="_blank" rel="noopener noreferrer">
+                  Open PDF in a new tab
+                </a>
+                .
+              </p>
             </div>
-          </div>
+          ) : (
+            <div className="resume-preview resume-preview--empty">
+              <p className="resume-preview-hint">Add a resume PDF in the CMS (Resume → Resume PDF).</p>
+            </div>
+          )}
         </div>
       </div>
     </ModuleCard>
@@ -330,22 +339,29 @@ const ExperienceModule = () => {
     <ModuleCard title="EXPERIENCE" subtitle="Timeline">
       <div className="experience-list">
         {experience.map((x) => (
-          <div key={x.id} className="experience-item">
-            <div className="experience-meta">
-              <span className="experience-type">{x.type}</span>
-              <span className="experience-date">{x.date}</span>
-            </div>
-            <div className="experience-title">{x.title}</div>
-            <div className="experience-company">
-              {x.company} · {x.location}
-            </div>
-            <p className="experience-desc">{x.description}</p>
-            <div className="experience-tags">
-              {x.tags.map((t) => (
-                <span key={t} className="experience-tag">
-                  {t}
-                </span>
-              ))}
+          <div key={x.id} className={`experience-item ${x.images.length > 0 ? 'experience-item--with-media' : ''}`}>
+            {x.images.length > 0 ? (
+              <div className="experience-media">
+                <ImageCarousel images={x.images} altPrefix={x.company} variant="contain" />
+              </div>
+            ) : null}
+            <div className="experience-body">
+              <div className="experience-meta">
+                <span className="experience-type">{x.type}</span>
+                <span className="experience-date">{x.date}</span>
+              </div>
+              <div className="experience-title">{x.title}</div>
+              <div className="experience-company">
+                {x.company} · {x.location}
+              </div>
+              <p className="experience-desc">{x.description}</p>
+              <div className="experience-tags">
+                {x.tags.map((t) => (
+                  <span key={t} className="experience-tag">
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         ))}
@@ -362,10 +378,10 @@ const moduleMap = {
 }
 
 export default function Oscilloscope({ activeChannel, onChannelChange, onHome, direction }) {
-  const [knobIntensity, setKnobIntensity] = useState(0.52)
-  const [knobVolts, setKnobVolts] = useState(0.43)
+  const [knobIntensity, setKnobIntensity] = useState(0.5)
+  const [knobVolts, setKnobVolts] = useState(0.5)
   const [knobVPos, setKnobVPos] = useState(0.5)
-  const [knobSec, setKnobSec] = useState(0.43)
+  const [knobSec, setKnobSec] = useState(0.5)
   const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
 

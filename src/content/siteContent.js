@@ -11,6 +11,18 @@ function flatList(arr, key) {
     .filter(Boolean)
 }
 
+/** Cover image first, then extra gallery URLs (deduped). */
+function projectImages(proj) {
+  const primary = (proj.imageUrl ?? '').trim()
+  const extra = flatList(proj.gallery, 'src')
+  const out = []
+  if (primary) out.push(primary)
+  for (const u of extra) {
+    if (u && !out.includes(u)) out.push(u)
+  }
+  return out
+}
+
 function normalize(rawData) {
   const p = rawData.profile || {}
   return {
@@ -31,6 +43,7 @@ function normalize(rawData) {
       tags: flatList(proj.tags, 'tag'),
       link: proj.link?.trim() ? proj.link.trim() : null,
       imageUrl: proj.imageUrl ?? '',
+      images: projectImages(proj),
     })),
     experience: (rawData.experience || []).map((ex) => ({
       id: ex.id ?? '',
@@ -41,6 +54,7 @@ function normalize(rawData) {
       date: ex.date ?? '',
       description: ex.description ?? '',
       tags: flatList(ex.tags, 'tag'),
+      images: flatList(ex.gallery, 'src'),
     })),
     links: {
       email: rawData.links?.email ?? '',

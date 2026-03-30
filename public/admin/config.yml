@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: YOUR_GITHUB_USERNAME/YOUR_REPO_NAME
+  repo: clavinohou/portfolio
   branch: main
 
 # Uncomment for local development (run `npm run cms` alongside `npm run dev`):
@@ -12,7 +12,7 @@ local_backend: true
 media_folder: public/uploads
 public_folder: /uploads
 
-site_url: https://YOUR_USERNAME.github.io
+site_url: https://clavinohou.github.io
 # If GitHub Pages uses a project URL, set e.g. https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/
 # And set the same in vite.config.js `base`
 
@@ -69,13 +69,26 @@ collections:
                   - { label: Tag, name: tag, widget: string }
               - { label: Link (optional), name: link, widget: string, required: false, hint: Full URL or leave empty }
               - {
-                  label: Image,
+                  label: Cover image,
                   name: imageUrl,
                   widget: image,
                   required: false,
                   choose_url: true,
-                  hint: Upload, or paste /images/... or /uploads/... path,
+                  hint: Main thumbnail; shown first in carousel,
                 }
+              - label: More photos (carousel)
+                name: gallery
+                widget: list
+                required: false
+                summary: '{{fields.src}}'
+                fields:
+                  - {
+                      label: Image,
+                      name: src,
+                      widget: image,
+                      choose_url: true,
+                      hint: Company or project photos,
+                    }
           - label: Experience
             name: experience
             widget: list
@@ -93,6 +106,19 @@ collections:
                 widget: list
                 fields:
                   - { label: Tag, name: tag, widget: string }
+              - label: Photos (carousel)
+                name: gallery
+                widget: list
+                required: false
+                summary: '{{fields.src}}'
+                fields:
+                  - {
+                      label: Image,
+                      name: src,
+                      widget: image,
+                      choose_url: true,
+                      hint: Logos, team photos, or work samples,
+                    }
           - label: Links & social
             name: links
             widget: object
