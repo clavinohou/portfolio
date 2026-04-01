@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/updateResumeMeta.mjs && vite build",
     "preview": "vite preview",
     "cms": "decap-server"
   },
