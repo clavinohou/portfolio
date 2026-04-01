@@ -109,6 +109,15 @@ html.scope-home-no-scroll body {
   max-height: 100dvh;
 }
 
+@media (max-width: 768px) {
+  html.scope-home-no-scroll,
+  html.scope-home-no-scroll body {
+    overflow: auto;
+    height: auto;
+    max-height: none;
+  }
+}
+
 /* Channel page open: lock document scroll; only the projector panel scrolls */
 html.projector-page-open,
 html.projector-page-open body {

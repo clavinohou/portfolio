@@ -9,14 +9,17 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', 
   const [i, setI] = useState(0)
   const [expanded, setExpanded] = useState(false)
   const [windowStart, setWindowStart] = useState(0)
+  const [zoomed, setZoomed] = useState(false)
 
   useEffect(() => {
     setI(0)
     setWindowStart(0)
+    setZoomed(false)
   }, [images])
 
   useEffect(() => {
     if (!expanded) return
+    setZoomed(false)
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
@@ -142,11 +145,15 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', 
                 key={i}
                 src={src}
                 alt=""
-                className="media-lightbox__img"
+                className={`media-lightbox__img ${zoomed ? 'media-lightbox__img--zoomed' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setZoomed((z) => !z)
+                }}
               />
             </div>
           </motion.div>

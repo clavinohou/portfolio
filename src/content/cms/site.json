@@ -74,10 +74,15 @@
       "description": "I founded Miso Mechanics, a community-based FIRST Robotics Competition (FRC) team in North Seattle, with the vision of building a world-class program from the ground up. Despite our small physical footprint, we rapidly established ourselves as a competitive powerhouse both regionally and globally. Following a strong rookie season, we proved our elite capabilities by ranking 4th at the prestigious Chezy Champs offseason event and allying with Hall of Fame Team 254. We carried this momentum into a dominant 2025 season, winning a District Event, ranking 7th overall in the highly competitive Pacific Northwest district, and ranking in the top 3% of all robots in the world. Ultimately, finishing my journey at the FIRST World Championship among the best robots in the world.\n\n**Key Contributions:**\n\n* **Electrical Systems Architecture:** Planned, wired, and implemented the complete electrical systems across three distinct competition robots, achieving a 100% reliability rate with zero electrical failures across 10+ high-stakes competitions.\n* **Mechanical Design & CAD:** Self-taught CAD to design critical robot subsystems and relieve bottlenecks for the design team. Notably created our robot's climber mechanisms, managing the design and manufacturing process completely remotely while working overseas in Taiwan.\n* **Operations & Project Management:** Directed day-to-day team logistics, coordinated practice field sessions, managed parts procurement, and oversaw task delegation to ensure the team operated efficiently under tight build-season deadlines."
     },
     {
-      "id": "media-controller-keyboard",
-      "title": "Custom Media Controller & Keyboard",
+      "stackSize": 1,
       "date": "September 2022",
-      "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning.",
+      "gallery": [
+        {
+          "src": "/uploads/pcbschimg.png"
+        }
+      ],
+      "imageUrl": "/uploads/pcbimage.png",
+      "title": "Custom Media Controller & Keyboard",
       "tags": [
         {
           "tag": "PCB Design"
@@ -89,8 +94,9 @@
           "tag": "Embedded Systems"
         }
       ],
-      "link": "",
-      "imageUrl": "/images/project-keyboard.jpg"
+      "link": "https://github.com/clavinohou/first-pcb-keypad",
+      "id": "media-controller-keyboard",
+      "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning."
     },
     {
       "id": "pulse-frc",
@@ -109,7 +115,8 @@
         }
       ],
       "link": "https://pulsefrc.app",
-      "imageUrl": "/images/project-pulse.jpg"
+      "imageUrl": "/uploads/untitled-aug-28-2024.png",
+      "stackSize": 1
     }
   ],
   "experience": [

@@ -233,6 +233,17 @@
 .media-lightbox__img {
   border-radius: 8px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  cursor: zoom-in;
+}
+
+.media-lightbox__img--zoomed {
+  cursor: zoom-out;
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  transform: scale(1.5);
+  transform-origin: center;
 }
 
 .media-lightbox__nav {

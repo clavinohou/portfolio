@@ -393,11 +393,102 @@ const ExperienceModule = () => {
   )
 }
 
+const ContactModule = () => {
+  const { links } = siteContent
+  const email = links.email || 'clavin@gatech.edu'
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    const name = formData.get('name') || ''
+    const from = formData.get('from') || ''
+    const message = formData.get('message') || ''
+
+    const subject = encodeURIComponent(`Portfolio contact from ${name || 'visitor'}`)
+    const body = encodeURIComponent(
+      `Name: ${name}\nFrom: ${from}\n\nMessage:\n${message}`,
+    )
+
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
+  }
+
+  return (
+    <ModuleCard title="CONTACT" subtitle="Ways to reach me">
+      <div className="contact-module">
+        <div className="contact-module-left">
+          <div className="module-section-label">DIRECT</div>
+          <div className="contact-module-list">
+            <a href={`mailto:${email}`} className="contact-module-link">
+              <span className="contact-module-label">Email</span>
+              <span className="contact-module-value">{email}</span>
+            </a>
+            {links.linkedin && (
+              <a
+                href={links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-module-link"
+              >
+                <span className="contact-module-label">LinkedIn</span>
+                <span className="contact-module-value">View profile →</span>
+              </a>
+            )}
+            {links.github && (
+              <a
+                href={links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-module-link"
+              >
+                <span className="contact-module-label">GitHub</span>
+                <span className="contact-module-value">View repos →</span>
+              </a>
+            )}
+            {links.instagram && (
+              <a
+                href={links.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-module-link"
+              >
+                <span className="contact-module-label">Instagram</span>
+                <span className="contact-module-value">View photos →</span>
+              </a>
+            )}
+          </div>
+        </div>
+        <div className="contact-module-right">
+          <div className="module-section-label">SEND A MESSAGE</div>
+          <form className="contact-module-form" onSubmit={handleSubmit}>
+            <label className="contact-module-field">
+              <span>Your name</span>
+              <input type="text" name="name" autoComplete="name" />
+            </label>
+            <label className="contact-module-field">
+              <span>Where you’re from / org</span>
+              <input type="text" name="from" />
+            </label>
+            <label className="contact-module-field">
+              <span>Message</span>
+              <textarea name="message" rows={4} required />
+            </label>
+            <button type="submit" className="module-cta contact-module-submit">
+              Open email with details →
+            </button>
+          </form>
+        </div>
+      </div>
+    </ModuleCard>
+  )
+}
+
 const moduleMap = {
   about: AboutModule,
   projects: ProjectsModule,
   resume: ResumeModule,
   experience: ExperienceModule,
+  contact: ContactModule,
 }
 
 export default function Oscilloscope({ activeChannel, onChannelChange, onHome, direction }) {
@@ -655,6 +746,27 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
             <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="scope-foot-link">
               LinkedIn
             </a>
+            {links.instagram && (
+              <>
+                <span className="scope-foot-sep">·</span>
+                <a
+                  href={links.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="scope-foot-link"
+                >
+                  Instagram
+                </a>
+              </>
+            )}
+            <span className="scope-foot-sep">·</span>
+            <button
+              type="button"
+              className="scope-foot-link scope-foot-link--button"
+              onClick={() => onChannelChange('contact')}
+            >
+              Contact
+            </button>
           </div>
         </div>
       </motion.div>

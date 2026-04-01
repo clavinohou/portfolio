@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Oscilloscope from './components/Oscilloscope'
 import './App.css'
 
-const channelOrder = ['about', 'projects', 'resume', 'experience']
+const channelOrder = ['about', 'projects', 'resume', 'experience', 'contact']
 
 export default function App() {
   /** null = home (oscilloscope only); otherwise which projector page is open */
