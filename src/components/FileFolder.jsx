@@ -38,7 +38,7 @@ const FileFolder = ({ id, label, color, index, total, onSelect, mouseX, mouseY }
                 alignItems: 'center'
             }}>
                 <h3 style={{
-                    fontFamily: 'var(--font-mono)',
+                    fontFamily: 'var(--font-sans)',
                     fontSize: '1.2rem',
                     fontWeight: 600,
                     color: '#333',
@@ -47,7 +47,7 @@ const FileFolder = ({ id, label, color, index, total, onSelect, mouseX, mouseY }
                     {label}
                 </h3>
                 <span style={{
-                    fontFamily: 'var(--font-mono)',
+                    fontFamily: 'var(--font-sans)',
                     fontSize: '0.9rem',
                     opacity: 0.6
                 }}>

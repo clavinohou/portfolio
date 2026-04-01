@@ -34,8 +34,49 @@
   },
   "projects": [
     {
+      "stackSize": 4,
+      "date": "June 2023 - May 2025",
+      "gallery": [
+        {
+          "src": "/uploads/9442-awards.jpg"
+        },
+        {
+          "src": "/uploads/img_5543.png"
+        },
+        {
+          "src": "/uploads/img_9862-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_9800-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_8017-copy.jpg"
+        }
+      ],
+      "imageUrl": "/uploads/9442-logo.png",
+      "title": "Team Founder, President, and Mechanical/Electrical Lead - FRC 9442",
+      "tags": [
+        {
+          "tag": "Leadership"
+        },
+        {
+          "tag": "Harnessing"
+        },
+        {
+          "tag": "Mechanical Design / CAD"
+        },
+        {
+          "tag": "Rapid Iteration + Prototyping"
+        }
+      ],
+      "link": "misomechanics.org",
+      "id": "miso-mechanics",
+      "description": "I founded Miso Mechanics, a community-based FIRST Robotics Competition (FRC) team in North Seattle, with the vision of building a world-class program from the ground up. Despite our small physical footprint, we rapidly established ourselves as a competitive powerhouse both regionally and globally. Following a strong rookie season, we proved our elite capabilities by ranking 4th at the prestigious Chezy Champs offseason event and allying with Hall of Fame Team 254. We carried this momentum into a dominant 2025 season, winning a District Event, ranking 7th overall in the highly competitive Pacific Northwest district, and ranking in the top 3% of all robots in the world. Ultimately, finishing my journey at the FIRST World Championship among the best robots in the world.\n\n**Key Contributions:**\n\n* **Electrical Systems Architecture:** Planned, wired, and implemented the complete electrical systems across three distinct competition robots, achieving a 100% reliability rate with zero electrical failures across 10+ high-stakes competitions.\n* **Mechanical Design & CAD:** Self-taught CAD to design critical robot subsystems and relieve bottlenecks for the design team. Notably created our robot's climber mechanisms, managing the design and manufacturing process completely remotely while working overseas in Taiwan.\n* **Operations & Project Management:** Directed day-to-day team logistics, coordinated practice field sessions, managed parts procurement, and oversaw task delegation to ensure the team operated efficiently under tight build-season deadlines."
+    },
+    {
       "id": "media-controller-keyboard",
       "title": "Custom Media Controller & Keyboard",
+      "date": "September 2022",
       "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning.",
       "tags": [
         {
@@ -54,6 +95,7 @@
     {
       "id": "pulse-frc",
       "title": "Pulse FRC Pit Display",
+      "date": "June 2024",
       "description": "Designed and optimized UX/UI for a multi-functional pit display supporting FRC teams during competition. Reached 4,000+ users in the first week.",
       "tags": [
         {
@@ -72,13 +114,33 @@
   ],
   "experience": [
     {
+      "id": "yellow-jacket-space-program",
+      "type": "Club",
+      "title": "Avionics Engineer",
+      "company": "Yellow Jacket Space Program",
+      "location": "Atlanta, GA",
+      "date": "Jan 2026 - Present",
+      "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32’s integrated ADCs for real-time power rail telemetry.",
+      "tags": [
+        {
+          "tag": "Aviation"
+        },
+        {
+          "tag": "PCB Design"
+        },
+        {
+          "tag": "Embedded Systems"
+        }
+      ]
+    },
+    {
       "id": "asia-vital",
       "type": "Internship",
       "title": "Research and Design Intern",
       "company": "Asia Vital Components",
       "location": "New Taipei City, Taiwan",
       "date": "Aug 2024",
-      "description": "Engineered and validated a next-generation (V2) liquid cooling system by leading testing and integration efforts on the Liquid Pump Unit (LPU), and Coolant Distribution Unit (CDU). Conducted rigorous pressure and leak testing to ensure system integrity, achieving a 100% pass rate across validation cycles. Assembled and wired multiple CDU units, integrating distributed leak detection sensors and verifying functionality through controlled fault injection and response testing.\n\nDesigned and implemented temperature monitoring solutions using welded thermistors, collecting and analyzing large datasets to benchmark V2 performance against prior V1 systems. Identified thermal inefficiencies and introduced targeted airflow optimizations—including custom air guides, which improved radiator cooling uniformity and reduced temperature variance across critical components.",
+      "description": "* Engineered and validated a next-generation (V2) liquid cooling system by leading testing and integration efforts on the Liquid Pump Unit (LPU), and Coolant Distribution Unit (CDU). \n* Conducted rigorous pressure and leak testing to ensure system integrity, achieving a 100% pass rate across validation cycles. \n* Assembled and wired multiple CDU units, integrating distributed leak detection sensors and verifying functionality through controlled fault injection and response testing.\n* Designed and implemented temperature monitoring solutions using welded thermistors, collecting and analyzing large datasets to benchmark V2 performance against prior V1 systems.\n*  Identified thermal inefficiencies and introduced targeted airflow optimizations—including custom air guides, which improved radiator cooling uniformity and reduced temperature variance across critical components.",
       "tags": [
         {
           "tag": "Thermal Analysis"
@@ -98,7 +160,7 @@
       "company": "NUS College of Design & Engineering",
       "location": "Singapore",
       "date": "Sep 2024",
-      "description": "Worked under researcher Marcelo Ang to explore emerging applications in humanoid and soft robotics, contributing to early-stage research on automating cargo lashing operations in high-throughput maritime ports such as Singapore. The project aimed to replace a traditionally manual, labor-intensive process with a scalable robotic solution.\n\nDeveloped a functional proof-of-concept system using a custom-built 3DOF robotic arm to simulate automated lashing and unlashing tasks. Self-taught C++ to implement low-level servo control, and engineered a custom hardware controller to interface with the system. Designed and deployed inverse kinematics and velocity control algorithms, improving end-effector positioning accuracy and motion smoothness by an estimated 40% compared to initial direct-control methods.\n\nDemonstrated the feasibility of automating repetitive port operations using cost-effective, widely accessible components, validating that robust performance could be achieved without specialized hardware. This work established a foundation for scaling toward higher-DOF systems and more complex real-world deployment scenarios, supporting broader efforts in industrial robotics automation.",
+      "description": "Worked under researcher Marcelo Ang to explore emerging applications in humanoid and soft robotics, contributing to early-stage research on automating cargo lashing operations in high-throughput maritime ports such as Singapore. The project aimed to replace a traditionally manual, labor-intensive process with a scalable robotic solution.\n\n* Developed a functional proof-of-concept system using a custom-built 3DOF robotic arm to simulate automated lashing and unlashing tasks. Self-taught C++ to implement low-level servo control, and engineered a custom hardware controller to interface with the system.\n*  Designed and deployed inverse kinematics and velocity control algorithms, improving end-effector positioning accuracy and motion smoothness by an estimated 40% compared to initial direct-control methods.\n\nDemonstrated the feasibility of automating repetitive port operations using cost-effective, widely accessible components, validating that robust performance could be achieved without specialized hardware. This work established a foundation for scaling toward higher-DOF systems and more complex real-world deployment scenarios, supporting broader efforts in industrial robotics automation.",
       "tags": [
         {
           "tag": "Robotics"
@@ -121,6 +183,8 @@
   "resume": {
     "downloadLabel": "Download Resume",
     "downloadUrl": "/uploads/calvinresume21326b.pdf",
+    "lastUpdated": "2026-03-30",
+    "internalPrevUrl": "/uploads/calvinresume21326b.pdf",
     "highlights": [
       {
         "highlight": "Electrical Engineering (B.S.) — Georgia Tech"

@@ -98,7 +98,7 @@ const IntroSequence = ({ onComplete, progress }) => {
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
         }}>
           <span style={{
-            fontFamily: 'var(--font-mono)',
+            fontFamily: 'var(--font-sans)',
             color: '#FF6B35', // Orange Accent
             fontSize: '0.9rem',
             fontWeight: 600,
@@ -135,7 +135,7 @@ const IntroSequence = ({ onComplete, progress }) => {
           transition={{ repeat: Infinity, duration: 2 }}
         >
           <span style={{
-            fontFamily: 'var(--font-mono)',
+            fontFamily: 'var(--font-sans)',
             fontSize: '0.7rem',
             color: '#999',
             textTransform: 'uppercase'

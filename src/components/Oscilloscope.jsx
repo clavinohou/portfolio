@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
 import { ImageCarousel } from './ImageCarousel'
+import { MarkdownBlock } from './MarkdownBlock'
+import { ErrorBoundary } from './ErrorBoundary'
 import './Oscilloscope.css'
 
 const fallbackImageUrl =
@@ -241,9 +243,9 @@ const AboutModule = () => {
         </div>
         <div className="module-right">
           {profile.about.map((p, idx) => (
-            <p key={idx} className="module-paragraph">
-              {p}
-            </p>
+            <div key={idx} className="module-paragraph">
+              <MarkdownBlock markdown={p} />
+            </div>
           ))}
         </div>
       </div>
@@ -260,14 +262,17 @@ const ProjectsModule = () => {
           <motion.div key={p.id} className="project-card" whileHover={{ y: -4 }}>
             <div className="project-image">
               {p.images.length > 0 ? (
-                <ImageCarousel images={p.images} altPrefix={p.title} />
+                <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
               ) : (
                 <img src={fallbackImageUrl} alt="" />
               )}
             </div>
             <div className="project-content">
               <div className="project-title">{p.title}</div>
-              <div className="project-desc">{p.description}</div>
+              {p.date ? <span className="project-date">{p.date}</span> : null}
+              <div className="project-desc">
+                <MarkdownBlock markdown={p.description} />
+              </div>
               <div className="project-tags">
                 {p.tags.map((t) => (
                   <span key={t} className="project-tag">
@@ -291,10 +296,26 @@ const ProjectsModule = () => {
 const ResumeModule = () => {
   const { resume } = siteContent
   const pdfSrc = publicUrl(resume.downloadUrl)
+  const lastUpdatedLabel = resume.lastUpdated
+    ? (() => {
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(resume.lastUpdated)
+        if (m) {
+          const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+          return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+        }
+        return resume.lastUpdated
+      })()
+    : null
+
   return (
     <ModuleCard title="RESUME" subtitle="Spec sheet view">
       <div className="resume-grid">
         <div className="resume-left">
+          {lastUpdatedLabel ? (
+            <p className="resume-last-updated">
+              Last updated: <span className="resume-last-updated__date">{lastUpdatedLabel}</span>
+            </p>
+          ) : null}
           <div className="resume-highlight-list">
             {resume.highlights.map((h) => (
               <div key={h} className="resume-highlight">
@@ -342,7 +363,7 @@ const ExperienceModule = () => {
           <div key={x.id} className={`experience-item ${x.images.length > 0 ? 'experience-item--with-media' : ''}`}>
             {x.images.length > 0 ? (
               <div className="experience-media">
-                <ImageCarousel images={x.images} altPrefix={x.company} variant="contain" />
+                <ImageCarousel images={x.images} altPrefix={x.company} variant="contain" stackSize={x.stackSize} />
               </div>
             ) : null}
             <div className="experience-body">
@@ -354,7 +375,9 @@ const ExperienceModule = () => {
               <div className="experience-company">
                 {x.company} · {x.location}
               </div>
-              <p className="experience-desc">{x.description}</p>
+              <div className="experience-desc">
+                <MarkdownBlock markdown={x.description} />
+              </div>
               <div className="experience-tags">
                 {x.tags.map((t) => (
                   <span key={t} className="experience-tag">
@@ -675,7 +698,9 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
                     exit="exit"
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <ActiveModule />
+                    <ErrorBoundary>
+                      <ActiveModule />
+                    </ErrorBoundary>
                   </motion.div>
                 ) : null}
               </AnimatePresence>

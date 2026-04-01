@@ -46,7 +46,7 @@ const Drawer = ({ dragY, children }) => {
                     boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
                 }}>
                     <span style={{
-                        fontFamily: 'var(--font-mono)',
+                        fontFamily: 'var(--font-sans)',
                         color: '#FF6B35',
                         fontSize: '0.9rem',
                         fontWeight: 600,

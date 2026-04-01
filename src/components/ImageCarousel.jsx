@@ -4,13 +4,15 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { publicUrl } from '../utils/publicUrl'
 import './ImageCarousel.css'
 
-export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover' }) {
+export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', stackSize }) {
   const list = (Array.isArray(images) ? images : []).map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean)
   const [i, setI] = useState(0)
   const [expanded, setExpanded] = useState(false)
+  const [windowStart, setWindowStart] = useState(0)
 
   useEffect(() => {
     setI(0)
+    setWindowStart(0)
   }, [images])
 
   useEffect(() => {
@@ -23,6 +25,9 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover' }
   }, [expanded])
 
   const n = list.length
+  const maxSlots = typeof stackSize === 'number' && Number.isFinite(stackSize) && stackSize > 0 ? stackSize : n
+  const visibleSlots = Math.min(maxSlots, n)
+
   const goPrev = useCallback(
     (e) => {
       e?.stopPropagation?.()
@@ -153,46 +158,55 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover' }
   return (
     <>
       <div className={rootClass} onClick={(e) => e.stopPropagation()}>
-        <div className="media-carousel__viewport">
-          <img
-            src={src}
-            alt={`${altPrefix} — ${i + 1} of ${n}`}
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
+        <div className="media-carousel__grid" aria-label={altPrefix}>
+          {(n <= visibleSlots ? list : Array.from({ length: visibleSlots }, (_, offset) => {
+            const idx = (windowStart + offset) % n
+            return list[idx]
+          })).map((u, idxInWindow) => {
+            const idx = n <= visibleSlots ? idxInWindow : (windowStart + idxInWindow) % n
+            const thumbSrc = publicUrl(u)
+            return (
+              <button
+                key={u + idx}
+                type="button"
+                className="media-carousel__thumb"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setI(idx)
+                  setExpanded(true)
+                }}
+                aria-label={`${altPrefix} — image ${idx + 1} of ${n}`}
+              >
+                <img src={thumbSrc} alt="" loading="lazy" decoding="async" draggable={false} />
+                <span className="media-carousel__thumb-icon">⤢</span>
+              </button>
+            )
+          })}
         </div>
-        <button
-          type="button"
-          className="media-carousel__expand"
-          aria-label="Open full size in a popup"
-          onClick={() => setExpanded(true)}
-        >
-          ⤢
-        </button>
-        {n > 1 && (
+        {n > visibleSlots && (
           <>
-            <button type="button" className="media-carousel__nav media-carousel__nav--prev" aria-label="Previous" onClick={goPrev}>
-              ‹
+            <button
+              type="button"
+              className="media-carousel__vnav media-carousel__vnav--up"
+              aria-label="Previous images"
+              onClick={(e) => {
+                e.stopPropagation()
+                setWindowStart((v) => (v - 1 + n) % n)
+              }}
+            >
+              ↑
             </button>
-            <button type="button" className="media-carousel__nav media-carousel__nav--next" aria-label="Next" onClick={goNext}>
-              ›
+            <button
+              type="button"
+              className="media-carousel__vnav media-carousel__vnav--down"
+              aria-label="Next images"
+              onClick={(e) => {
+                e.stopPropagation()
+                setWindowStart((v) => (v + 1) % n)
+              }}
+            >
+              ↓
             </button>
-            <div className="media-carousel__dots" role="tablist" aria-label="Slides">
-              {list.map((_, di) => (
-                <button
-                  key={di}
-                  type="button"
-                  role="tab"
-                  aria-selected={di === i}
-                  className={`media-carousel__dot ${di === i ? 'is-active' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setI(di)
-                  }}
-                />
-              ))}
-            </div>
           </>
         )}
       </div>

@@ -8,5 +8,52 @@
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
+    <script>
+      ;(function () {
+        function todayISO() {
+          var d = new Date()
+          return (
+            d.getFullYear() +
+            '-' +
+            String(d.getMonth() + 1).padStart(2, '0') +
+            '-' +
+            String(d.getDate()).padStart(2, '0')
+          )
+        }
+
+        function attachPreSave(CMS) {
+          if (!CMS || typeof CMS.registerEventListener !== 'function') return
+          CMS.registerEventListener('preSave', function (opts) {
+            var entry = opts.entry
+            if (!entry || typeof entry.getIn !== 'function') return entry
+
+            var data = entry.get('data')
+            if (!data || typeof data.getIn !== 'function') return entry
+
+            var resume = entry.getIn(['data', 'resume'])
+            if (!resume) return entry
+
+            var next = String(entry.getIn(['data', 'resume', 'downloadUrl']) || '').trim()
+            var baseline = String(entry.getIn(['data', 'resume', 'internalPrevUrl']) || '').trim()
+
+            if (next === baseline) return entry
+
+            var e = entry
+            if (next) {
+              e = e.setIn(['data', 'resume', 'lastUpdated'], todayISO())
+            }
+            e = e.setIn(['data', 'resume', 'internalPrevUrl'], next)
+            return e
+          })
+        }
+
+        attachPreSave(window.CMS)
+        if (!window.CMS) {
+          document.addEventListener('DOMContentLoaded', function () {
+            attachPreSave(window.CMS)
+          })
+        }
+      })()
+    </script>
   </body>
 </html>

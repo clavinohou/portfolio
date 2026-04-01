@@ -23,6 +23,13 @@ function projectImages(proj) {
   return out
 }
 
+function normalizeStackSize(val) {
+  if (typeof val === 'number' && Number.isFinite(val) && val > 0) return val
+  const n = Number(val)
+  if (Number.isFinite(n) && n > 0) return n
+  return null
+}
+
 function normalize(rawData) {
   const p = rawData.profile || {}
   return {
@@ -39,11 +46,13 @@ function normalize(rawData) {
     projects: (rawData.projects || []).map((proj) => ({
       id: proj.id ?? '',
       title: proj.title ?? '',
+      date: (proj.date ?? '').trim(),
       description: proj.description ?? '',
       tags: flatList(proj.tags, 'tag'),
       link: proj.link?.trim() ? proj.link.trim() : null,
       imageUrl: proj.imageUrl ?? '',
       images: projectImages(proj),
+      stackSize: normalizeStackSize(proj.stackSize),
     })),
     experience: (rawData.experience || []).map((ex) => ({
       id: ex.id ?? '',
@@ -55,6 +64,7 @@ function normalize(rawData) {
       description: ex.description ?? '',
       tags: flatList(ex.tags, 'tag'),
       images: flatList(ex.gallery, 'src'),
+      stackSize: normalizeStackSize(ex.stackSize),
     })),
     links: {
       email: rawData.links?.email ?? '',
@@ -65,6 +75,7 @@ function normalize(rawData) {
     resume: {
       downloadLabel: rawData.resume?.downloadLabel ?? 'Download Resume',
       downloadUrl: rawData.resume?.downloadUrl ?? '/resume/CalvinHouResume.pdf',
+      lastUpdated: String(rawData.resume?.lastUpdated ?? '').trim(),
       highlights: flatList(rawData.resume?.highlights, 'highlight'),
     },
   }

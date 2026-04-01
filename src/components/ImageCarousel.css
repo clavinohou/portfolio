@@ -1,145 +1,113 @@
 .media-carousel {
   position: relative;
   width: 100%;
-  height: 100%;
   min-height: 0;
   border-radius: inherit;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.04);
+  overflow: visible;
+  background: transparent;
 }
 
 .media-carousel--contain {
   background: linear-gradient(145deg, #f4f4f5 0%, #e4e4e7 100%);
 }
 
-.media-carousel__viewport {
+/* Grid of fixed-size thumbnails inside the card */
+.media-carousel__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.media-carousel__thumb {
+  position: relative;
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.02);
+  cursor: pointer;
 }
 
-.media-carousel--cover .media-carousel__viewport img {
-  object-fit: cover;
-}
-
-.media-carousel--contain .media-carousel__viewport img {
-  object-fit: contain;
-  padding: 6px;
-}
-
-.media-carousel__viewport img {
+.media-carousel__thumb img {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
   user-select: none;
 }
 
-/* Expand: show on hover / focus (keyboard); always visible on coarse pointers */
-.media-carousel__expand {
+.media-carousel__thumb::after {
+  content: '';
   position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 3;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 0.9rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--gray-900, #18181b);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  transition:
-    opacity 0.18s ease,
-    transform 0.15s ease,
-    border-color 0.15s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .media-carousel__expand {
-    opacity: 0;
-  }
-
-  .media-carousel:hover .media-carousel__expand,
-  .media-carousel:focus-within .media-carousel__expand {
-    opacity: 1;
-  }
-}
-
-.media-carousel__expand:hover {
-  transform: scale(1.06);
-  border-color: rgba(255, 107, 53, 0.45);
-}
-
-.media-carousel__expand:focus-visible {
-  opacity: 1;
-  outline: 2px solid var(--accent, #ff6b35);
-  outline-offset: 2px;
-}
-
-.media-carousel__nav {
-  position: absolute;
-  top: 50%;
-  z-index: 2;
-  transform: translateY(-50%);
-  width: 26px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.88);
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--gray-900, #18181b);
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
-  opacity: 0.85;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0;
   transition: opacity 0.15s ease;
 }
 
-.media-carousel__nav:hover {
-  opacity: 1;
-}
-
-.media-carousel__nav--prev {
-  left: 4px;
-}
-
-.media-carousel__nav--next {
-  right: 4px;
-}
-
-.media-carousel__dots {
+.media-carousel__thumb-icon {
   position: absolute;
-  bottom: 6px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%) scale(0.9);
+  font-size: 0.95rem;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
   display: flex;
-  gap: 5px;
-  z-index: 2;
-}
-
-.media-carousel__dot {
-  width: 6px;
-  height: 6px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.2);
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  opacity: 0;
   transition:
-    background 0.15s ease,
+    opacity 0.15s ease,
     transform 0.15s ease;
 }
 
-.media-carousel__dot.is-active {
-  background: var(--accent, #ff6b35);
-  transform: scale(1.15);
+.media-carousel__thumb:hover::after {
+  opacity: 1;
 }
+
+.media-carousel__thumb:hover .media-carousel__thumb-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Vertical nav (when there are more images than visible slots) */
+.media-carousel__vnav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-900, #18181b);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.media-carousel__vnav--up {
+  top: -10px;
+}
+
+.media-carousel__vnav--down {
+  bottom: -10px;
+}
+
+/* (Previous in-card arrows/dots removed; navigation lives in the fullscreen lightbox only.) */
 
 /* —— Modal popup (portaled to body) —— */
 .media-lightbox {
@@ -208,7 +176,7 @@
 }
 
 .media-lightbox__counter {
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-sans);
   font-size: 0.72rem;
   color: var(--gray-500, #71717a);
 }

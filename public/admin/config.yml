@@ -52,7 +52,7 @@ collections:
                 widget: list
                 summary: '{{fields.paragraph}}'
                 fields:
-                  - { label: Paragraph, name: paragraph, widget: text }
+                  - { label: Paragraph (Markdown), name: paragraph, widget: markdown }
           - label: Projects
             name: projects
             widget: list
@@ -60,7 +60,14 @@ collections:
             fields:
               - { label: ID (slug, no spaces), name: id, widget: string, hint: e.g. my-project }
               - { label: Title, name: title, widget: string }
-              - { label: Description, name: description, widget: text }
+              - {
+                  label: Date,
+                  name: date,
+                  widget: string,
+                  required: false,
+                  hint: 'e.g. 2024, Spring 2025, or Jan 2024–Mar 2025',
+                }
+              - { label: Description (Markdown), name: description, widget: markdown }
               - label: Tags
                 name: tags
                 widget: list
@@ -89,6 +96,16 @@ collections:
                       choose_url: true,
                       hint: Company or project photos,
                     }
+              - {
+                  label: Visible image rows (stack),
+                  name: stackSize,
+                  widget: number,
+                  value_type: int,
+                  min: 1,
+                  max: 8,
+                  required: false,
+                  hint: 'How many images to show in the stack before arrows. Leave empty to show all images.',
+                }
           - label: Experience
             name: experience
             widget: list
@@ -100,7 +117,7 @@ collections:
               - { label: Company, name: company, widget: string }
               - { label: Location, name: location, widget: string }
               - { label: Date, name: date, widget: string }
-              - { label: Description, name: description, widget: text }
+              - { label: Description (Markdown), name: description, widget: markdown }
               - label: Tags
                 name: tags
                 widget: list
@@ -139,6 +156,14 @@ collections:
                   choose_url: true,
                   hint: Upload PDF or keep path like /resume/CalvinHouResume.pdf,
                 }
+              - {
+                  label: Last updated,
+                  name: lastUpdated,
+                  widget: string,
+                  required: false,
+                  hint: 'Set automatically when you change the PDF (YYYY-MM-DD). You can edit if needed.',
+                }
+              - { label: '', name: internalPrevUrl, widget: hidden, default: '' }
               - label: Highlight bullets
                 name: highlights
                 widget: list
