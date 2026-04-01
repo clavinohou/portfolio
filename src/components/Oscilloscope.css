@@ -34,6 +34,29 @@
   min-height: clamp(240px, min(36vh, 50vmin), 520px);
 }
 
+@media (max-width: 768px) {
+  .bench-stage {
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .bench-stage--home {
+    height: auto;
+    max-height: none;
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .bench-stage--home .scope-rig {
+    padding-bottom: 32px;
+  }
+
+  .bench-stage--home .scope-chassis {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 
 .bench-surface {
   position: absolute;
