@@ -38,29 +38,57 @@ function main() {
 
   const resume = data.resume || {}
   const currentUrl = (resume.downloadUrl || '').trim()
-  const prevUrl = (resume.internalPrevUrl || '').trim()
 
   if (!currentUrl) {
     // Nothing to do if there is no resume URL configured
     return
   }
 
-  const today = formatDateYYYYMMDD(new Date())
+  // Try to resolve the resume file on disk to read its modified time.
+  // This assumes files under /uploads live in public/uploads (Decap default).
+  let pdfPath = null
+  if (!/^https?:\/\//i.test(currentUrl)) {
+    const withoutLeadingSlash = currentUrl.replace(/^\/+/, '')
+    pdfPath = path.join(__dirname, '..', 'public', withoutLeadingSlash)
+  }
 
-  // If the URL changed since last build, bump the lastUpdated field automatically.
-  if (currentUrl !== prevUrl) {
-    resume.lastUpdated = today
-    resume.internalPrevUrl = currentUrl
-    data.resume = resume
+  if (!pdfPath || !fs.existsSync(pdfPath)) {
+    console.warn(
+      `[updateResumeMeta] Resume file not found at resolved path: ${pdfPath || '(none)'} — leaving lastUpdated unchanged.`,
+    )
+    return
+  }
 
-    try {
-      fs.writeFileSync(siteJsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8')
-      console.log(
-        `[updateResumeMeta] Resume URL changed. Set lastUpdated=${today} and internalPrevUrl=${currentUrl}`,
-      )
-    } catch (err) {
-      console.warn('[updateResumeMeta] Failed to write updated site.json.', err)
-    }
+  let stats
+  try {
+    stats = fs.statSync(pdfPath)
+  } catch (err) {
+    console.warn(
+      `[updateResumeMeta] Failed to stat resume file at ${pdfPath} — leaving lastUpdated unchanged.`,
+      err,
+    )
+    return
+  }
+
+  const fileDate = formatDateYYYYMMDD(new Date(stats.mtime))
+
+  // Only update lastUpdated if it differs from the resume PDF's modified date.
+  if (resume.lastUpdated === fileDate) {
+    return
+  }
+
+  resume.lastUpdated = fileDate
+  // Keep this around for potential future use, but don't rely on it for detection.
+  resume.internalPrevUrl = currentUrl
+  data.resume = resume
+
+  try {
+    fs.writeFileSync(siteJsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8')
+    console.log(
+      `[updateResumeMeta] Updated resume lastUpdated=${fileDate} based on PDF mtime at ${pdfPath}`,
+    )
+  } catch (err) {
+    console.warn('[updateResumeMeta] Failed to write updated site.json.', err)
   }
 }
 
