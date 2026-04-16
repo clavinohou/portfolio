@@ -136,6 +136,16 @@ collections:
                       choose_url: true,
                       hint: Logos, team photos, or work samples,
                     }
+              - {
+                  label: Visible image rows (stack),
+                  name: stackSize,
+                  widget: number,
+                  value_type: int,
+                  min: 1,
+                  max: 8,
+                  required: false,
+                  hint: 'How many images to show in the stack before arrows. Leave empty to show all images.',
+                }
           - label: Links & social
             name: links
             widget: object
