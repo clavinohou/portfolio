@@ -182,6 +182,23 @@
           "tag": "Inverse Kinematics"
         }
       ]
+    },
+    {
+      "id": "amazon-future-engineer",
+      "type": "Externship",
+      "title": "Amazon Future Engineer Program Participant",
+      "company": "Amazon",
+      "location": "Seattle, WA",
+      "date": "July 2023",
+      "description": "* * Directed a subgroup in designing and programming a mail theft prevention device, securing 1st place in the program’s Technical Skill Track.\n\n  * Selected from a competitive pool of 3,000+ Seattle Public Schools applicants for an exclusive operational shadowing program at Amazon.\n\n  * Analyzed daily corporate operations and industry strategies through direct engagement with Amazon executive leadership.",
+      "tags": [
+        {
+          "tag": "Leadership"
+        },
+        {
+          "tag": "C++"
+        }
+      ]
     }
   ],
   "links": {
