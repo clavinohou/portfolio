@@ -12,7 +12,7 @@ local_backend: true
 media_folder: public/uploads
 public_folder: /uploads
 
-site_url: https://clavinohou.github.io
+site_url: https://calvinhou.com
 # If GitHub Pages uses a project URL, set e.g. https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/
 # And set the same in vite.config.js `base`
 
