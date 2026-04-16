@@ -144,13 +144,23 @@
       ]
     },
     {
-      "id": "asia-vital",
-      "type": "Internship",
-      "title": "Research and Design Intern",
-      "company": "Asia Vital Components",
-      "location": "New Taipei City, Taiwan",
       "date": "Aug 2024",
-      "description": "* Engineered and validated a next-generation (V2) liquid cooling system by leading testing and integration efforts on the Liquid Pump Unit (LPU), and Coolant Distribution Unit (CDU). \n* Conducted rigorous pressure and leak testing to ensure system integrity, achieving a 100% pass rate across validation cycles. \n* Assembled and wired multiple CDU units, integrating distributed leak detection sensors and verifying functionality through controlled fault injection and response testing.\n* Designed and implemented temperature monitoring solutions using welded thermistors, collecting and analyzing large datasets to benchmark V2 performance against prior V1 systems.\n*  Identified thermal inefficiencies and introduced targeted airflow optimizations—including custom air guides, which improved radiator cooling uniformity and reduced temperature variance across critical components.",
+      "gallery": [
+        {
+          "src": "/uploads/img_4239-copy-1.jpg"
+        },
+        {
+          "src": "/uploads/img_3419-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_3900-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_4248-copy.jpg"
+        }
+      ],
+      "location": "New Taipei City, Taiwan",
+      "title": "Research and Design Intern",
       "tags": [
         {
           "tag": "Thermal Analysis"
@@ -161,7 +171,11 @@
         {
           "tag": "AI Systems"
         }
-      ]
+      ],
+      "type": "Internship",
+      "id": "asia-vital",
+      "description": "* Engineered and validated a next-generation (V2) liquid cooling system by leading testing and integration efforts on the Liquid Pump Unit (LPU), and Coolant Distribution Unit (CDU). \n* Conducted rigorous pressure and leak testing to ensure system integrity, achieving a 100% pass rate across validation cycles. \n* Assembled and wired multiple CDU units, integrating distributed leak detection sensors and verifying functionality through controlled fault injection and response testing.\n* Designed and implemented temperature monitoring solutions using welded thermistors, collecting and analyzing large datasets to benchmark V2 performance against prior V1 systems.\n*  Identified thermal inefficiencies and introduced targeted airflow optimizations—including custom air guides, which improved radiator cooling uniformity and reduced temperature variance across critical components.",
+      "company": "Asia Vital Components"
     },
     {
       "date": "Sep 2024",
