@@ -164,13 +164,14 @@
       ]
     },
     {
-      "id": "nus-robotics",
-      "type": "Internship",
-      "title": "Advanced Robotics Centre Research Intern",
-      "company": "NUS College of Design & Engineering",
-      "location": "Singapore",
       "date": "Sep 2024",
-      "description": "Worked under researcher Marcelo Ang to explore emerging applications in humanoid and soft robotics, contributing to early-stage research on automating cargo lashing operations in high-throughput maritime ports such as Singapore. The project aimed to replace a traditionally manual, labor-intensive process with a scalable robotic solution.\n\n* Developed a functional proof-of-concept system using a custom-built 3DOF robotic arm to simulate automated lashing and unlashing tasks. Self-taught C++ to implement low-level servo control, and engineered a custom hardware controller to interface with the system.\n*  Designed and deployed inverse kinematics and velocity control algorithms, improving end-effector positioning accuracy and motion smoothness by an estimated 40% compared to initial direct-control methods.\n\nDemonstrated the feasibility of automating repetitive port operations using cost-effective, widely accessible components, validating that robust performance could be achieved without specialized hardware. This work established a foundation for scaling toward higher-DOF systems and more complex real-world deployment scenarios, supporting broader efforts in industrial robotics automation.",
+      "gallery": [
+        {
+          "src": "/uploads/img_4912-2-copy.jpg"
+        }
+      ],
+      "location": "Singapore",
+      "title": "Advanced Robotics Centre Research Intern",
       "tags": [
         {
           "tag": "Robotics"
@@ -181,7 +182,11 @@
         {
           "tag": "Inverse Kinematics"
         }
-      ]
+      ],
+      "type": "Internship",
+      "id": "nus-robotics",
+      "description": "Worked under researcher Marcelo Ang to explore emerging applications in humanoid and soft robotics, contributing to early-stage research on automating cargo lashing operations in high-throughput maritime ports such as Singapore. The project aimed to replace a traditionally manual, labor-intensive process with a scalable robotic solution.\n\n* Developed a functional proof-of-concept system using a custom-built 3DOF robotic arm to simulate automated lashing and unlashing tasks. Self-taught C++ to implement low-level servo control, and engineered a custom hardware controller to interface with the system.\n*  Designed and deployed inverse kinematics and velocity control algorithms, improving end-effector positioning accuracy and motion smoothness by an estimated 40% compared to initial direct-control methods.\n\nDemonstrated the feasibility of automating repetitive port operations using cost-effective, widely accessible components, validating that robust performance could be achieved without specialized hardware. This work established a foundation for scaling toward higher-DOF systems and more complex real-world deployment scenarios, supporting broader efforts in industrial robotics automation.",
+      "company": "NUS College of Design & Engineering"
     },
     {
       "id": "amazon-future-engineer",
