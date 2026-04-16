@@ -492,6 +492,8 @@ const moduleMap = {
 }
 
 export default function Oscilloscope({ activeChannel, onChannelChange, onHome, direction }) {
+  const [powerState, setPowerState] = useState('on')
+  const powerTimerRef = useRef(null)
   const [knobIntensity, setKnobIntensity] = useState(0.5)
   const [knobVolts, setKnobVolts] = useState(0.5)
   const [knobVPos, setKnobVPos] = useState(0.5)
@@ -500,6 +502,29 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
 
   const isHome = activeChannel == null
+  const isPoweredOn = powerState !== 'off'
+
+  const togglePower = useCallback(() => {
+    if (powerState === 'turning-off' || powerState === 'turning-on') return
+    if (powerTimerRef.current) {
+      clearTimeout(powerTimerRef.current)
+      powerTimerRef.current = null
+    }
+
+    if (powerState === 'on') {
+      setPowerState('turning-off')
+      powerTimerRef.current = setTimeout(() => {
+        setPowerState('off')
+        powerTimerRef.current = null
+      }, 430)
+    } else {
+      setPowerState('turning-on')
+      powerTimerRef.current = setTimeout(() => {
+        setPowerState('on')
+        powerTimerRef.current = null
+      }, 560)
+    }
+  }, [powerState])
 
   useEffect(() => {
     document.documentElement.classList.toggle('scope-home-no-scroll', isHome)
@@ -509,6 +534,12 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
       document.documentElement.classList.remove('projector-page-open')
     }
   }, [isHome])
+
+  useEffect(() => {
+    return () => {
+      if (powerTimerRef.current) clearTimeout(powerTimerRef.current)
+    }
+  }, [])
 
   const ActiveModule = useMemo(() => (activeChannel ? moduleMap[activeChannel] ?? AboutModule : AboutModule), [activeChannel])
 
@@ -526,7 +557,7 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
     return { vGain, hScale, vOff, hOff }
   }, [knobVolts, knobSec, knobVPos, knobHPos])
 
-  const glowVar = useMemo(() => 0.35 + knobIntensity * 0.65, [knobIntensity])
+  const glowVar = useMemo(() => (isPoweredOn ? 0.35 + knobIntensity * 0.65 : 0.03), [isPoweredOn, knobIntensity])
 
   const voltsLabelIdx = Math.min(VOLTS_DIV_LABELS.length - 1, Math.round(knobVolts * (VOLTS_DIV_LABELS.length - 1)))
   const secLabelIdx = Math.min(TIME_DIV_LABELS.length - 1, Math.round(knobSec * (TIME_DIV_LABELS.length - 1)))
@@ -556,24 +587,35 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
               <span className="scope-model-name">HOU-1002</span>
               <span className="scope-model-sub">DUAL TRACE · 100 MHz</span>
             </div>
-            <div className="scope-power-cluster">
+            <button
+              type="button"
+              className={`scope-power-cluster state-${powerState}`}
+              onClick={togglePower}
+              aria-pressed={isPoweredOn}
+              aria-label={isPoweredOn ? 'Turn oscilloscope off' : 'Turn oscilloscope on'}
+            >
               <span className="scope-power-led" />
               <span className="scope-power-label">POWER</span>
-            </div>
+            </button>
           </div>
 
-          <div className="scope-chassis-main">
+          <div className={`scope-power-body ${isPoweredOn ? 'is-on' : 'is-off'}`}>
+            <div className="scope-chassis-main">
             {/* CRT assembly */}
             <div className="scope-crt-column">
               <div className="scope-crt-bezel">
                 <div className="scope-crt-glass">
                   <div
-                    className="scope-phosphor"
+                    className={`scope-phosphor state-${powerState}`}
                     style={{
                       '--scope-glow': String(glowVar),
                     }}
                   >
                     <div className="scope-screen-grid" />
+                    <div className={`scope-crt-power-overlay state-${powerState}`} aria-hidden="true">
+                      <span className="scope-crt-power-line" />
+                      <span className="scope-crt-power-dot" />
+                    </div>
                     <div className="scope-crt-layout">
                       <div className="scope-crt-upper">
                         <div className="scope-crt-name mono">{profile.name}</div>
@@ -715,7 +757,7 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
           </div>
 
           {/* Channel buttons — front panel */}
-          <div className="scope-channel-panel">
+            <div className="scope-channel-panel">
             {CHANNELS.map(({ id, ch, label }) => {
               const isActive = activeChannel === id
               return (
@@ -732,9 +774,9 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
                 </button>
               )
             })}
-          </div>
+            </div>
 
-          <div className="scope-chassis-foot mono">
+            <div className="scope-chassis-foot mono">
             <a href={`mailto:${links.email}`} className="scope-foot-link">
               {links.email}
             </a>
@@ -767,6 +809,7 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
             >
               Contact
             </button>
+          </div>
           </div>
         </div>
       </motion.div>
