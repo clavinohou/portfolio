@@ -37,7 +37,7 @@
   },
   "projects": [
     {
-      "stackSize": 4,
+      "stackSize": 3,
       "date": "June 2023 - May 2025",
       "gallery": [
         {
@@ -124,13 +124,14 @@
   ],
   "experience": [
     {
-      "id": "yellow-jacket-space-program",
-      "type": "Club",
-      "title": "Avionics Engineer",
-      "company": "Yellow Jacket Space Program",
-      "location": "Atlanta, GA",
       "date": "Jan 2026 - Present",
-      "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32’s integrated ADCs for real-time power rail telemetry.",
+      "gallery": [
+        {
+          "src": "/uploads/1630580805380.jpeg"
+        }
+      ],
+      "location": "Atlanta, GA",
+      "title": "Avionics Engineer",
       "tags": [
         {
           "tag": "Aviation"
@@ -141,7 +142,11 @@
         {
           "tag": "Embedded Systems"
         }
-      ]
+      ],
+      "type": "Club",
+      "id": "yellow-jacket-space-program",
+      "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32’s integrated ADCs for real-time power rail telemetry.",
+      "company": "Yellow Jacket Space Program"
     },
     {
       "stackSize": 2,
@@ -204,13 +209,14 @@
       "company": "NUS College of Design & Engineering"
     },
     {
-      "id": "amazon-future-engineer",
-      "type": "Externship",
-      "title": "Amazon Future Engineer Program Participant",
-      "company": "Amazon",
-      "location": "Seattle, WA",
       "date": "July 2023",
-      "description": "* Directed a subgroup in designing and programming a mail theft prevention device, securing 1st place in the program’s Technical Skill Track.\n* Selected from a competitive pool of 3,000+ Seattle Public Schools applicants for an exclusive operational shadowing program at Amazon.\n* Analyzed daily corporate operations and industry strategies through direct engagement with Amazon executive leadership.",
+      "gallery": [
+        {
+          "src": "/uploads/amazon-future-engineer-featured.png"
+        }
+      ],
+      "location": "Seattle, WA",
+      "title": "Amazon Future Engineer Program Participant",
       "tags": [
         {
           "tag": "Leadership"
@@ -221,7 +227,11 @@
         {
           "tag": "Rapid Iteration"
         }
-      ]
+      ],
+      "type": "Externship",
+      "id": "amazon-future-engineer",
+      "description": "* Directed a subgroup in designing and programming a mail theft prevention device, securing 1st place in the program’s Technical Skill Track.\n* Selected from a competitive pool of 3,000+ Seattle Public Schools applicants for an exclusive operational shadowing program at Amazon.\n* Analyzed daily corporate operations and industry strategies through direct engagement with Amazon executive leadership.",
+      "company": "Amazon"
     }
   ],
   "links": {

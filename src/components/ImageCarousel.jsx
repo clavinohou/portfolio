@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { publicUrl } from '../utils/publicUrl'
 import './ImageCarousel.css'
 
-export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', stackSize }) {
-  const list = (Array.isArray(images) ? images : []).map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean)
+function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', stackSize }) {
+  const list = useMemo(
+    () => (Array.isArray(images) ? images : []).map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean),
+    [images],
+  )
   const [i, setI] = useState(0)
   const [expanded, setExpanded] = useState(false)
   const [windowStart, setWindowStart] = useState(0)
@@ -166,10 +169,13 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', 
     <>
       <div className={rootClass} onClick={(e) => e.stopPropagation()}>
         <div className="media-carousel__grid" aria-label={altPrefix}>
-          {(n <= visibleSlots ? list : Array.from({ length: visibleSlots }, (_, offset) => {
-            const idx = (windowStart + offset) % n
-            return list[idx]
-          })).map((u, idxInWindow) => {
+          {(n <= visibleSlots
+            ? list
+            : Array.from({ length: visibleSlots }, (_, offset) => {
+                const idx = (windowStart + offset) % n
+                return list[idx]
+              })
+          ).map((u, idxInWindow) => {
             const idx = n <= visibleSlots ? idxInWindow : (windowStart + idxInWindow) % n
             const thumbSrc = publicUrl(u)
             return (
@@ -217,7 +223,9 @@ export function ImageCarousel({ images, altPrefix = 'Photo', variant = 'cover', 
           </>
         )}
       </div>
-      {typeof document !== 'undefined' ? createPortal(lightbox, document.body) : null}
+      {expanded && typeof document !== 'undefined' ? createPortal(lightbox, document.body) : null}
     </>
   )
 }
+
+export const ImageCarousel = memo(ImageCarouselBase)

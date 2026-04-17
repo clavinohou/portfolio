@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
@@ -23,6 +23,7 @@ const CHANNELS = [
   { id: 'resume', ch: 'CH3', label: 'RESUME' },
   { id: 'experience', ch: 'CH4', label: 'EXPERIENCE' },
 ]
+const MODULE_IDS = ['about', 'projects', 'resume', 'experience', 'contact']
 
 /** Waveform shape per front-panel input (matches physical jacks) */
 const WAVE_INPUTS = [
@@ -106,6 +107,17 @@ function voltsGainFromNorm(t) {
 
 function timeScaleFromNorm(t) {
   return 0.3 + t * 1.7
+}
+
+function plainFromMarkdown(markdown) {
+  const text = String(markdown || '')
+  return text
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_`>#-]/g, '')
+    .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /** Continuous 0–1 knob: drag to rotate (analog-style) */
@@ -253,16 +265,21 @@ const AboutModule = () => {
   )
 }
 
-const ProjectsModule = () => {
+const ProjectsModule = ({
+  mediaReady = true,
+  mediaVisibleCount = Number.POSITIVE_INFINITY,
+}) => {
   const { projects } = siteContent
   return (
     <ModuleCard title="PROJECTS" subtitle="Selection (clickable)">
       <div className="project-grid">
-        {projects.map((p) => (
-          <motion.div key={p.id} className="project-card" whileHover={{ y: -4 }}>
+        {projects.map((p, idx) => (
+          <div key={p.id} className="project-card">
             <div className="project-image">
-              {p.images.length > 0 ? (
+              {p.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
                 <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
+              ) : p.images.length > 0 ? (
+                <div className="project-media-placeholder" aria-hidden="true" />
               ) : (
                 <img src={fallbackImageUrl} alt="" />
               )}
@@ -271,7 +288,7 @@ const ProjectsModule = () => {
               <div className="project-title">{p.title}</div>
               {p.date ? <span className="project-date">{p.date}</span> : null}
               <div className="project-desc">
-                <MarkdownBlock markdown={p.description} />
+                <p>{plainFromMarkdown(p.description)}</p>
               </div>
               <div className="project-tags">
                 {p.tags.map((t) => (
@@ -286,7 +303,7 @@ const ProjectsModule = () => {
                 </a>
               ) : null}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </ModuleCard>
@@ -354,16 +371,23 @@ const ResumeModule = () => {
   )
 }
 
-const ExperienceModule = () => {
+const ExperienceModule = ({
+  mediaReady = true,
+  mediaVisibleCount = Number.POSITIVE_INFINITY,
+}) => {
   const { experience } = siteContent
   return (
     <ModuleCard title="EXPERIENCE" subtitle="Timeline">
       <div className="experience-list">
-        {experience.map((x) => (
+        {experience.map((x, idx) => (
           <div key={x.id} className={`experience-item ${x.images.length > 0 ? 'experience-item--with-media' : ''}`}>
-            {x.images.length > 0 ? (
+            {x.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
               <div className="experience-media">
                 <ImageCarousel images={x.images} altPrefix={x.company} variant="contain" stackSize={x.stackSize} />
+              </div>
+            ) : x.images.length > 0 ? (
+              <div className="experience-media">
+                <div className="experience-media-placeholder" aria-hidden="true" />
               </div>
             ) : null}
             <div className="experience-body">
@@ -376,7 +400,7 @@ const ExperienceModule = () => {
                 {x.company} · {x.location}
               </div>
               <div className="experience-desc">
-                <MarkdownBlock markdown={x.description} />
+                <p>{plainFromMarkdown(x.description)}</p>
               </div>
               <div className="experience-tags">
                 {x.tags.map((t) => (
@@ -500,9 +524,15 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
   const [knobSec, setKnobSec] = useState(0.5)
   const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
+  const allMediaUrls = useMemo(() => {
+    const projectUrls = siteContent.projects.flatMap((p) => p.images || [])
+    const experienceUrls = siteContent.experience.flatMap((x) => x.images || [])
+    return [...new Set([...projectUrls, ...experienceUrls].filter(Boolean))]
+  }, [])
 
   const isHome = activeChannel == null
   const isPoweredOn = powerState !== 'off'
+  const currentChannel = activeChannel ?? 'about'
 
   const togglePower = useCallback(() => {
     if (powerState === 'turning-off' || powerState === 'turning-on') return
@@ -527,6 +557,49 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
   }, [powerState])
 
   useEffect(() => {
+    let cancelled = false
+    const queue = [...allMediaUrls]
+    if (queue.length === 0) return undefined
+
+    const preloadNext = () => {
+      if (cancelled || queue.length === 0) return
+      const nextUrl = queue.shift()
+      if (!nextUrl) return
+      const img = new Image()
+      img.decoding = 'async'
+      img.onload = async () => {
+        try {
+          if (typeof img.decode === 'function') {
+            await img.decode()
+          }
+        } catch {
+          /* ignore decode failures */
+        }
+        if (cancelled) return
+        window.setTimeout(preloadNext, 95)
+      }
+      img.onerror = () => {
+        if (cancelled) return
+        window.setTimeout(preloadNext, 95)
+      }
+      img.src = publicUrl(nextUrl)
+    }
+
+    const kickoff = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => preloadNext(), { timeout: 1500 })
+      } else {
+        window.setTimeout(preloadNext, 1200)
+      }
+    }
+
+    kickoff()
+    return () => {
+      cancelled = true
+    }
+  }, [allMediaUrls])
+
+  useEffect(() => {
     document.documentElement.classList.toggle('scope-home-no-scroll', isHome)
     document.documentElement.classList.toggle('projector-page-open', !isHome)
     return () => {
@@ -540,8 +613,6 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
       if (powerTimerRef.current) clearTimeout(powerTimerRef.current)
     }
   }, [])
-
-  const ActiveModule = useMemo(() => (activeChannel ? moduleMap[activeChannel] ?? AboutModule : AboutModule), [activeChannel])
 
   const selectedWave = useMemo(
     () => WAVE_INPUTS.find((w) => w.slug === waveInputSlug) ?? WAVE_INPUTS[0],
@@ -566,6 +637,11 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
 
   const scopeTransition = { duration: 0.52, ease: [0.33, 0, 0.2, 1] }
   const projectorTransition = { duration: 0.52, ease: [0.33, 0, 0.2, 1] }
+  const moduleMotionVariants = {
+    enter: { opacity: 0 },
+    center: { opacity: 1 },
+  }
+  const moduleMotionTransition = { duration: 0.24, ease: 'easeOut' }
 
   return (
     <div className={`bench-stage ${isHome ? 'bench-stage--home' : ''}`}>
@@ -837,28 +913,43 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
               </span>
             </header>
             <div className="projector-screen-surface">
-              <AnimatePresence mode="wait" custom={direction}>
-                {activeChannel ? (
-                  <motion.div
-                    key={activeChannel}
-                    className="projector-inner"
-                    custom={direction}
-                    variants={{
-                      enter: (dir) => ({ x: dir > 0 ? '18%' : '-18%', opacity: 0 }),
-                      center: { x: 0, opacity: 1 },
-                      exit: (dir) => ({ x: dir > 0 ? '-12%' : '12%', opacity: 0 }),
-                    }}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <ErrorBoundary>
-                      <ActiveModule />
-                    </ErrorBoundary>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
+              <motion.div
+                className="projector-inner"
+                custom={direction}
+                variants={moduleMotionVariants}
+                initial="enter"
+                animate="center"
+                transition={moduleMotionTransition}
+              >
+                <ErrorBoundary>
+                  <div className="projector-module-stack">
+                    {MODULE_IDS.map((id) => {
+                      const panelClass = `projector-module-panel ${currentChannel === id ? 'is-active' : ''}`
+                      if (id === 'projects') {
+                        return (
+                          <div key={id} className={panelClass}>
+                            <ProjectsModule mediaReady={true} mediaVisibleCount={Number.POSITIVE_INFINITY} />
+                          </div>
+                        )
+                      }
+                      if (id === 'experience') {
+                        return (
+                          <div key={id} className={panelClass}>
+                            <ExperienceModule mediaReady={true} mediaVisibleCount={Number.POSITIVE_INFINITY} />
+                          </div>
+                        )
+                      }
+                      const ModuleComp = moduleMap[id]
+                      if (!ModuleComp) return null
+                      return (
+                        <div key={id} className={panelClass}>
+                          <ModuleComp />
+                        </div>
+                      )
+                    })}
+                  </div>
+                </ErrorBoundary>
+              </motion.div>
             </div>
           </div>
         </div>

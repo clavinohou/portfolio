@@ -69,6 +69,24 @@
     transform 0.15s ease;
 }
 
+.media-carousel__count {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .media-carousel__thumb:hover::after {
   opacity: 1;
 }
