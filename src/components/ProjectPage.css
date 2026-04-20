@@ -1,0 +1,736 @@
+/* —— Project page (standalone page at /log/:id) —— */
+/* Uses the shared .projectlog shell + paper background from BlogHome.css */
+
+.projectlog {
+  --pp-accent: #ff6b35;
+  --pp-accent-soft: color-mix(in oklab, var(--pp-accent) 32%, transparent);
+}
+
+.projectlog-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 56px) clamp(18px, 4vw, 40px) clamp(40px, 6vw, 80px);
+}
+
+/* —— Hero —— */
+.projectlog-hero {
+  position: relative;
+  padding: clamp(22px, 3vw, 36px) clamp(22px, 3vw, 36px);
+  padding-left: clamp(26px, 3.5vw, 44px);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 100%),
+    var(--bl-paper-tint);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.7) inset,
+    0 18px 36px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.projectlog-hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--pp-accent);
+  box-shadow: 0 0 22px color-mix(in oklab, var(--pp-accent) 45%, transparent);
+}
+
+.projectlog-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: clamp(20px, 3.5vw, 40px);
+  align-items: start;
+}
+
+.projectlog-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.projectlog-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  color: var(--bl-ink-muted);
+  text-transform: uppercase;
+}
+
+.projectlog-crumb-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--pp-accent) 10%, rgba(255, 255, 255, 0.9));
+  border: 1px solid color-mix(in oklab, var(--pp-accent) 42%, rgba(0, 0, 0, 0.1));
+  color: color-mix(in oklab, var(--pp-accent) 70%, var(--bl-ink));
+  font-weight: 800;
+}
+
+.projectlog-crumb-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--pp-accent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--pp-accent) 60%, transparent);
+}
+
+.projectlog-crumb-sep {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.projectlog-crumb-date {
+  color: var(--bl-ink-soft);
+  font-weight: 700;
+}
+
+.projectlog-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  color: var(--bl-ink);
+}
+
+.projectlog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.projectlog-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--bl-ink);
+}
+
+.projectlog-description {
+  color: var(--bl-ink-soft);
+  line-height: 1.72;
+  font-size: 1rem;
+}
+
+.projectlog-description .markdown-block a {
+  color: var(--pp-accent);
+  border-bottom-color: color-mix(in oklab, var(--pp-accent) 35%, transparent);
+}
+
+.projectlog-description .markdown-block strong {
+  color: var(--bl-ink);
+}
+
+.projectlog-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.projectlog-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.projectlog-cta--primary {
+  background: var(--bl-ink);
+  color: #fff;
+  border: 1px solid var(--bl-ink);
+  box-shadow: 0 6px 14px color-mix(in oklab, var(--pp-accent) 18%, rgba(0, 0, 0, 0.2));
+}
+
+.projectlog-cta--primary:hover {
+  transform: translateY(-2px);
+  background: color-mix(in oklab, var(--pp-accent) 18%, var(--bl-ink));
+  border-color: var(--pp-accent);
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--pp-accent) 28%, rgba(0, 0, 0, 0.22));
+}
+
+.projectlog-cta--ghost {
+  background: transparent;
+  color: var(--bl-ink-soft);
+  border: 1px dashed rgba(0, 0, 0, 0.22);
+  letter-spacing: 0.12em;
+}
+
+.projectlog-cta--ghost:hover {
+  color: var(--bl-ink);
+  border-color: var(--pp-accent);
+  background: color-mix(in oklab, var(--pp-accent) 6%, transparent);
+}
+
+.projectlog-hero-media {
+  position: relative;
+  border-radius: 14px;
+  overflow: visible;
+  min-height: 240px;
+  padding: 10px;
+  background: linear-gradient(165deg, #ffffff 0%, #e7e7ec 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 22px 44px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.projectlog-hero-media .media-carousel {
+  border-radius: 10px;
+}
+
+.projectlog-hero-empty {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.03) 0,
+    rgba(0, 0, 0, 0.03) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  color: var(--bl-ink-muted);
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+}
+
+/* —— Build log section —— */
+.projectlog-log {
+  margin-top: clamp(32px, 4vw, 52px);
+}
+
+.projectlog-log-head {
+  margin-bottom: 18px;
+}
+
+.projectlog-log-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.projectlog-log-title h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.projectlog-log-title-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #18181b;
+  color: #f4c542;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.projectlog-log-title-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  animation: bloglogRec 1.2s ease-in-out infinite;
+}
+
+.projectlog-log-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--bl-ink-soft);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.projectlog-log-sub {
+  margin: 6px 0 0;
+  color: var(--bl-ink-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+/* —— Chart paper + entries —— */
+.projectlog-paper {
+  position: relative;
+  padding: 22px clamp(22px, 3.5vw, 40px) 26px;
+  min-height: 200px;
+  border-radius: 8px;
+  background-color: var(--bl-paper);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 23px,
+      var(--bl-paper-line) 23px,
+      var(--bl-paper-line) 24px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 23px,
+      var(--bl-paper-line) 23px,
+      var(--bl-paper-line) 24px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 119px,
+      var(--bl-paper-line-strong) 119px,
+      var(--bl-paper-line-strong) 120px
+    );
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.14),
+    0 2px 0 rgba(255, 255, 255, 0.45) inset;
+  color: var(--bl-ink);
+}
+
+.projectlog-paper-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  background:
+    radial-gradient(circle at center, #c4c2b6 2.5px, transparent 3px) center / 14px 14px,
+    var(--bl-paper-edge);
+}
+
+.projectlog-paper-edge--left {
+  left: 0;
+  border-right: 1px dashed rgba(16, 99, 144, 0.3);
+}
+
+.projectlog-paper-edge--right {
+  right: 0;
+  border-left: 1px dashed rgba(16, 99, 144, 0.3);
+}
+
+.projectlog-stream-head,
+.projectlog-stream-foot {
+  position: relative;
+  padding: 6px 8px;
+  margin: 0 8px 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--bl-ink-muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.projectlog-stream-foot {
+  margin: 16px 8px 0;
+  justify-content: center;
+  letter-spacing: 0.24em;
+}
+
+.projectlog-entries {
+  list-style: none;
+  padding: 0 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.projectlog-entry {
+  --entry-accent: var(--pp-accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.projectlog-entry-card {
+  position: relative;
+  padding: 16px 18px 20px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.projectlog-entry-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--entry-accent);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--entry-accent) 55%, transparent);
+}
+
+.projectlog-entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(16, 99, 144, 0.28);
+}
+
+.projectlog-entry-tape {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background: #18181b;
+  color: #f4f4f5;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.projectlog-entry-num {
+  color: var(--entry-accent);
+  font-weight: 800;
+}
+
+.projectlog-entry-sep {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.projectlog-entry-date {
+  color: #e4e4e7;
+}
+
+.projectlog-entry-time {
+  color: #5eead4;
+}
+
+.projectlog-entry-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.projectlog-entry-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.005em;
+  line-height: 1.28;
+  color: var(--bl-ink);
+}
+
+.projectlog-entry-summary {
+  margin: 0;
+  color: var(--bl-ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+
+.projectlog-entry-text {
+  color: var(--bl-ink);
+  line-height: 1.72;
+  font-size: 0.96rem;
+}
+
+.projectlog-entry-text .markdown-block a,
+.projectlog-entry-text .markdown-block a.markdown-link {
+  color: var(--entry-accent);
+  border-bottom-color: color-mix(in oklab, var(--entry-accent) 40%, transparent);
+}
+
+.projectlog-entry-text .markdown-block blockquote {
+  border-left-color: color-mix(in oklab, var(--entry-accent) 55%, transparent);
+  color: var(--bl-ink-soft);
+  font-style: italic;
+}
+
+.projectlog-entry-text .markdown-block code {
+  background: rgba(16, 99, 144, 0.08);
+  color: #0f3a55;
+}
+
+.projectlog-entry-text .markdown-block pre {
+  margin: 0.6em 0;
+  padding: 0;
+  background: #111114;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.projectlog-entry-text .markdown-block pre code {
+  background: transparent;
+  color: #e4e4e7;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  padding: 12px 14px;
+  display: block;
+}
+
+.projectlog-entry-gallery {
+  margin-top: 4px;
+}
+
+.projectlog-entry-gallery .media-carousel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.projectlog-entry-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.projectlog-entry-tag {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--bl-ink-soft);
+}
+
+.projectlog-perforation {
+  height: 12px;
+  margin-top: 10px;
+  border-top: 1px dashed rgba(16, 99, 144, 0.35);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 10px,
+    rgba(16, 99, 144, 0.18) 10px,
+    rgba(16, 99, 144, 0.18) 11px
+  );
+  opacity: 0.65;
+}
+
+/* —— Empty state —— */
+.projectlog-empty {
+  margin: 18px auto;
+  padding: 28px 24px;
+  border-radius: 8px;
+  border: 1px dashed rgba(16, 99, 144, 0.35);
+  background: rgba(255, 255, 255, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--bl-ink-soft);
+  max-width: 560px;
+}
+
+.projectlog-empty-icon {
+  font-size: 1.6rem;
+  color: var(--pp-accent);
+}
+
+.projectlog-empty-title {
+  font-weight: 800;
+  color: var(--bl-ink);
+  letter-spacing: 0.02em;
+}
+
+.projectlog-empty-text {
+  margin: 0;
+  max-width: 44ch;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.projectlog-empty-text strong {
+  color: var(--bl-ink);
+  font-weight: 700;
+}
+
+/* —— Prev / next —— */
+.projectlog-nextprev {
+  margin-top: clamp(32px, 5vw, 60px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.projectlog-nextprev-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  min-height: 72px;
+}
+
+.projectlog-nextprev-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--pp-accent-soft);
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--pp-accent) 18%, rgba(0, 0, 0, 0.08));
+}
+
+.projectlog-nextprev-card--next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.projectlog-nextprev-dir {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--pp-accent);
+  font-weight: 800;
+}
+
+.projectlog-nextprev-title {
+  font-weight: 800;
+  color: var(--bl-ink);
+  letter-spacing: -0.005em;
+}
+
+/* —— Foot —— */
+.projectlog-foot {
+  margin-top: clamp(24px, 4vw, 40px);
+  padding: 18px 0 0;
+  border-top: 1px dashed rgba(16, 99, 144, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+}
+
+.projectlog-foot-link {
+  color: var(--bl-ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  background: transparent;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.projectlog-foot-link:hover {
+  color: var(--pp-accent);
+  border-bottom-color: var(--pp-accent-soft);
+}
+
+.projectlog-foot-link--button {
+  border-bottom: 1px solid transparent;
+}
+
+.projectlog-foot-sep {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* —— Missing —— */
+.projectlog-missing {
+  display: grid;
+  place-items: center;
+  gap: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--bl-ink-soft);
+  letter-spacing: 0.14em;
+  min-height: 60vh;
+}
+
+/* —— Responsive —— */
+@media (max-width: 900px) {
+  .projectlog-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectlog-hero-media {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .projectlog-page {
+    padding: 20px 14px 40px;
+  }
+
+  .projectlog-hero {
+    padding: 20px 18px;
+    padding-left: 22px;
+  }
+
+  .projectlog-paper {
+    padding: 18px 14px 22px;
+  }
+
+  .projectlog-paper-edge {
+    width: 10px;
+    background-size: 10px 10px;
+  }
+
+  .projectlog-entry-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .projectlog-entry-title {
+    font-size: 1.04rem;
+  }
+
+  .projectlog-nextprev {
+    grid-template-columns: 1fr;
+  }
+
+  .projectlog-nextprev-card--next {
+    text-align: left;
+    align-items: flex-start;
+  }
+}

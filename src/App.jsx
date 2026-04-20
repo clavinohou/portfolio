@@ -1,10 +1,44 @@
 import { useState } from 'react'
 import Oscilloscope from './components/Oscilloscope'
+import ProjectPage from './components/ProjectPage'
+import BlogHome from './components/BlogHome'
+import { RouterProvider, useRouter, normalizePath } from './router'
 import './App.css'
 
 const channelOrder = ['about', 'projects', 'resume', 'experience', 'contact']
 
 export default function App() {
+  return (
+    <RouterProvider>
+      <RouteSwitcher />
+    </RouterProvider>
+  )
+}
+
+function RouteSwitcher() {
+  const { path } = useRouter()
+  const clean = normalizePath(path)
+
+  // /log  → build log landing page
+  if (clean === '/log') return <BlogHome />
+
+  // /log/:projectId  → individual project page
+  if (clean.startsWith('/log/')) {
+    const rawId = clean.slice('/log/'.length)
+    let projectId = rawId
+    try {
+      projectId = decodeURIComponent(rawId)
+    } catch {
+      // keep rawId if decoding fails
+    }
+    return <ProjectPage projectId={projectId} />
+  }
+
+  // Anything else falls through to the oscilloscope home.
+  return <OscilloscopeApp />
+}
+
+function OscilloscopeApp() {
   /** null = home (oscilloscope only); otherwise which projector page is open */
   const [activeChannel, setActiveChannel] = useState(null)
   const [direction, setDirection] = useState(1)

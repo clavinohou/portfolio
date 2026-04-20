@@ -1,0 +1,37 @@
+<!doctype html>
+<!--
+  SPA fallback for static hosts (GitHub Pages / Cloudflare Pages / Netlify).
+  GitHub Pages serves /404.html whenever a file doesn't exist on disk, so for
+  deep links like /log/miso-climber-v3 we just bounce back into index.html and
+  let the client-side router take over.
+
+  Netlify/Vercel/Cloudflare Pages users can also add an explicit SPA redirect
+  rule (_redirects: "/*  /index.html  200"), but this 404.html works as a
+  universal belt-and-braces fallback.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calvin Hou - Portfolio</title>
+    <script>
+      // Preserve the original path + query so the SPA can route correctly after
+      // reload. We replace (not push) so the back button stays clean.
+      (function () {
+        var path = window.location.pathname + window.location.search + window.location.hash
+        if (path && path !== '/') {
+          sessionStorage.setItem('__spa_redirect__', path)
+        }
+        window.location.replace('/')
+      })()
+    </script>
+  </head>
+  <body>
+    <noscript>
+      This page requires JavaScript. Please visit
+      <a href="/">calvinhou.com</a>.
+    </noscript>
+  </body>
+</html>

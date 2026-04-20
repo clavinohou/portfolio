@@ -7,21 +7,11 @@
     "location": "From Seattle, WA",
     "year": "Junior (Graduating May 2028)",
     "interests": [
-      {
-        "interest": "Robotics + Automation"
-      },
-      {
-        "interest": "PCB Design"
-      },
-      {
-        "interest": "Embedded Systems"
-      },
-      {
-        "interest": "FPGA's & ASIC's"
-      },
-      {
-        "interest": "Rocketry + Space"
-      }
+      { "interest": "Robotics + Automation" },
+      { "interest": "PCB Design" },
+      { "interest": "Embedded Systems" },
+      { "interest": "FPGA's & ASIC's" },
+      { "interest": "Rocketry + Space" }
     ],
     "about": [
       {
@@ -35,148 +25,37 @@
       }
     ]
   },
-  "projects": [
-    {
-      "stackSize": 3,
-      "date": "June 2023 - May 2025",
-      "gallery": [
-        {
-          "src": "/uploads/9442-awards.jpg"
-        },
-        {
-          "src": "/uploads/img_5543.png"
-        },
-        {
-          "src": "/uploads/img_9862-copy.jpg"
-        },
-        {
-          "src": "/uploads/img_9800-copy.jpg"
-        },
-        {
-          "src": "/uploads/img_8017-copy.jpg"
-        }
-      ],
-      "imageUrl": "/uploads/9442-logo.png",
-      "title": "Team Founder, President, and Mechanical/Electrical Lead - FRC 9442",
-      "tags": [
-        {
-          "tag": "Leadership"
-        },
-        {
-          "tag": "Harnessing"
-        },
-        {
-          "tag": "Mechanical Design / CAD"
-        },
-        {
-          "tag": "Rapid Iteration + Prototyping"
-        }
-      ],
-      "link": "https://misomechanics.org",
-      "id": "miso-mechanics",
-      "description": "I founded Miso Mechanics, a community-based FIRST Robotics Competition (FRC) team in North Seattle, with the vision of building a world-class program from the ground up. Despite our small physical footprint, we rapidly established ourselves as a competitive powerhouse both regionally and globally. Following a strong rookie season, we proved our elite capabilities by ranking 4th at the prestigious Chezy Champs offseason event and allying with Hall of Fame Team 254. We carried this momentum into a dominant 2025 season, winning a District Event, ranking 7th overall in the highly competitive Pacific Northwest district, and ranking in the top 3% of all robots in the world. Ultimately, finishing my journey at the FIRST World Championship among the best robots in the world.\n\n**Key Contributions:**\n\n* **Electrical Systems Architecture:** Planned, wired, and implemented the complete electrical systems across three distinct competition robots, achieving a 100% reliability rate with zero electrical failures across 10+ high-stakes competitions.\n* **Mechanical Design & CAD:** Self-taught CAD to design critical robot subsystems and relieve bottlenecks for the design team. Notably created our robot's climber mechanisms, managing the design and manufacturing process completely remotely while working overseas in Taiwan.\n* **Operations & Project Management:** Directed day-to-day team logistics, coordinated practice field sessions, managed parts procurement, and oversaw task delegation to ensure the team operated efficiently under tight build-season deadlines."
-    },
-    {
-      "stackSize": 1,
-      "date": "September 2022",
-      "gallery": [
-        {
-          "src": "/uploads/pcbschimg.png"
-        }
-      ],
-      "imageUrl": "/uploads/pcbimage.png",
-      "title": "Custom Media Controller & Keyboard",
-      "tags": [
-        {
-          "tag": "PCB Design"
-        },
-        {
-          "tag": "Hardware"
-        },
-        {
-          "tag": "Embedded Systems"
-        }
-      ],
-      "link": "https://github.com/clavinohou/first-pcb-keypad",
-      "id": "media-controller-keyboard",
-      "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning."
-    },
-    {
-      "id": "pulse-frc",
-      "title": "Pulse FRC Pit Display",
-      "date": "June 2024",
-      "description": "Designed and optimized UX/UI for a multi-functional pit display supporting FRC teams during competition. Reached 4,000+ users in the first week.",
-      "tags": [
-        {
-          "tag": "UI/UX"
-        },
-        {
-          "tag": "Web Development"
-        },
-        {
-          "tag": "FRC"
-        }
-      ],
-      "link": "https://pulsefrc.app",
-      "imageUrl": "/uploads/untitled-aug-28-2024.png",
-      "stackSize": 1
-    }
-  ],
   "experience": [
     {
       "date": "Jan 2026 - Present",
-      "gallery": [
-        {
-          "src": "/uploads/1630580805380.jpeg"
-        }
-      ],
+      "gallery": [{ "src": "/uploads/1630580805380.jpeg" }],
       "location": "Atlanta, GA",
       "title": "Avionics Engineer",
       "tags": [
-        {
-          "tag": "Aviation"
-        },
-        {
-          "tag": "PCB Design"
-        },
-        {
-          "tag": "Embedded Systems"
-        }
+        { "tag": "Aviation" },
+        { "tag": "PCB Design" },
+        { "tag": "Embedded Systems" }
       ],
       "type": "Club",
       "id": "yellow-jacket-space-program",
-      "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32’s integrated ADCs for real-time power rail telemetry.",
+      "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32's integrated ADCs for real-time power rail telemetry.",
       "company": "Yellow Jacket Space Program"
     },
     {
       "stackSize": 2,
       "date": "Aug 2024",
       "gallery": [
-        {
-          "src": "/uploads/img_4239-copy-1.jpg"
-        },
-        {
-          "src": "/uploads/img_3419-copy.jpg"
-        },
-        {
-          "src": "/uploads/img_3900-copy.jpg"
-        },
-        {
-          "src": "/uploads/img_4248-copy.jpg"
-        }
+        { "src": "/uploads/img_4239-copy-1.jpg" },
+        { "src": "/uploads/img_3419-copy.jpg" },
+        { "src": "/uploads/img_3900-copy.jpg" },
+        { "src": "/uploads/img_4248-copy.jpg" }
       ],
       "location": "New Taipei City, Taiwan",
       "title": "Research and Design Intern",
       "tags": [
-        {
-          "tag": "Thermal Analysis"
-        },
-        {
-          "tag": "Hardware Validation"
-        },
-        {
-          "tag": "AI Systems"
-        }
+        { "tag": "Thermal Analysis" },
+        { "tag": "Hardware Validation" },
+        { "tag": "AI Systems" }
       ],
       "type": "Internship",
       "id": "asia-vital",
@@ -185,23 +64,13 @@
     },
     {
       "date": "Sep 2024",
-      "gallery": [
-        {
-          "src": "/uploads/img_4912-2-copy.jpg"
-        }
-      ],
+      "gallery": [{ "src": "/uploads/img_4912-2-copy.jpg" }],
       "location": "Singapore",
       "title": "Advanced Robotics Centre Research Intern",
       "tags": [
-        {
-          "tag": "Robotics"
-        },
-        {
-          "tag": "Control Systems"
-        },
-        {
-          "tag": "Inverse Kinematics"
-        }
+        { "tag": "Robotics" },
+        { "tag": "Control Systems" },
+        { "tag": "Inverse Kinematics" }
       ],
       "type": "Internship",
       "id": "nus-robotics",
@@ -210,27 +79,17 @@
     },
     {
       "date": "July 2023",
-      "gallery": [
-        {
-          "src": "/uploads/amazon-future-engineer-featured.png"
-        }
-      ],
+      "gallery": [{ "src": "/uploads/amazon-future-engineer-featured.png" }],
       "location": "Seattle, WA",
       "title": "Amazon Future Engineer Program Participant",
       "tags": [
-        {
-          "tag": "Leadership"
-        },
-        {
-          "tag": "Java Script"
-        },
-        {
-          "tag": "Rapid Iteration"
-        }
+        { "tag": "Leadership" },
+        { "tag": "Java Script" },
+        { "tag": "Rapid Iteration" }
       ],
       "type": "Externship",
       "id": "amazon-future-engineer",
-      "description": "* Directed a subgroup in designing and programming a mail theft prevention device, securing 1st place in the program’s Technical Skill Track.\n* Selected from a competitive pool of 3,000+ Seattle Public Schools applicants for an exclusive operational shadowing program at Amazon.\n* Analyzed daily corporate operations and industry strategies through direct engagement with Amazon executive leadership.",
+      "description": "* Directed a subgroup in designing and programming a mail theft prevention device, securing 1st place in the program's Technical Skill Track.\n* Selected from a competitive pool of 3,000+ Seattle Public Schools applicants for an exclusive operational shadowing program at Amazon.\n* Analyzed daily corporate operations and industry strategies through direct engagement with Amazon executive leadership.",
       "company": "Amazon"
     }
   ],
@@ -246,15 +105,9 @@
     "lastUpdated": "2026-03-31",
     "internalPrevUrl": "/uploads/calvinresume21326b.pdf",
     "highlights": [
-      {
-        "highlight": "Electrical Engineering (B.S.) — Georgia Tech"
-      },
-      {
-        "highlight": "Robotics + embedded systems experience"
-      },
-      {
-        "highlight": "PCB design and hardware validation"
-      }
+      { "highlight": "Electrical Engineering (B.S.) — Georgia Tech" },
+      { "highlight": "Robotics + embedded systems experience" },
+      { "highlight": "PCB design and hardware validation" }
     ]
   }
 }

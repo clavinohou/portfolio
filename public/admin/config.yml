@@ -16,11 +16,232 @@ site_url: https://calvinhou.com
 # If GitHub Pages uses a project URL, set e.g. https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/
 # And set the same in vite.config.js `base`
 
+# Show a live preview pane beside the editor for collections that opt in.
+editor:
+  preview: true
+
+# —— Collections ——————————————————————————————————————————————————————————
+# Three top-level collections, each with its own "New" button in the sidebar:
+#
+#   1. Projects       — one JSON file per project      (src/content/cms/projects/*.json)
+#   2. Build Log      — one JSON file per blog entry   (src/content/cms/blog/*.json)
+#   3. Site settings  — single file for the bits you rarely touch
+#
+# Projects and Build Log are folder collections, so creating a new one is just
+# "click the + button → fill in the form → Save". Under the hood Decap writes
+# `src/content/cms/<collection>/<slug>.json` and Vite's import.meta.glob picks
+# it up on the next build (or HMR reload in dev).
 collections:
+  # ————————————————————————— PROJECTS ——————————————————————————
+  - name: projects
+    label: Projects
+    label_singular: Project
+    description: >-
+      One file per project. Click “New Project” to add one — the filename
+      will match the ID slug you enter below. Projects show up on the
+      oscilloscope “PROJECTS” channel AND on the Build Log site at /log.
+    folder: src/content/cms/projects
+    create: true
+    format: json
+    extension: json
+    slug: '{{fields.id}}'
+    identifier_field: title
+    summary: '{{title}}  ·  order {{order}}'
+    sortable_fields: ['order', 'title', 'date']
+    view_groups:
+      - label: By channel order
+        field: order
+    fields:
+      - {
+          label: ID (URL slug),
+          name: id,
+          widget: string,
+          pattern: ['^[a-z0-9][a-z0-9-]*$', 'Use lowercase letters, numbers, and dashes only — e.g. my-cool-project'],
+          hint: 'This becomes the filename and the URL (/log/<id>). Lowercase, dashes only. DO NOT change this after a project is published or external links will break.',
+        }
+      - { label: Title, name: title, widget: string }
+      - {
+          label: Display order,
+          name: order,
+          widget: number,
+          value_type: int,
+          min: 1,
+          default: 99,
+          hint: 'Lower = shown first. Use 1 for your flagship project, 2 for the next, etc. New projects default to 99 so they land at the end — edit to re-order.',
+        }
+      - {
+          label: Date,
+          name: date,
+          widget: string,
+          required: false,
+          hint: 'Free-form, e.g. 2024, Spring 2025, or Jan 2024 – Mar 2025.',
+        }
+      - {
+          label: External link,
+          name: link,
+          widget: string,
+          required: false,
+          hint: 'Optional — full URL to the project (GitHub repo, live site, etc.). Leave empty if there isn’t one.',
+        }
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        summary: '{{fields.tag}}'
+        hint: 'Short keywords shown as pills on the project card.'
+        fields:
+          - { label: Tag, name: tag, widget: string }
+      - {
+          label: Description (Markdown),
+          name: description,
+          widget: markdown,
+          hint: 'Long-form description. Supports bold, lists, links, code blocks, etc.',
+        }
+      - {
+          label: Cover image,
+          name: imageUrl,
+          widget: image,
+          required: false,
+          choose_url: true,
+          hint: 'Main thumbnail — shown first in the carousel. Upload or pick from existing uploads.',
+        }
+      - label: Gallery / additional photos
+        name: gallery
+        widget: list
+        required: false
+        summary: '{{fields.src}}'
+        hint: 'Extra photos rotated in the image stack after the cover image.'
+        fields:
+          - {
+              label: Image,
+              name: src,
+              widget: image,
+              choose_url: true,
+            }
+      - {
+          label: Visible images in stack,
+          name: stackSize,
+          widget: number,
+          value_type: int,
+          min: 1,
+          max: 8,
+          required: false,
+          hint: 'How many images peek out behind the top image before the user has to arrow through. Leave blank to show all.',
+        }
+
+  # ————————————————————————— BUILD LOG —————————————————————————
+  - name: blog
+    label: Build log entries
+    label_singular: Build log entry
+    description: >-
+      One file per build log entry. Each entry attaches to one project via
+      the “Related project” field and appears on that project’s page at
+      /log/<project-id>. Newest first. Keep entries small and frequent —
+      notes-to-self, failures, breakthroughs, calculations that held up.
+    folder: src/content/cms/blog
+    create: true
+    format: json
+    extension: json
+    slug: '{{fields.id}}'
+    identifier_field: title
+    summary: '{{title}}  ·  {{project}}  ·  {{date}}'
+    sortable_fields: ['date', 'project', 'title']
+    view_groups:
+      - label: By project
+        field: project
+      - label: By year
+        field: date
+        pattern: '\d{4}'
+    view_filters:
+      - label: This year
+        field: date
+        pattern: '2026'
+      - label: Last year
+        field: date
+        pattern: '2025'
+    fields:
+      - {
+          label: ID (URL slug),
+          name: id,
+          widget: string,
+          pattern: ['^[a-z0-9][a-z0-9-]*$', 'Use lowercase letters, numbers, and dashes only — e.g. climber-v3-tuning'],
+          hint: 'Stable slug for the filename. Lowercase, dashes only. Not shown on the site but visible in git.',
+        }
+      - { label: Title, name: title, widget: string, hint: 'The headline for this entry. Keep it punchy.' }
+      - {
+          label: Date / time,
+          name: date,
+          widget: datetime,
+          format: 'YYYY-MM-DDTHH:mm',
+          date_format: 'YYYY-MM-DD',
+          time_format: 'HH:mm',
+          picker_utc: false,
+          hint: 'When the entry was written. Used for chronological ordering.',
+        }
+      - {
+          label: Related project,
+          name: project,
+          widget: relation,
+          collection: projects,
+          search_fields: [title, id],
+          display_fields: [title],
+          value_field: id,
+          required: true,
+          hint: 'Pick the project this entry belongs to. The entry will appear on that project’s /log/<id> page.',
+        }
+      - {
+          label: One-line summary,
+          name: summary,
+          widget: text,
+          required: false,
+          hint: 'Italicized blurb shown right under the title. Think: TL;DR in one sentence.',
+        }
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        summary: '{{fields.tag}}'
+        fields:
+          - { label: Tag, name: tag, widget: string }
+      - {
+          label: Body (Markdown),
+          name: body,
+          widget: markdown,
+          hint: 'The actual entry. Supports bold, lists, headings, fenced code blocks, quotes, links, etc.',
+        }
+      - label: Photos / diagrams
+        name: gallery
+        widget: list
+        required: false
+        summary: '{{fields.src}}'
+        hint: 'Scope captures, whiteboard photos, sketches, CAD screenshots — anything that tells the story.'
+        fields:
+          - {
+              label: Image,
+              name: src,
+              widget: image,
+              choose_url: true,
+            }
+      - {
+          label: Visible images in stack,
+          name: stackSize,
+          widget: number,
+          value_type: int,
+          min: 1,
+          max: 8,
+          required: false,
+          hint: 'How many images peek out behind the top one. Leave blank to show all.',
+        }
+
+  # ————————————————————————— SITE SETTINGS —————————————————————————
   - name: site
-    label: Portfolio content
+    label: Site settings
+    description: >-
+      The stuff you set once and rarely touch: profile / about, experience,
+      social links, resume. New projects and build log entries live in their
+      own collections above — use those instead of editing this file.
     files:
-      - label: Site data
+      - label: Site data (profile, experience, links, resume)
         name: site
         file: src/content/cms/site.json
         format: json
@@ -53,66 +274,14 @@ collections:
                 summary: '{{fields.paragraph}}'
                 fields:
                   - { label: Paragraph (Markdown), name: paragraph, widget: markdown }
-          - label: Projects
-            name: projects
-            widget: list
-            summary: '{{fields.title}}'
-            fields:
-              - { label: ID (slug, no spaces), name: id, widget: string, hint: e.g. my-project }
-              - { label: Title, name: title, widget: string }
-              - {
-                  label: Date,
-                  name: date,
-                  widget: string,
-                  required: false,
-                  hint: 'e.g. 2024, Spring 2025, or Jan 2024–Mar 2025',
-                }
-              - { label: Description (Markdown), name: description, widget: markdown }
-              - label: Tags
-                name: tags
-                widget: list
-                summary: '{{fields.tag}}'
-                fields:
-                  - { label: Tag, name: tag, widget: string }
-              - { label: Link (optional), name: link, widget: string, required: false, hint: Full URL or leave empty }
-              - {
-                  label: Cover image,
-                  name: imageUrl,
-                  widget: image,
-                  required: false,
-                  choose_url: true,
-                  hint: Main thumbnail; shown first in carousel,
-                }
-              - label: More photos (carousel)
-                name: gallery
-                widget: list
-                required: false
-                summary: '{{fields.src}}'
-                fields:
-                  - {
-                      label: Image,
-                      name: src,
-                      widget: image,
-                      choose_url: true,
-                      hint: Company or project photos,
-                    }
-              - {
-                  label: Visible image rows (stack),
-                  name: stackSize,
-                  widget: number,
-                  value_type: int,
-                  min: 1,
-                  max: 8,
-                  required: false,
-                  hint: 'How many images to show in the stack before arrows. Leave empty to show all images.',
-                }
           - label: Experience
             name: experience
             widget: list
             summary: '{{fields.title}} — {{fields.company}}'
+            hint: 'Jobs, internships, and clubs. Shown on the EXPERIENCE channel.'
             fields:
               - { label: ID (slug), name: id, widget: string }
-              - { label: Type, name: type, widget: string, hint: e.g. Internship }
+              - { label: Type, name: type, widget: string, hint: 'e.g. Internship, Club, Externship' }
               - { label: Title, name: title, widget: string }
               - { label: Company, name: company, widget: string }
               - { label: Location, name: location, widget: string }
@@ -121,6 +290,7 @@ collections:
               - label: Tags
                 name: tags
                 widget: list
+                required: false
                 fields:
                   - { label: Tag, name: tag, widget: string }
               - label: Photos (carousel)
@@ -134,17 +304,16 @@ collections:
                       name: src,
                       widget: image,
                       choose_url: true,
-                      hint: Logos, team photos, or work samples,
+                      hint: 'Logos, team photos, or work samples.',
                     }
               - {
-                  label: Visible image rows (stack),
+                  label: Visible images in stack,
                   name: stackSize,
                   widget: number,
                   value_type: int,
                   min: 1,
                   max: 8,
                   required: false,
-                  hint: 'How many images to show in the stack before arrows. Leave empty to show all images.',
                 }
           - label: Links & social
             name: links
@@ -164,7 +333,7 @@ collections:
                   name: downloadUrl,
                   widget: file,
                   choose_url: true,
-                  hint: Upload PDF or keep path like /resume/CalvinHouResume.pdf,
+                  hint: 'Upload a PDF or keep a path like /resume/CalvinHouResume.pdf',
                 }
               - {
                   label: Last updated,

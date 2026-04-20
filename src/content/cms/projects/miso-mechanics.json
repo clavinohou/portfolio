@@ -1,0 +1,23 @@
+{
+  "id": "miso-mechanics",
+  "title": "Team Founder, President, and Mechanical/Electrical Lead - FRC 9442",
+  "order": 1,
+  "date": "June 2023 - May 2025",
+  "link": "https://misomechanics.org",
+  "tags": [
+    { "tag": "Leadership" },
+    { "tag": "Harnessing" },
+    { "tag": "Mechanical Design / CAD" },
+    { "tag": "Rapid Iteration + Prototyping" }
+  ],
+  "imageUrl": "/uploads/9442-logo.png",
+  "gallery": [
+    { "src": "/uploads/9442-awards.jpg" },
+    { "src": "/uploads/img_5543.png" },
+    { "src": "/uploads/img_9862-copy.jpg" },
+    { "src": "/uploads/img_9800-copy.jpg" },
+    { "src": "/uploads/img_8017-copy.jpg" }
+  ],
+  "stackSize": 3,
+  "description": "I founded Miso Mechanics, a community-based FIRST Robotics Competition (FRC) team in North Seattle, with the vision of building a world-class program from the ground up. Despite our small physical footprint, we rapidly established ourselves as a competitive powerhouse both regionally and globally. Following a strong rookie season, we proved our elite capabilities by ranking 4th at the prestigious Chezy Champs offseason event and allying with Hall of Fame Team 254. We carried this momentum into a dominant 2025 season, winning a District Event, ranking 7th overall in the highly competitive Pacific Northwest district, and ranking in the top 3% of all robots in the world. Ultimately, finishing my journey at the FIRST World Championship among the best robots in the world.\n\n**Key Contributions:**\n\n* **Electrical Systems Architecture:** Planned, wired, and implemented the complete electrical systems across three distinct competition robots, achieving a 100% reliability rate with zero electrical failures across 10+ high-stakes competitions.\n* **Mechanical Design & CAD:** Self-taught CAD to design critical robot subsystems and relieve bottlenecks for the design team. Notably created our robot's climber mechanisms, managing the design and manufacturing process completely remotely while working overseas in Taiwan.\n* **Operations & Project Management:** Directed day-to-day team logistics, coordinated practice field sessions, managed parts procurement, and oversaw task delegation to ensure the team operated efficiently under tight build-season deadlines."
+}

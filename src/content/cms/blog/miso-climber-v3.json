@@ -1,0 +1,14 @@
+{
+  "id": "miso-climber-v3",
+  "title": "Climber v3 — converging on a winch that won't skip teeth",
+  "date": "2025-02-14T22:30",
+  "project": "miso-mechanics",
+  "summary": "Iterated on the climber spool + ratchet. Two failure modes identified on the practice field, both fixed before competition.",
+  "tags": [
+    { "tag": "Mechanical" },
+    { "tag": "Iteration" },
+    { "tag": "Competition" }
+  ],
+  "gallery": [],
+  "body": "Spent the night on the practice field trying to reproduce the climb failure we saw at the district event.\n\n**Findings:**\n\n* The Dyneema was jumping out of the spool groove whenever the robot was pulled at an angle > 15°.\n* The one-way bearing was occasionally back-driving under high preload because the set screw had loosened.\n\n**Fixes landing tomorrow:**\n\n1. Swapping to a deeper V-groove spool (printed in PA-CF for tonight, machined aluminum for Champs).\n2. Adding a second set screw on a flat I milled into the bearing inner race.\n3. Dialing the preload so the ratchet engages within ~5° of rotation.\n\nGoing to test on the practice field tomorrow with a worst-case 25° pull angle. If it holds, we freeze the design."
+}

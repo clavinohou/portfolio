@@ -1,0 +1,18 @@
+{
+  "id": "media-controller-keyboard",
+  "title": "Custom Media Controller & Keyboard",
+  "order": 2,
+  "date": "September 2022",
+  "link": "https://github.com/clavinohou/first-pcb-keypad",
+  "tags": [
+    { "tag": "PCB Design" },
+    { "tag": "Hardware" },
+    { "tag": "Embedded Systems" }
+  ],
+  "imageUrl": "/uploads/pcbimage.png",
+  "gallery": [
+    { "src": "/uploads/pcbschimg.png" }
+  ],
+  "stackSize": 1,
+  "description": "Designed and fabricated a custom PCB using KiCad and STM32. \nUtilizes CherryMX-style switches and a rotary encoder for volume control.\n\nHandwired a keyboard using a simple diode matrix to prevent ghosting, with a Teensy 2.0 microcontroller for reliable USB keyscanning."
+}

@@ -5,6 +5,7 @@ import { publicUrl } from '../utils/publicUrl'
 import { ImageCarousel } from './ImageCarousel'
 import { MarkdownBlock } from './MarkdownBlock'
 import { ErrorBoundary } from './ErrorBoundary'
+import { Link } from '../router'
 import './Oscilloscope.css'
 
 const fallbackImageUrl =
@@ -268,43 +269,86 @@ const AboutModule = () => {
 const ProjectsModule = ({
   mediaReady = true,
   mediaVisibleCount = Number.POSITIVE_INFINITY,
+  blogEntryCountsByProject = null,
 }) => {
   const { projects } = siteContent
   return (
-    <ModuleCard title="PROJECTS" subtitle="Selection (clickable)">
+    <ModuleCard
+      title="PROJECTS"
+      subtitle={
+        <>
+          Open a project to read its build log — or{' '}
+          <Link to="/log" className="projects-subtitle-link mono">
+            visit the full Build Log ↗
+          </Link>
+        </>
+      }
+    >
       <div className="project-grid">
-        {projects.map((p, idx) => (
-          <div key={p.id} className="project-card">
-            <div className="project-image">
-              {p.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
-                <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
-              ) : p.images.length > 0 ? (
-                <div className="project-media-placeholder" aria-hidden="true" />
-              ) : (
-                <img src={fallbackImageUrl} alt="" />
-              )}
-            </div>
-            <div className="project-content">
-              <div className="project-title">{p.title}</div>
-              {p.date ? <span className="project-date">{p.date}</span> : null}
-              <div className="project-desc">
-                <p>{plainFromMarkdown(p.description)}</p>
+        {projects.map((p, idx) => {
+          const entryCount = blogEntryCountsByProject?.get?.(p.id) ?? 0
+          const href = `/log/${encodeURIComponent(p.id)}`
+          return (
+            <Link
+              key={p.id}
+              to={href}
+              className="project-card project-card--clickable"
+              aria-label={`Open ${p.title} build log`}
+            >
+              <div className="project-image">
+                {p.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
+                  <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
+                ) : p.images.length > 0 ? (
+                  <div className="project-media-placeholder" aria-hidden="true" />
+                ) : (
+                  <img src={fallbackImageUrl} alt="" />
+                )}
               </div>
-              <div className="project-tags">
-                {p.tags.map((t) => (
-                  <span key={t} className="project-tag">
-                    {t}
-                  </span>
-                ))}
+              <div className="project-content">
+                <div className="project-card-toprow">
+                  <div className="project-title">{p.title}</div>
+                  {entryCount > 0 ? (
+                    <span
+                      className="project-card-logchip mono"
+                      title={`${entryCount} build log ${entryCount === 1 ? 'entry' : 'entries'}`}
+                    >
+                      <span className="project-card-logchip-led" aria-hidden />
+                      <span className="project-card-logchip-count">
+                        {String(entryCount).padStart(2, '0')}
+                      </span>
+                      <span className="project-card-logchip-label">LOG</span>
+                    </span>
+                  ) : null}
+                </div>
+                {p.date ? <span className="project-date">{p.date}</span> : null}
+                <div className="project-desc">
+                  <p>{plainFromMarkdown(p.description)}</p>
+                </div>
+                <div className="project-tags">
+                  {p.tags.map((t) => (
+                    <span key={t} className="project-tag">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="project-card-footer">
+                  <span className="project-card-open mono">OPEN BUILD LOG →</span>
+                  {p.link ? (
+                    <a
+                      className="project-external-link"
+                      href={p.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      External ↗
+                    </a>
+                  ) : null}
+                </div>
               </div>
-              {p.link ? (
-                <a className="project-external-link" href={p.link} target="_blank" rel="noopener noreferrer">
-                  View project →
-                </a>
-              ) : null}
-            </div>
-          </div>
-        ))}
+            </Link>
+          )
+        })}
       </div>
     </ModuleCard>
   )
@@ -515,7 +559,12 @@ const moduleMap = {
   contact: ContactModule,
 }
 
-export default function Oscilloscope({ activeChannel, onChannelChange, onHome, direction }) {
+export default function Oscilloscope({
+  activeChannel,
+  onChannelChange,
+  onHome,
+  direction,
+}) {
   const [powerState, setPowerState] = useState('on')
   const powerTimerRef = useRef(null)
   const [knobIntensity, setKnobIntensity] = useState(0.5)
@@ -524,6 +573,16 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
   const [knobSec, setKnobSec] = useState(0.5)
   const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
+  // Per-project build log counts, shown as a small chip on each project card.
+  const blogEntryCountsByProject = useMemo(() => {
+    const counts = new Map()
+    for (const entry of siteContent.blog || []) {
+      if (!entry.project) continue
+      counts.set(entry.project, (counts.get(entry.project) || 0) + 1)
+    }
+    return counts
+  }, [])
+
   const allMediaUrls = useMemo(() => {
     const projectUrls = siteContent.projects.flatMap((p) => p.images || [])
     const experienceUrls = siteContent.experience.flatMap((x) => x.images || [])
@@ -928,7 +987,11 @@ export default function Oscilloscope({ activeChannel, onChannelChange, onHome, d
                       if (id === 'projects') {
                         return (
                           <div key={id} className={panelClass}>
-                            <ProjectsModule mediaReady={true} mediaVisibleCount={Number.POSITIVE_INFINITY} />
+                            <ProjectsModule
+                              mediaReady={true}
+                              mediaVisibleCount={Number.POSITIVE_INFINITY}
+                              blogEntryCountsByProject={blogEntryCountsByProject}
+                            />
                           </div>
                         )
                       }
