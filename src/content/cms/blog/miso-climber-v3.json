@@ -1,14 +1,10 @@
 {
-  "id": "miso-climber-v3",
-  "title": "Climber v3 — converging on a winch that won't skip teeth",
-  "date": "2025-02-14T22:30",
+  "id": "additional-info",
+  "title": "Links and Resources",
+  "date": "2026-04-20T04:35",
   "project": "miso-mechanics",
-  "summary": "Iterated on the climber spool + ratchet. Two failure modes identified on the practice field, both fixed before competition.",
-  "tags": [
-    { "tag": "Mechanical" },
-    { "tag": "Iteration" },
-    { "tag": "Competition" }
-  ],
+  "summary": "Officially moved on from the team as of May 25, so ill just add some supporting resources here.",
+  "tags": [],
   "gallery": [],
-  "body": "Spent the night on the practice field trying to reproduce the climb failure we saw at the district event.\n\n**Findings:**\n\n* The Dyneema was jumping out of the spool groove whenever the robot was pulled at an angle > 15°.\n* The one-way bearing was occasionally back-driving under high preload because the set screw had loosened.\n\n**Fixes landing tomorrow:**\n\n1. Swapping to a deeper V-groove spool (printed in PA-CF for tonight, machined aluminum for Champs).\n2. Adding a second set screw on a flat I milled into the bearing inner race.\n3. Dialing the preload so the ratchet engages within ~5° of rotation.\n\nGoing to test on the practice field tomorrow with a worst-case 25° pull angle. If it holds, we freeze the design."
+  "body": "Technical binder from 2024: [Here](https://misomechanics.notion.site/Tech-Binder-163457b2373081efbc55f4c48908b966)\\\nChief Delphi build blog from 2024: [Here](https://www.chiefdelphi.com/t/9442-robot-cad-in-12-days/451585) \\\nTeam Statistics from 2024: [Here](https://www.statbotics.io/team/9442/2024)\\\n\\\nTechnical binder from 2025: [Here](https://docs.google.com/document/d/1n9bCezJQDwjsgKJ6nbojI2TXvOSpWsZJw6xqDxLvrNw/edit?tab=t.0)\\\nPublic Robot CAD: [Here](https://cad.onshape.com/documents/15ff4d1f4690547d6406aa94/w/9f4c14acd10a508b634339b9/e/f4805a7477c632ce75703b16)\\\nTeam Statistics from 2025: [Here](https://www.statbotics.io/team/9442/2025)"
 }
