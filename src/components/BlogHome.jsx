@@ -281,17 +281,10 @@ export function Nav({ variant = 'home' }) {
   return (
     <header className="bloghome-nav">
       <div className="bloghome-nav-left">
-        {variant === 'home' ? (
-          <Link to="/" className="bloghome-nav-back mono">
-            <span className="bloghome-nav-back-arrow" aria-hidden>←</span>
-            <span>MAIN BENCH</span>
-          </Link>
-        ) : (
-          <Link to="/log" className="bloghome-nav-back mono">
-            <span className="bloghome-nav-back-arrow" aria-hidden>←</span>
-            <span>ALL PROJECTS</span>
-          </Link>
-        )}
+        <Link to="/" className="bloghome-nav-back mono">
+          <span className="bloghome-nav-back-arrow" aria-hidden>←</span>
+          <span>MAIN PAGE</span>
+        </Link>
       </div>
 
       <div className="bloghome-nav-center mono" aria-hidden>
@@ -306,8 +299,8 @@ export function Nav({ variant = 'home' }) {
           <span>REC</span>
         </span>
         {variant === 'project' ? (
-          <Link to="/" className="bloghome-nav-home mono">
-            ⌂ HOME
+          <Link to="/log" className="bloghome-nav-home mono">
+            ALL PROJECTS →
           </Link>
         ) : null}
       </div>

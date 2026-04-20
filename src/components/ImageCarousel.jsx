@@ -190,7 +190,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                 }}
                 aria-label={`${altPrefix} — image ${idx + 1} of ${n}`}
               >
-                <img src={thumbSrc} alt="" loading="lazy" decoding="async" draggable={false} />
+                <img src={thumbSrc} alt="" loading="eager" decoding="async" draggable={false} />
                 <span className="media-carousel__thumb-icon">⤢</span>
               </button>
             )

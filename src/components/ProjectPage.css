@@ -586,6 +586,19 @@
   font-weight: 700;
 }
 
+.projectlog-empty-link {
+  color: var(--pp-accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--pp-accent-soft);
+  font-weight: 700;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.projectlog-empty-link:hover {
+  color: color-mix(in oklab, var(--pp-accent) 85%, #000);
+  border-bottom-color: var(--pp-accent);
+}
+
 /* —— Prev / next —— */
 .projectlog-nextprev {
   margin-top: clamp(32px, 5vw, 60px);

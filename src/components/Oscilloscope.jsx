@@ -8,6 +8,11 @@ import { ErrorBoundary } from './ErrorBoundary'
 import { Link } from '../router'
 import './Oscilloscope.css'
 
+// Module-level cache of already-preloaded image URLs. Survives component
+// remounts (e.g. hot module replacement, route changes) so images only get
+// warmed once per page load.
+const preloadCache = new Set()
+
 const fallbackImageUrl =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
@@ -565,7 +570,10 @@ export default function Oscilloscope({
   onHome,
   direction,
 }) {
-  const [powerState, setPowerState] = useState('on')
+  // Start in the "booting" state on first mount so the screen plays the
+  // warm-up animation (like an old CRT coming to life). Once the boot finishes
+  // it settles into the normal "on" state and the power button can be used.
+  const [powerState, setPowerState] = useState('booting')
   const powerTimerRef = useRef(null)
   const [knobIntensity, setKnobIntensity] = useState(0.5)
   const [knobVolts, setKnobVolts] = useState(0.5)
@@ -583,18 +591,50 @@ export default function Oscilloscope({
     return counts
   }, [])
 
-  const allMediaUrls = useMemo(() => {
-    const projectUrls = siteContent.projects.flatMap((p) => p.images || [])
-    const experienceUrls = siteContent.experience.flatMap((x) => x.images || [])
-    return [...new Set([...projectUrls, ...experienceUrls].filter(Boolean))]
+  // Per-channel media URL buckets so we can prioritise the channels the user
+  // is most likely to open first (projects → experience), and so hovering a
+  // channel button can boost the priority for exactly that channel.
+  const mediaByChannel = useMemo(() => {
+    const coversFirst = (items) => {
+      const covers = []
+      const rest = []
+      for (const it of items) {
+        const imgs = it.images || []
+        if (imgs[0]) covers.push(imgs[0])
+        for (let i = 1; i < imgs.length; i++) rest.push(imgs[i])
+      }
+      return [...covers, ...rest]
+    }
+    return {
+      projects: coversFirst(siteContent.projects),
+      experience: coversFirst(siteContent.experience),
+    }
   }, [])
+
+  const allMediaUrls = useMemo(() => {
+    // Order matters: covers of projects, then covers of experience, then the
+    // rest, then dedupe so every URL only gets preloaded once.
+    return [...new Set([...mediaByChannel.projects, ...mediaByChannel.experience].filter(Boolean))]
+  }, [mediaByChannel])
+
+  // Controller for the preload worker pool; lets us push URLs to the front
+  // on hover for snappier channel switches.
+  const preloadCtrlRef = useRef(null)
 
   const isHome = activeChannel == null
   const isPoweredOn = powerState !== 'off'
   const currentChannel = activeChannel ?? 'about'
 
   const togglePower = useCallback(() => {
-    if (powerState === 'turning-off' || powerState === 'turning-on') return
+    // Ignore clicks while any transition animation is running (including the
+    // first-load "booting" warm-up).
+    if (
+      powerState === 'turning-off' ||
+      powerState === 'turning-on' ||
+      powerState === 'booting'
+    ) {
+      return
+    }
     if (powerTimerRef.current) {
       clearTimeout(powerTimerRef.current)
       powerTimerRef.current = null
@@ -615,48 +655,111 @@ export default function Oscilloscope({
     }
   }, [powerState])
 
+  // Drive the first-load "booting" animation: hold the state for a beat
+  // longer than a manual power-on to mimic a tube actually warming up, then
+  // settle into the normal on state.
   useEffect(() => {
+    if (powerState !== 'booting') return undefined
+    const BOOT_DURATION_MS = 1150
+    const id = window.setTimeout(() => setPowerState('on'), BOOT_DURATION_MS)
+    return () => window.clearTimeout(id)
+  }, [powerState])
+
+  // —— Parallel media preloader ————————————————————————————————————
+  // The old implementation waited 1.2s, then loaded one image at a time with
+  // 95ms gaps — so hitting "Projects" within ~5s of page load meant the
+  // browser was still fetching/decoding, which caused the visible jitter.
+  //
+  // This version:
+  //   • fires on the next animation frame (no idle delay)
+  //   • runs CONCURRENCY workers in parallel
+  //   • calls img.decode() so raster work happens OFF the main thread
+  //   • remembers preloaded URLs in a module-level Set, so re-mounts are free
+  //   • exposes a "boost" fn that moves URLs to the front of the queue —
+  //     called on channel-button hover to warm up that channel's images
+  //     before the click actually lands.
+  useEffect(() => {
+    if (allMediaUrls.length === 0) {
+      preloadCtrlRef.current = null
+      return undefined
+    }
+
     let cancelled = false
-    const queue = [...allMediaUrls]
-    if (queue.length === 0) return undefined
+    const CONCURRENCY = 6
+    let active = 0
+    const queue = []
+    const queued = new Set()
 
-    const preloadNext = () => {
-      if (cancelled || queue.length === 0) return
-      const nextUrl = queue.shift()
-      if (!nextUrl) return
-      const img = new Image()
-      img.decoding = 'async'
-      img.onload = async () => {
-        try {
-          if (typeof img.decode === 'function') {
-            await img.decode()
-          }
-        } catch {
-          /* ignore decode failures */
+    const enqueue = (urls, { front = false } = {}) => {
+      const fresh = []
+      for (const raw of urls) {
+        if (!raw) continue
+        const resolved = publicUrl(raw)
+        if (preloadCache.has(resolved) || queued.has(resolved)) continue
+        queued.add(resolved)
+        fresh.push(resolved)
+      }
+      if (fresh.length === 0) return
+      if (front) queue.unshift(...fresh)
+      else queue.push(...fresh)
+      pump()
+    }
+
+    const pump = () => {
+      if (cancelled) return
+      while (active < CONCURRENCY && queue.length > 0) {
+        const url = queue.shift()
+        active += 1
+        const img = new Image()
+        img.decoding = 'async'
+        // Hint to the browser: this is a background warm-up, don't push out
+        // anything user-critical that might be in flight.
+        if ('fetchPriority' in img) img.fetchPriority = 'low'
+
+        const done = () => {
+          if (cancelled) return
+          active -= 1
+          preloadCache.add(url)
+          queued.delete(url)
+          pump()
         }
-        if (cancelled) return
-        window.setTimeout(preloadNext, 95)
-      }
-      img.onerror = () => {
-        if (cancelled) return
-        window.setTimeout(preloadNext, 95)
-      }
-      img.src = publicUrl(nextUrl)
-    }
-
-    const kickoff = () => {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => preloadNext(), { timeout: 1500 })
-      } else {
-        window.setTimeout(preloadNext, 1200)
+        img.onload = async () => {
+          try {
+            if (typeof img.decode === 'function') await img.decode()
+          } catch {
+            /* ignore decode failures */
+          }
+          done()
+        }
+        img.onerror = done
+        img.src = url
       }
     }
 
-    kickoff()
+    enqueue(allMediaUrls)
+
+    // Defer one frame so we don't fight with the initial paint, but no more.
+    const rafId = window.requestAnimationFrame(() => pump())
+
+    preloadCtrlRef.current = {
+      boost: (urls) => enqueue(urls, { front: true }),
+    }
+
     return () => {
       cancelled = true
+      window.cancelAnimationFrame(rafId)
+      preloadCtrlRef.current = null
     }
   }, [allMediaUrls])
+
+  const warmChannel = useCallback(
+    (channelId) => {
+      const urls = mediaByChannel[channelId]
+      if (!urls || urls.length === 0) return
+      preloadCtrlRef.current?.boost(urls)
+    },
+    [mediaByChannel],
+  )
 
   useEffect(() => {
     document.documentElement.classList.toggle('scope-home-no-scroll', isHome)
@@ -901,6 +1004,9 @@ export default function Oscilloscope({
                   type="button"
                   className={`scope-ch-btn ${isActive ? 'active' : ''}`}
                   onClick={() => onChannelChange(id)}
+                  onMouseEnter={() => warmChannel(id)}
+                  onFocus={() => warmChannel(id)}
+                  onTouchStart={() => warmChannel(id)}
                   aria-pressed={isActive}
                   aria-label={`${ch} ${label}`}
                 >

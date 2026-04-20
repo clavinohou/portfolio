@@ -270,11 +270,11 @@ function BuildLog({ entries, channelLabel, accent }) {
         <div className="projectlog-paper-edge projectlog-paper-edge--right" aria-hidden />
         <div className="projectlog-empty">
           <div className="projectlog-empty-icon mono" aria-hidden>◌</div>
-          <div className="projectlog-empty-title">Paper roll is blank</div>
+          <div className="projectlog-empty-title">Radio silence on this channel</div>
           <p className="projectlog-empty-text">
-            No build log entries yet for this project. Add one in the CMS under{' '}
-            <strong>Portfolio content → Build log entries</strong>, and set the{' '}
-            <strong>Related project</strong> field to this project.
+            Nothing on the tape yet...{' '}
+            <Link to="/log" className="projectlog-empty-link">channels</Link>{' '}
+            for ones I couldn't shut up about.
           </p>
         </div>
       </div>
