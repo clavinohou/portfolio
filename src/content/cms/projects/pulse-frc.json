@@ -1,16 +1,23 @@
 {
-  "id": "pulse-frc",
-  "title": "Pulse FRC Pit Display",
+  "stackSize": 1,
   "order": 3,
   "date": "June 2024",
-  "link": "https://pulsefrc.app",
-  "tags": [
-    { "tag": "UI/UX" },
-    { "tag": "Web Development" },
-    { "tag": "FRC" }
-  ],
-  "imageUrl": "/uploads/untitled-aug-28-2024.png",
   "gallery": [],
-  "stackSize": 1,
+  "imageUrl": "/uploads/untitled-aug-28-2024.png",
+  "showInBuildLog": true,
+  "title": "Pulse FRC Pit Display",
+  "tags": [
+    {
+      "tag": "UI/UX"
+    },
+    {
+      "tag": "Web Development"
+    },
+    {
+      "tag": "FRC"
+    }
+  ],
+  "link": "https://pulsefrc.app",
+  "id": "pulse-frc",
   "description": "Designed and optimized UX/UI for a multi-functional pit display supporting FRC teams during competition. Reached 4,000+ users in the first week."
 }
