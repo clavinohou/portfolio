@@ -36,7 +36,8 @@ function pad(n, w = 3) {
 }
 
 export default function BlogHome() {
-  const { projects, blog, profile, links } = siteContent
+  // Only projects with the "Show on Build Log site" toggle on appear here.
+  const { buildLogProjects: projects, blog, profile, links } = siteContent
 
   const stats = useMemo(() => {
     const byProject = new Map()
@@ -282,7 +283,22 @@ export function Nav({ variant = 'home' }) {
     <header className="bloghome-nav">
       <div className="bloghome-nav-left">
         <Link to="/" className="bloghome-nav-back mono">
-          <span className="bloghome-nav-back-arrow" aria-hidden>←</span>
+          <span className="bloghome-nav-back-arrow" aria-hidden>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 11.5 12 4l9 7.5" />
+              <path d="M5 10v10h14V10" />
+              <path d="M10 20v-6h4v6" />
+            </svg>
+          </span>
           <span>MAIN PAGE</span>
         </Link>
       </div>

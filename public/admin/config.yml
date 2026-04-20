@@ -83,6 +83,13 @@ collections:
           required: false,
           hint: 'Optional — full URL to the project (GitHub repo, live site, etc.). Leave empty if there isn’t one.',
         }
+      - {
+          label: Show on Build Log site,
+          name: showInBuildLog,
+          widget: boolean,
+          default: true,
+          hint: 'ON (default) → project appears on the Build Log at /log and clicking the card on the portfolio opens its build log page. OFF → project only shows on the portfolio; the card becomes a link to the External URL above (or non-clickable if none). Use OFF for older projects that predate the build log.',
+        }
       - label: Tags
         name: tags
         widget: list
@@ -92,10 +99,17 @@ collections:
         fields:
           - { label: Tag, name: tag, widget: string }
       - {
+          label: Short summary,
+          name: summary,
+          widget: text,
+          required: false,
+          hint: 'The short blurb shown on the oscilloscope PROJECTS card. Keep it to 1–2 sentences — plain text, no markdown. Leave blank to reuse the long description below.',
+        }
+      - {
           label: Description (Markdown),
           name: description,
           widget: markdown,
-          hint: 'Long-form description. Supports bold, lists, links, code blocks, etc.',
+          hint: 'Long-form description shown on the Build Log project page (/log/<id>). Supports bold, lists, links, code blocks, etc.',
         }
       - {
           label: Cover image,

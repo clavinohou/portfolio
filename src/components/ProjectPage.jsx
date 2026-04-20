@@ -46,7 +46,10 @@ function pad(n, width = 3) {
 }
 
 export default function ProjectPage({ projectId }) {
-  const { projects, blog } = siteContent
+  // Portfolio-only projects (showInBuildLog=false) are intentionally absent
+  // from buildLogProjects, so visiting /log/<their-id> hits the existing
+  // "project not found" UI below.
+  const { buildLogProjects: projects, blog } = siteContent
   const { navigate } = useRouter()
 
   const { project, projectIndex } = useMemo(() => {

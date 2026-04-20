@@ -50,9 +50,16 @@ function normalizeProject(proj, path) {
     id,
     title: proj.title ?? '',
     date: (proj.date ?? '').toString().trim(),
+    // Short card blurb for the oscilloscope PROJECTS module. Plain text.
+    summary: (proj.summary ?? '').toString().trim(),
+    // Long-form markdown shown on the Build Log project page.
     description: proj.description ?? '',
     tags: flatList(proj.tags, 'tag'),
     link: proj.link?.trim?.() ? proj.link.trim() : null,
+    // When false, hide this project from the Build Log site (/log and
+    // /log/<id>) — it still appears on the portfolio. Defaults to true so
+    // existing content without the field keeps showing everywhere.
+    showInBuildLog: proj.showInBuildLog === false ? false : true,
     imageUrl: proj.imageUrl ?? '',
     images: projectImages(proj),
     stackSize: normalizeStackSize(proj.stackSize),
@@ -107,6 +114,7 @@ function buildBlog() {
 
 function normalize(rawData) {
   const p = rawData.profile || {}
+  const allProjects = buildProjects()
   return {
     profile: {
       name: p.name ?? '',
@@ -118,7 +126,12 @@ function normalize(rawData) {
       interests: flatList(p.interests, 'interest'),
       about: flatList(p.about, 'paragraph'),
     },
-    projects: buildProjects(),
+    // Full list used by the oscilloscope PROJECTS module — everything shows.
+    projects: allProjects,
+    // Subset shown on the Build Log site (/log and /log/<id>). Projects with
+    // showInBuildLog=false are hidden here so legacy projects that predate
+    // the build log can stay on the portfolio without polluting the notebook.
+    buildLogProjects: allProjects.filter((proj) => proj.showInBuildLog !== false),
     blog: buildBlog(),
     experience: (rawData.experience || []).map((ex) => ({
       id: ex.id ?? '',

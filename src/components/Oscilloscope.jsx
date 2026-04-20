@@ -292,14 +292,14 @@ const ProjectsModule = ({
       <div className="project-grid">
         {projects.map((p, idx) => {
           const entryCount = blogEntryCountsByProject?.get?.(p.id) ?? 0
-          const href = `/log/${encodeURIComponent(p.id)}`
-          return (
-            <Link
-              key={p.id}
-              to={href}
-              className="project-card project-card--clickable"
-              aria-label={`Open ${p.title} build log`}
-            >
+          const inBuildLog = p.showInBuildLog !== false
+          // The card is always the same visual block; only the wrapper element
+          // and the footer CTA change based on how the project routes:
+          //   • in build log  → <Link to="/log/:id">  (internal)
+          //   • external only → <a href={p.link}>     (hidden from build log)
+          //   • neither       → <div>                 (inert info card)
+          const cardInner = (
+            <>
               <div className="project-image">
                 {p.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
                   <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
@@ -312,7 +312,7 @@ const ProjectsModule = ({
               <div className="project-content">
                 <div className="project-card-toprow">
                   <div className="project-title">{p.title}</div>
-                  {entryCount > 0 ? (
+                  {inBuildLog && entryCount > 0 ? (
                     <span
                       className="project-card-logchip mono"
                       title={`${entryCount} build log ${entryCount === 1 ? 'entry' : 'entries'}`}
@@ -327,7 +327,11 @@ const ProjectsModule = ({
                 </div>
                 {p.date ? <span className="project-date">{p.date}</span> : null}
                 <div className="project-desc">
-                  <p>{plainFromMarkdown(p.description)}</p>
+                  {p.summary ? (
+                    <p>{p.summary}</p>
+                  ) : (
+                    <MarkdownBlock markdown={p.description} />
+                  )}
                 </div>
                 <div className="project-tags">
                   {p.tags.map((t) => (
@@ -337,21 +341,59 @@ const ProjectsModule = ({
                   ))}
                 </div>
                 <div className="project-card-footer">
-                  <span className="project-card-open mono">OPEN BUILD LOG →</span>
-                  {p.link ? (
-                    <a
-                      className="project-external-link"
-                      href={p.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      External ↗
-                    </a>
+                  {inBuildLog ? (
+                    <>
+                      <span className="project-card-open mono">OPEN BUILD LOG →</span>
+                      {p.link ? (
+                        <a
+                          className="project-external-link"
+                          href={p.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          External ↗
+                        </a>
+                      ) : null}
+                    </>
+                  ) : p.link ? (
+                    <span className="project-card-open mono">VISIT PROJECT ↗</span>
                   ) : null}
                 </div>
               </div>
-            </Link>
+            </>
+          )
+
+          if (inBuildLog) {
+            return (
+              <Link
+                key={p.id}
+                to={`/log/${encodeURIComponent(p.id)}`}
+                className="project-card project-card--clickable"
+                aria-label={`Open ${p.title} build log`}
+              >
+                {cardInner}
+              </Link>
+            )
+          }
+          if (p.link) {
+            return (
+              <a
+                key={p.id}
+                href={p.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="project-card project-card--clickable"
+                aria-label={`Visit ${p.title}`}
+              >
+                {cardInner}
+              </a>
+            )
+          }
+          return (
+            <div key={p.id} className="project-card">
+              {cardInner}
+            </div>
           )
         })}
       </div>
