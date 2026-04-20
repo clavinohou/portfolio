@@ -8,7 +8,7 @@
     }
   ],
   "imageUrl": "/uploads/pcbimage.png",
-  "showInBuildLog": true,
+  "showInBuildLog": false,
   "title": "Custom Media Controller & Keyboard",
   "tags": [
     {
