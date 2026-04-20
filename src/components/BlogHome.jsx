@@ -102,12 +102,11 @@ export default function BlogHome() {
           </h1>
 
           <p className="bloghome-lede">
-            An engineering notebook kept alongside the
-            {' '}
-            <Link to="/" className="bloghome-lede-link">main bench</Link>.
-            Short, honest entries about what I'm building — the failures, the
-            fixes, the calculations that actually held up — filed by project
-            like strips torn off a chart recorder.
+            Have you ever thought to yourself, "Dang, I wonder what projects Calvin is working on?"
+          </p>
+          <p className="bloghome-lede" style={{ marginTop: 4 }}>No?</p>
+          <p className="bloghome-lede" style={{ marginTop: 4 }}>
+            Well, that's fine I guess... but if you do find yourself wondering, here you go.
           </p>
 
           <div className="bloghome-stats mono" aria-label="Notebook statistics">

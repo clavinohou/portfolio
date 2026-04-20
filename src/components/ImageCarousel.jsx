@@ -165,9 +165,19 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
     </AnimatePresence>
   )
 
+  // When the carousel is rendered inside a clickable card (e.g. a project
+  // card that wraps the whole thing in an <a href>), bare stopPropagation
+  // isn't enough — the browser still follows the anchor's href because the
+  // default action wasn't cancelled. preventDefault cancels that, and
+  // stopPropagation keeps the parent's synthetic onClick from firing.
+  const swallowClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   return (
     <>
-      <div className={rootClass} onClick={(e) => e.stopPropagation()}>
+      <div className={rootClass} onClick={swallowClick}>
         <div className="media-carousel__grid" aria-label={altPrefix}>
           {(n <= visibleSlots
             ? list
@@ -184,7 +194,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                 type="button"
                 className="media-carousel__thumb"
                 onClick={(e) => {
-                  e.stopPropagation()
+                  swallowClick(e)
                   setI(idx)
                   setExpanded(true)
                 }}
@@ -203,7 +213,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
               className="media-carousel__vnav media-carousel__vnav--up"
               aria-label="Previous images"
               onClick={(e) => {
-                e.stopPropagation()
+                swallowClick(e)
                 setWindowStart((v) => (v - 1 + n) % n)
               }}
             >
@@ -214,7 +224,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
               className="media-carousel__vnav media-carousel__vnav--down"
               aria-label="Next images"
               onClick={(e) => {
-                e.stopPropagation()
+                swallowClick(e)
                 setWindowStart((v) => (v + 1) % n)
               }}
             >

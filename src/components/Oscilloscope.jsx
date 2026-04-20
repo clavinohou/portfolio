@@ -350,7 +350,22 @@ const ProjectsModule = ({
                           href={p.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            // This <a> sits inside the card's outer <Link>
+                            // (also an <a>). Nested anchors are invalid HTML
+                            // and browsers handle them inconsistently — the
+                            // outer href can still fire on left click. Cancel
+                            // both anchors' default navigation, stop React
+                            // bubbling, and open the external URL ourselves.
+                            // Only intercept plain left clicks so cmd/ctrl/
+                            // middle-click still use the browser's native
+                            // "open in new tab" behaviour.
+                            if (e.button !== 0) return
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+                            e.preventDefault()
+                            e.stopPropagation()
+                            window.open(p.link, '_blank', 'noopener,noreferrer')
+                          }}
                         >
                           External ↗
                         </a>
