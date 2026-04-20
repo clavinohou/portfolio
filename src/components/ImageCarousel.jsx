@@ -71,6 +71,21 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
   const src = publicUrl(list[i])
   const rootClass = `media-carousel media-carousel--${variant}`
 
+  // When the carousel (or its lightbox portal) is rendered inside a clickable
+  // card — e.g. a project card wrapped in <Link> (an <a href>) — bare
+  // stopPropagation isn't enough. preventDefault cancels the anchor's default
+  // navigation, stopPropagation keeps the synthetic event from bubbling
+  // through the React tree (which portals still do) into the parent Link.
+  const swallowClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  // The lightbox is rendered into document.body via createPortal, but React's
+  // synthetic events still bubble through the React tree — so clicks inside
+  // the portal reach the parent card's <Link> anchor and fire navigation.
+  // Every click handler in the lightbox calls swallowClick BEFORE doing its
+  // thing so the event never reaches that anchor.
   const lightbox = (
     <AnimatePresence>
       {expanded && (
@@ -83,6 +98,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
+          onClick={swallowClick}
         >
           <motion.div
             className="media-lightbox__backdrop"
@@ -90,7 +106,10 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setExpanded(false)}
+            onClick={(e) => {
+              swallowClick(e)
+              setExpanded(false)
+            }}
           />
           <motion.div
             className="media-lightbox__panel"
@@ -99,7 +118,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={swallowClick}
           >
             <div className="media-lightbox__chrome">
               <span className="media-lightbox__title">{altPrefix}</span>
@@ -112,7 +131,10 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                 type="button"
                 className="media-lightbox__close"
                 aria-label="Close"
-                onClick={() => setExpanded(false)}
+                onClick={(e) => {
+                  swallowClick(e)
+                  setExpanded(false)
+                }}
               >
                 ×
               </button>
@@ -125,7 +147,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                     className="media-lightbox__nav media-lightbox__nav--prev"
                     aria-label="Previous"
                     onClick={(e) => {
-                      e.stopPropagation()
+                      swallowClick(e)
                       goPrev(e)
                     }}
                   >
@@ -136,7 +158,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                     className="media-lightbox__nav media-lightbox__nav--next"
                     aria-label="Next"
                     onClick={(e) => {
-                      e.stopPropagation()
+                      swallowClick(e)
                       goNext(e)
                     }}
                   >
@@ -154,7 +176,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
                 onClick={(e) => {
-                  e.stopPropagation()
+                  swallowClick(e)
                   setZoomed((z) => !z)
                 }}
               />
@@ -164,16 +186,6 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
       )}
     </AnimatePresence>
   )
-
-  // When the carousel is rendered inside a clickable card (e.g. a project
-  // card that wraps the whole thing in an <a href>), bare stopPropagation
-  // isn't enough — the browser still follows the anchor's href because the
-  // default action wasn't cancelled. preventDefault cancels that, and
-  // stopPropagation keeps the parent's synthetic onClick from firing.
-  const swallowClick = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
 
   return (
     <>
