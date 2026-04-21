@@ -1,6 +1,6 @@
 {
   "summary": "A smart, ultra-compact 1S LiPo charging board engineered specifically for BetaFPV BT2.0 batteries. Powered by USB PD 3.0, it provides a reliable 750mA sustained charge per cell and features built-in I2C and wireless connectivity to track charging stats directly from a mobile app.",
-  "stackSize": 1,
+  "stackSize": 4,
   "order": 1,
   "date": "Jan 2026",
   "gallery": [
