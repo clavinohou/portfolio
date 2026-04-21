@@ -46,11 +46,12 @@ collections:
     extension: json
     slug: '{{fields.id}}'
     identifier_field: title
-    summary: '{{title}}  ·  order {{order}}'
-    sortable_fields: ['order', 'title', 'date']
+    summary: '{{title}}  ·  {{sortOrder}}'
+    sortable_fields: ['sortOrder', 'title', 'date']
     view_groups:
-      - label: By channel order
-        field: order
+      - label: By pinned date
+        field: sortOrder
+        pattern: '\d{4}'
     fields:
       - {
           label: ID (URL slug),
@@ -61,13 +62,15 @@ collections:
         }
       - { label: Title, name: title, widget: string }
       - {
-          label: Display order,
-          name: order,
-          widget: number,
-          value_type: int,
-          min: 1,
-          default: 99,
-          hint: 'Lower = shown first. Use 1 for your flagship project, 2 for the next, etc. New projects default to 99 so they land at the end — edit to re-order.',
+          label: Pinned date (sort key),
+          name: sortOrder,
+          widget: datetime,
+          format: 'YYYY-MM-DDTHH:mm',
+          date_format: 'YYYY-MM-DD',
+          time_format: 'HH:mm',
+          picker_utc: false,
+          required: false,
+          hint: 'Projects show newest-first using this value. New entries default to right now, so they land at the top automatically. To bump an old project back to the front, just edit this field and press "Now" — no need to renumber anything else.',
         }
       - {
           label: Date,
@@ -133,14 +136,24 @@ collections:
               choose_url: true,
             }
       - {
-          label: Visible images in stack,
+          label: Visible images on portfolio card,
           name: stackSize,
           widget: number,
           value_type: int,
           min: 1,
           max: 8,
           required: false,
-          hint: 'How many images peek out behind the top image before the user has to arrow through. Leave blank to show all.',
+          hint: 'Shown on the oscilloscope PROJECTS card (calvinhou.com). That card is narrow and sits next to a short summary, so 1–3 images usually looks best. Leave blank to show all.',
+        }
+      - {
+          label: Visible images on Build Log page,
+          name: buildLogStackSize,
+          widget: number,
+          value_type: int,
+          min: 1,
+          max: 8,
+          required: false,
+          hint: 'Shown on the Build Log project page (/log/<id>). That hero is taller (sits next to the long description), so 3–5 images usually looks best. Leave blank to reuse the portfolio card value above, or fall back to showing all.',
         }
 
   # ————————————————————————— BUILD LOG —————————————————————————
@@ -237,14 +250,14 @@ collections:
               choose_url: true,
             }
       - {
-          label: Visible images in stack,
+          label: Visible images on Build Log entry,
           name: stackSize,
           widget: number,
           value_type: int,
           min: 1,
           max: 8,
           required: false,
-          hint: 'How many images peek out behind the top one. Leave blank to show all.',
+          hint: 'How many images show in the stack on this entry. Leave blank to show all.',
         }
 
   # ————————————————————————— SITE SETTINGS —————————————————————————

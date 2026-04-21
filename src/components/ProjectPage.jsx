@@ -180,7 +180,11 @@ export default function ProjectPage({ projectId }) {
                 <ImageCarousel
                   images={project.images}
                   altPrefix={project.title}
-                  stackSize={project.stackSize ?? Math.min(project.images.length, 4)}
+                  stackSize={
+                    project.buildLogStackSize
+                    ?? project.stackSize
+                    ?? Math.min(project.images.length, 4)
+                  }
                   variant="cover"
                 />
               ) : (

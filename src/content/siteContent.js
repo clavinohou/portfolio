@@ -46,6 +46,15 @@ function idFromPath(path) {
 
 function normalizeProject(proj, path) {
   const id = (proj.id ?? '').toString().trim() || idFromPath(path)
+  // sortOrder is a datetime string (ISO-ish, YYYY-MM-DDTHH:mm). We store the
+  // millisecond value and sort DESC so the most recently "pinned" project lands
+  // at the top. To bump a project to the front, just edit sortOrder to "now" in
+  // Decap — no renumbering required. Legacy numeric `order` (lower = first) is
+  // still honored for any project that hasn't been migrated yet.
+  const sortOrderRaw = (proj.sortOrder ?? '').toString().trim()
+  const sortOrderMs = sortOrderRaw ? new Date(sortOrderRaw).getTime() : NaN
+  const hasSortOrder = Number.isFinite(sortOrderMs)
+  const legacyOrder = Number.isFinite(Number(proj.order)) ? Number(proj.order) : null
   return {
     id,
     title: proj.title ?? '',
@@ -62,10 +71,13 @@ function normalizeProject(proj, path) {
     showInBuildLog: proj.showInBuildLog === false ? false : true,
     imageUrl: proj.imageUrl ?? '',
     images: projectImages(proj),
+    // Two independent stack sizes so the narrow oscilloscope card and the
+    // wider /log/<id> hero can show a different number of thumbnails.
+    // buildLogStackSize falls back to stackSize if unset.
     stackSize: normalizeStackSize(proj.stackSize),
-    // numeric order field controls display order on the site (1, 2, 3…).
-    // Unset entries sort to the end but remain stable by id.
-    order: Number.isFinite(Number(proj.order)) ? Number(proj.order) : Number.POSITIVE_INFINITY,
+    buildLogStackSize: normalizeStackSize(proj.buildLogStackSize),
+    _sortOrderMs: hasSortOrder ? sortOrderMs : null,
+    _legacyOrder: legacyOrder,
   }
 }
 
@@ -97,10 +109,24 @@ function buildProjects() {
   return entries
     .filter((p) => p.id && p.title)
     .sort((a, b) => {
-      if (a.order !== b.order) return a.order - b.order
+      // 1. Projects with a sortOrder datetime sort ABOVE those without — newer
+      //    (larger ms) comes first. This is the primary reorder knob now.
+      const aHas = a._sortOrderMs !== null
+      const bHas = b._sortOrderMs !== null
+      if (aHas && bHas && a._sortOrderMs !== b._sortOrderMs) {
+        return b._sortOrderMs - a._sortOrderMs
+      }
+      if (aHas !== bHas) return aHas ? -1 : 1
+      // 2. Legacy numeric `order` (lower = first) — kept so pre-migration
+      //    projects don't randomly jump when we roll this out.
+      const aLegacy = a._legacyOrder ?? Number.POSITIVE_INFINITY
+      const bLegacy = b._legacyOrder ?? Number.POSITIVE_INFINITY
+      if (aLegacy !== bLegacy) return aLegacy - bLegacy
+      // 3. Stable alphabetical fallback.
       return a.id.localeCompare(b.id)
     })
-    .map(({ order: _order, ...rest }) => rest) // hide the internal order key from consumers
+    // Hide internal sort keys from downstream consumers.
+    .map(({ _sortOrderMs: _a, _legacyOrder: _b, ...rest }) => rest)
 }
 
 function buildBlog() {
