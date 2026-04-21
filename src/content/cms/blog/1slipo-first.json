@@ -1,0 +1,9 @@
+{
+  "id": "1slipo-first",
+  "title": "Orders In!",
+  "project": "1s-lipo",
+  "date": "2026-04-21T17:02",
+  "summary": "TLDR: Ordered parts, waiting on it to arrive...",
+  "tags": [],
+  "body": "Just a quick initial update on the board.\\\nAll the necessary orders have officially been placed through JLCPCB, DigiKey, and Amazon.\n\nI’ve already received the DigiKey components, but the JLCPCB order is naturally taking a little longer to account for the actual board production time and overseas shipping.\n\nAssuming the shipping estimates hold up, assembly should kick off this coming weekend. From there, I can finally dive right into board bring-up and testing.\n\nMore updates coming soon!"
+}
