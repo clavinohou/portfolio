@@ -2,7 +2,7 @@
 
 My personal portfolio - Inspired by the Teenage Engineering design language.
 
-![View it here](calvinhou.com)
+[Check it out here!](calvinhou.com)
 
 
 ## Front + Backend
