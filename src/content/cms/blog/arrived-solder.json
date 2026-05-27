@@ -1,9 +1,17 @@
 {
-  "id": "arrived-solder",
-  "title": "Boards arrived & Soldered",
-  "project": "1s-lipo",
-  "date": "2026-05-08T14:48",
+  "body": "**01. fabrication & qc**\\\nThe bare boards arrived with zero electrical defects. I did notice some minor solder mask anomalies on a few of the high-density IC footprints. This seems to be a manufacturing edge case, likely due to me pushing the pad clearance tolerances too close to JLC's limits, but the copper pads themselves are perfectly intact. Overall, the boards are perfectly functional, just with some surface defects.\n\n**02. esp32 reflow**\\\nWithout access to a reflow oven, I used a hot plate to mount the ESP32. The process was straightforward: I tinned the pads on both the module and the PCB, applied heat, and let surface tension pull the board precisely onto the underlying footprint.\n\n**03. dfn packages & hot air**\\\nThis was my first time soldering DFN packages. I applied solder paste using a stencil and reflowed the components with a hot air station, which made the process surprisingly simple. I initially considered using an oven for this step, but to avoid thermally stressing the already-mounted ESP32, I figured that localized hot air was the safest route.\n\n**04. logistics + next steps**\\\nDuring assembly, I realized the DigiKey order was missing a decoupling capacitor for the top battery-checker circuit. They shipped a replacement immediately, but it arrived after I had already moved off campus. Since it’s strictly a decoupling cap, I figure that I can safely proceed with initial power-on testing without it.\n\nOverall, the assembly went incredibly smoothly. I am currently waiting on a final shipment of connectors from BetaFPV, and then the board will be ready for full validation!",
   "summary": "The bare boards from JLC arrived flawlessly, despite a few small hiccups with the DigiKey order. One board is now fully assembled. Components were soldered on using a hot plate, an iron, and a hot air station.",
+  "stackSize": 1,
+  "date": "2026-05-08T14:48",
+  "gallery": [
+    {
+      "src": "/uploads/img_4705-copy.jpg"
+    },
+    {
+      "src": "/uploads/img_4707-copy.jpg"
+    }
+  ],
+  "title": "Boards arrived & Soldered",
   "tags": [
     {
       "tag": "Soldering"
@@ -12,13 +20,6 @@
       "tag": "Board Assembly"
     }
   ],
-  "body": "The boards arrived with no electrical issues. It looks like there were some issues with the footprints  and the solder mask but it only appeared on some boards and not on others so i think its just a weird edge case problem with jlc and my pad clearance being too close to each other, the pads are fine just the solder mask is a little weird on some of the ics that have super small pads. Aside from that the boards didnt have any noticible defects. \\\n\\\nI started soldering with the esp32 and a hot plate. I wanted to initially use an oven to reflow the pads under the esp32 but i didnt have access so a hotplate was the next best thing ic ould get my hands on. It was relatively simple, i just tinned pads on both sides and let it sit until i could see the surface tension pull the board onto the pads underneath.\\\n\\\nMoving onto the smaller ic's this was my first time soldering anything with a dfn package so it was a little different than expected, but with the hot air station it made is super easy. I stuck the solder paste on with the testencil and just hit everything with the hot air. I also wanted to use an oven instead in this step but as i had already put the esp on i didnt want to mess anything up with that so i took the safe route. \\\n\\\nAs i was working on assembly i noticed that Digikey had forgotten to include one of my decoupling caps for the battery checker circuit up at the top. I shot them a quick email about it and they sent a replacement my wya. but unfortunately it arrived after i had already moved off of campus.\\\nas its a decoupling cap im not too worried and i think i can still test the board without it.\\\n\\\nAside from that everything went pretty smoothly with the soldering and im excited to test the board, once i get my connectors from BetaFPV!",
-  "gallery": [
-    {
-      "src": "/uploads/img_4705-copy.jpg"
-    },
-    {
-      "src": "/uploads/img_4707-copy.jpg"
-    }
-  ]
+  "project": "1s-lipo",
+  "id": "arrived-solder"
 }
