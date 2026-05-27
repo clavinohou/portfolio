@@ -7,11 +7,21 @@
     "location": "From Seattle, WA",
     "year": "Junior (Graduating May 2028)",
     "interests": [
-      { "interest": "Robotics + Automation" },
-      { "interest": "PCB Design" },
-      { "interest": "Embedded Systems" },
-      { "interest": "FPGA's & ASIC's" },
-      { "interest": "Rocketry + Space" }
+      {
+        "interest": "Robotics + Automation"
+      },
+      {
+        "interest": "PCB Design"
+      },
+      {
+        "interest": "Embedded Systems"
+      },
+      {
+        "interest": "FPGA's & ASIC's"
+      },
+      {
+        "interest": "Rocketry + Space"
+      }
     ],
     "about": [
       {
@@ -19,22 +29,29 @@
       },
       {
         "paragraph": "My work background includes the validation and assembly of cutting-edge AI server hardware, robot design and development, and electrical system design for various on-campus competition teams, such as our FSAE and Rocketry Teams."
-      },
-      {
-        "paragraph": "Looking into the future, I hope to further expand into the FPGA and IC manufacturing area. I personally believe that's where there is the most potential future growth. In order to do this, I want to become more active in clubs that teach the basics, most notably SiliconJackets. In addition, there are lots of courses at GT that I can take, like ECE 4452."
       }
     ]
   },
   "experience": [
     {
       "date": "Jan 2026 - Present",
-      "gallery": [{ "src": "/uploads/1630580805380.jpeg" }],
+      "gallery": [
+        {
+          "src": "/uploads/1630580805380.jpeg"
+        }
+      ],
       "location": "Atlanta, GA",
       "title": "Avionics Engineer",
       "tags": [
-        { "tag": "Aviation" },
-        { "tag": "PCB Design" },
-        { "tag": "Embedded Systems" }
+        {
+          "tag": "Aviation"
+        },
+        {
+          "tag": "PCB Design"
+        },
+        {
+          "tag": "Embedded Systems"
+        }
       ],
       "type": "Club",
       "id": "yellow-jacket-space-program",
@@ -45,17 +62,31 @@
       "stackSize": 2,
       "date": "Aug 2024",
       "gallery": [
-        { "src": "/uploads/img_4239-copy-1.jpg" },
-        { "src": "/uploads/img_3419-copy.jpg" },
-        { "src": "/uploads/img_3900-copy.jpg" },
-        { "src": "/uploads/img_4248-copy.jpg" }
+        {
+          "src": "/uploads/img_4239-copy-1.jpg"
+        },
+        {
+          "src": "/uploads/img_3419-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_3900-copy.jpg"
+        },
+        {
+          "src": "/uploads/img_4248-copy.jpg"
+        }
       ],
       "location": "New Taipei City, Taiwan",
       "title": "Research and Design Intern",
       "tags": [
-        { "tag": "Thermal Analysis" },
-        { "tag": "Hardware Validation" },
-        { "tag": "AI Systems" }
+        {
+          "tag": "Thermal Analysis"
+        },
+        {
+          "tag": "Hardware Validation"
+        },
+        {
+          "tag": "AI Systems"
+        }
       ],
       "type": "Internship",
       "id": "asia-vital",
@@ -64,13 +95,23 @@
     },
     {
       "date": "Sep 2024",
-      "gallery": [{ "src": "/uploads/img_4912-2-copy.jpg" }],
+      "gallery": [
+        {
+          "src": "/uploads/img_4912-2-copy.jpg"
+        }
+      ],
       "location": "Singapore",
       "title": "Advanced Robotics Centre Research Intern",
       "tags": [
-        { "tag": "Robotics" },
-        { "tag": "Control Systems" },
-        { "tag": "Inverse Kinematics" }
+        {
+          "tag": "Robotics"
+        },
+        {
+          "tag": "Control Systems"
+        },
+        {
+          "tag": "Inverse Kinematics"
+        }
       ],
       "type": "Internship",
       "id": "nus-robotics",
@@ -79,13 +120,23 @@
     },
     {
       "date": "July 2023",
-      "gallery": [{ "src": "/uploads/amazon-future-engineer-featured.png" }],
+      "gallery": [
+        {
+          "src": "/uploads/amazon-future-engineer-featured.png"
+        }
+      ],
       "location": "Seattle, WA",
       "title": "Amazon Future Engineer Program Participant",
       "tags": [
-        { "tag": "Leadership" },
-        { "tag": "Java Script" },
-        { "tag": "Rapid Iteration" }
+        {
+          "tag": "Leadership"
+        },
+        {
+          "tag": "Java Script"
+        },
+        {
+          "tag": "Rapid Iteration"
+        }
       ],
       "type": "Externship",
       "id": "amazon-future-engineer",
@@ -105,9 +156,15 @@
     "lastUpdated": "2026-03-31",
     "internalPrevUrl": "/uploads/calvinresume21326b.pdf",
     "highlights": [
-      { "highlight": "Electrical Engineering (B.S.) — Georgia Tech" },
-      { "highlight": "Robotics + embedded systems experience" },
-      { "highlight": "PCB design and hardware validation" }
+      {
+        "highlight": "Electrical Engineering (B.S.) — Georgia Tech"
+      },
+      {
+        "highlight": "Robotics + embedded systems experience"
+      },
+      {
+        "highlight": "PCB design and hardware validation"
+      }
     ]
   }
 }
