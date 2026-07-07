@@ -115,17 +115,6 @@ function timeScaleFromNorm(t) {
   return 0.3 + t * 1.7
 }
 
-function plainFromMarkdown(markdown) {
-  const text = String(markdown || '')
-  return text
-    .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/[*_`>#-]/g, '')
-    .replace(/\n+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
 /** Continuous 0–1 knob: drag to rotate (analog-style) */
 function ScopeKnobDial({ label, value, onChange, ariaLabel }) {
   const stackRef = useRef(null)
@@ -506,7 +495,7 @@ const ExperienceModule = ({
                 {x.company} · {x.location}
               </div>
               <div className="experience-desc">
-                <p>{plainFromMarkdown(x.description)}</p>
+                <MarkdownBlock markdown={x.description} />
               </div>
               <div className="experience-tags">
                 {x.tags.map((t) => (
