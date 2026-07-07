@@ -34,12 +34,14 @@
   },
   "experience": [
     {
-      "id": "delta-electronics",
-      "type": "Internship",
-      "title": "Firmware Research and Design Internship",
-      "company": "Delta Electronics",
-      "location": "Bangkok, Thailand",
       "date": "Jun 2026 - Aug 2026",
+      "gallery": [
+        {
+          "src": "/uploads/delta_news_photo2019-02-27_15-52-29.jpg"
+        }
+      ],
+      "location": "Bangkok, Thailand",
+      "title": "Firmware Research and Design Internship",
       "tags": [
         {
           "tag": "Embedded Systems"
@@ -51,11 +53,10 @@
           "tag": "Embedded C"
         }
       ],
-      "gallery": [
-        {
-          "src": "/uploads/delta_news_photo2019-02-27_15-52-29.jpg"
-        }
-      ]
+      "type": "Internship",
+      "id": "delta-electronics",
+      "description": "* **Internship still in progress; More work to be done!!**\n\n* Discovered fragmented, product-siloed MCAL implementations — refactored and standardized 6 STM32 modules (PWM, ADC, DAC, CAN FD, UART, Watchdog) into a shared library, eliminating redundant rewrites for 8 engineers across 6 bespoke PSU/supercap designs used in Fortune 10 hyperscale cloud and semiconductor companies.\n\n* Root-caused EMF-induced signal faults in production data center PSUs through board-level debugging, then implemented and validated 21 filter configurations (IIR averaging + configurable glitch filtering) in STM32 embedded C — reducing false fault triggers and exposing tunable parameters as user-configurable endpoints\n\n* Wrote exhaustive Python bench test suites per module — the PWM suite alone validated 900 hardware configurations (9 timers × 4 channels × 5 frequencies × 5 duty cycles), establishing operational min/max bounds and generating evidence used for UL60730-1 certification",
+      "company": "Delta Electronics"
     },
     {
       "date": "Jan 2026 - Present",
