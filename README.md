@@ -1,8 +1,8 @@
 # Personal Portfolio - Calvin Hou
 
-My personal portfolio - Inspired by the Teenage Engineering design language.
+Design inspired by Teenage Engineering design language. (my favorite!)
 
-[Check it out here!](https://calvinhou.com)
+[Check it out here](https://calvinhou.com)
 
 
 ## Front + Backend
