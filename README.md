@@ -2,7 +2,7 @@
 
 Design inspired by Teenage Engineering design language. (my favorite!)
 
-[Check it out here](https://calvinhou.com)
+[Link](https://calvinhou.com)
 
 
 ## Front + Backend
