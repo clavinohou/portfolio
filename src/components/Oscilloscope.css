@@ -587,7 +587,7 @@
 }
 
 .scope-crt-name {
-  font-size: clamp(0.78rem, 1.6vw, 1rem);
+  font-size: clamp(0.94rem, 1.85vw, 1.2rem);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -600,7 +600,7 @@
 
 .scope-crt-title-line {
   margin-top: 4px;
-  font-size: clamp(0.62rem, 1.15vw, 0.78rem);
+  font-size: clamp(0.72rem, 1.35vw, 0.9rem);
   letter-spacing: 0.04em;
   color: rgba(152, 255, 196, 0.84);
   text-shadow: 0 0 11px rgba(85, 255, 150, 0.36);
@@ -609,7 +609,7 @@
 
 .scope-crt-meta {
   margin-top: clamp(6px, 1vw, 10px);
-  font-size: clamp(0.52rem, 1vw, 0.65rem);
+  font-size: clamp(0.6rem, 1.15vw, 0.74rem);
   letter-spacing: 0.04em;
   line-height: 1.45;
   color: rgba(142, 252, 186, 0.78);
@@ -630,6 +630,64 @@
   overflow: visible;
 }
 
+.scope-trigger-marker {
+  --trigger-color: var(--scope-accent-orange);
+  appearance: none;
+  position: absolute;
+  right: 2px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  width: 30px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--trigger-color);
+  transform: translateY(-50%);
+  cursor: ns-resize;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--trigger-color) 65%, transparent));
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.scope-trigger-marker svg {
+  width: 18px;
+  height: 14px;
+  overflow: visible;
+}
+
+.scope-trigger-marker path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.scope-trigger-marker-label {
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scope-trigger-marker.is-searching {
+  --trigger-color: var(--scope-accent-yellow);
+  animation: triggerMarkerSearching 780ms ease-in-out infinite alternate;
+}
+
+.scope-trigger-marker:focus-visible {
+  outline: 1px solid var(--trigger-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@keyframes triggerMarkerSearching {
+  from { opacity: 0.52; }
+  to { opacity: 1; }
+}
+
 .scope-wave {
   position: absolute;
   inset: 0;
@@ -644,7 +702,8 @@
 .scope-crt-trace-badge {
   position: absolute;
   top: 6px;
-  right: 8px;
+  /* Keep the right-edge trigger marker's travel lane clear. */
+  right: 44px;
   z-index: 3;
   font-size: clamp(0.48rem, 0.9vw, 0.58rem);
   letter-spacing: 0.12em;
@@ -663,7 +722,7 @@
 }
 
 .scope-crt-lower-label {
-  font-size: clamp(0.48rem, 0.85vw, 0.58rem);
+  font-size: clamp(0.56rem, 1vw, 0.66rem);
   letter-spacing: 0.16em;
   color: rgba(145, 250, 186, 0.65);
   text-shadow: 0 0 8px rgba(85, 255, 150, 0.25);
@@ -674,15 +733,15 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 5px 8px;
+  gap: 6px 9px;
   max-width: 100%;
 }
 
 .scope-crt-tag {
-  font-size: clamp(0.48rem, 0.95vw, 0.62rem);
+  font-size: clamp(0.55rem, 1.08vw, 0.7rem);
   letter-spacing: 0.04em;
   color: rgba(174, 255, 206, 0.9);
-  padding: 3px 6px;
+  padding: 4px 7px;
   border-radius: 2px;
   border: 1px solid rgba(95, 255, 155, 0.42);
   background: rgba(3, 34, 15, 0.44);
@@ -739,6 +798,15 @@
   opacity: 0.65;
 }
 
+.scope-hscale-center.is-locked {
+  color: color-mix(in oklab, var(--scope-accent-green) 56%, rgba(0, 0, 0, 0.58));
+}
+
+.scope-hscale-center.is-searching {
+  color: color-mix(in oklab, var(--scope-accent-yellow) 68%, rgba(0, 0, 0, 0.58));
+  opacity: 0.86;
+}
+
 /* Controls column */
 .scope-controls-column {
   --knob-dial: 56px;
@@ -758,15 +826,19 @@
   min-width: 0;
 }
 
-.scope-controls-section:nth-child(1) .scope-section-label {
+.scope-controls-section--trigger .scope-section-label {
+  color: color-mix(in oklab, var(--scope-accent-orange) 72%, #1f2937);
+}
+
+.scope-controls-section--vertical .scope-section-label {
   color: color-mix(in oklab, var(--scope-accent-green) 72%, #1f2937);
 }
 
-.scope-controls-section:nth-child(2) .scope-section-label {
+.scope-controls-section--horizontal .scope-section-label {
   color: color-mix(in oklab, var(--scope-accent-yellow) 74%, #1f2937);
 }
 
-.scope-controls-section:nth-child(3) .scope-section-label {
+.scope-controls-section--input .scope-section-label {
   color: color-mix(in oklab, var(--scope-accent-cyan) 72%, #1f2937);
 }
 
@@ -784,9 +856,12 @@
   align-items: start;
 }
 
-/* Third knob (V-POS): centered on its own row */
-.scope-knob-grid > .scope-knob:nth-child(3) {
-  grid-column: 1 / -1;
+.scope-knob-grid--single {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.scope-knob-grid--single .scope-knob {
+  grid-column: 1;
   justify-self: center;
 }
 
@@ -828,15 +903,19 @@
   border-radius: 8px;
 }
 
-.scope-controls-section:nth-child(1) .scope-knob {
+.scope-controls-section--trigger .scope-knob {
+  --focus-accent: var(--scope-accent-orange);
+}
+
+.scope-controls-section--vertical .scope-knob {
   --focus-accent: var(--scope-accent-green);
 }
 
-.scope-controls-section:nth-child(2) .scope-knob {
+.scope-controls-section--horizontal .scope-knob {
   --focus-accent: var(--scope-accent-yellow);
 }
 
-.scope-controls-section:nth-child(3) .scope-knob {
+.scope-controls-section--input .scope-knob {
   --focus-accent: var(--scope-accent-cyan);
 }
 
@@ -859,14 +938,21 @@
   pointer-events: none;
 }
 
-.scope-controls-section:nth-child(1) .scope-knob-ring {
+.scope-controls-section--trigger .scope-knob-ring {
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.5) inset,
+    0 6px 12px rgba(0, 0, 0, 0.12),
+    0 0 0 1px color-mix(in oklab, var(--scope-accent-orange) 32%, transparent);
+}
+
+.scope-controls-section--vertical .scope-knob-ring {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.5) inset,
     0 6px 12px rgba(0, 0, 0, 0.12),
     0 0 0 1px color-mix(in oklab, var(--scope-accent-green) 30%, transparent);
 }
 
-.scope-controls-section:nth-child(2) .scope-knob-ring {
+.scope-controls-section--horizontal .scope-knob-ring {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.5) inset,
     0 6px 12px rgba(0, 0, 0, 0.12),
@@ -905,6 +991,24 @@
   text-align: center;
   color: rgba(0, 0, 0, 0.48);
   line-height: 1.2;
+}
+
+.scope-knob-text > span {
+  display: block;
+}
+
+.scope-knob-value {
+  margin-top: 2px;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.62);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scope-trigger-marker.is-searching {
+    animation: none;
+  }
 }
 
 .scope-input-section {

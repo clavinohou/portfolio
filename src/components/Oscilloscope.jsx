@@ -80,11 +80,7 @@ function tileComplexWavePath() {
   const parts = []
   let i = 0
   for (let x = WAVE_X0; x <= WAVE_X1; x += step) {
-    const y =
-      50 +
-      16 * Math.sin((x / 38) * 2 * Math.PI) +
-      10 * Math.sin((x / 15) * 2 * Math.PI) +
-      5 * Math.sin((x / 7) * 2 * Math.PI)
+    const y = complexWaveY(x)
     const xf = Math.round(x * 100) / 100
     const yf = Math.round(Math.min(92, Math.max(8, y)) * 100) / 100
     parts.push(i === 0 ? `M${xf},${yf}` : `L${xf},${yf}`)
@@ -104,8 +100,110 @@ function waveformPath(shapeIndex) {
   }
 }
 
-const TIME_DIV_LABELS = ['1 ns', '10 ns', '100 ns', '1 μs', '10 μs', '100 μs', '1 ms', '10 ms']
-const VOLTS_DIV_LABELS = ['2 mV', '5 mV', '10 mV', '20 mV', '50 mV', '100 mV', '200 mV', '500 mV']
+// Front-panel scales run from coarse to fine as the knob turns clockwise,
+// matching the gain/timebase behavior of a real scope.
+const TIME_DIV_OPTIONS = [
+  { label: '10 ms', seconds: 10e-3 },
+  { label: '1 ms', seconds: 1e-3 },
+  { label: '100 μs', seconds: 100e-6 },
+  { label: '10 μs', seconds: 10e-6 },
+  { label: '1 μs', seconds: 1e-6 },
+  { label: '100 ns', seconds: 100e-9 },
+  { label: '10 ns', seconds: 10e-9 },
+  { label: '1 ns', seconds: 1e-9 },
+]
+const VOLTS_DIV_OPTIONS = [
+  { label: '500 mV', volts: 500e-3 },
+  { label: '200 mV', volts: 200e-3 },
+  { label: '100 mV', volts: 100e-3 },
+  { label: '50 mV', volts: 50e-3 },
+  { label: '20 mV', volts: 20e-3 },
+  { label: '10 mV', volts: 10e-3 },
+  { label: '5 mV', volts: 5e-3 },
+  { label: '2 mV', volts: 2e-3 },
+]
+
+function formatSeconds(seconds) {
+  const magnitude = Math.abs(seconds)
+  if (magnitude < 0.5e-9) return '0 s'
+  if (magnitude < 1e-6) return `${(seconds * 1e9).toFixed(magnitude < 10e-9 ? 1 : 0)} ns`
+  if (magnitude < 1e-3) return `${(seconds * 1e6).toFixed(magnitude < 10e-6 ? 1 : 0)} μs`
+  if (magnitude < 1) return `${(seconds * 1e3).toFixed(magnitude < 10e-3 ? 1 : 0)} ms`
+  return `${seconds.toFixed(magnitude < 10 ? 1 : 0)} s`
+}
+
+function formatVolts(volts) {
+  const magnitude = Math.abs(volts)
+  if (magnitude < 0.5e-3) return '0 V'
+  if (magnitude < 1) return `${(volts * 1e3).toFixed(magnitude < 10e-3 ? 1 : 0)} mV`
+  return `${volts.toFixed(magnitude < 10 ? 1 : 0)} V`
+}
+
+const COMPLEX_PERIOD = 200
+const COMPLEX_COMPONENTS = [
+  { harmonic: 2, amplitude: 15, phase: 0 },
+  { harmonic: 5, amplitude: 7, phase: 0.85 },
+  { harmonic: 11, amplitude: 3.5, phase: -0.4 },
+]
+
+function rawComplexWaveY(x) {
+  let value = 0
+  for (const component of COMPLEX_COMPONENTS) {
+    value +=
+      component.amplitude *
+      Math.sin((x / COMPLEX_PERIOD) * 2 * Math.PI * component.harmonic + component.phase)
+  }
+  return value
+}
+
+let complexPeak = 1
+for (let x = 0; x <= COMPLEX_PERIOD; x += 0.05) {
+  complexPeak = Math.max(complexPeak, Math.abs(rawComplexWaveY(x)))
+}
+const COMPLEX_GAIN = 22 / complexPeak
+
+function complexWaveY(x) {
+  return 50 + rawComplexWaveY(x) * COMPLEX_GAIN
+}
+
+function sampledWaveLimits(waveFn, period) {
+  let min = Number.POSITIVE_INFINITY
+  let max = Number.NEGATIVE_INFINITY
+  for (let x = 0; x <= period; x += 0.02) {
+    const y = waveFn(x)
+    min = Math.min(min, y)
+    max = Math.max(max, y)
+  }
+  return { min, max, period }
+}
+
+const WAVE_LIMITS = [
+  { min: 27, max: 73, period: 24 },
+  { min: 22, max: 78, period: 55 },
+  sampledWaveLimits(complexWaveY, COMPLEX_PERIOD),
+]
+
+/** Find the rising-voltage crossing (decreasing SVG y) used to lock the trace. */
+function risingCrossingX(shapeIndex, rawTriggerY) {
+  if (shapeIndex === 0) {
+    const ratio = Math.min(1, Math.max(-1, (rawTriggerY - 50) / 23))
+    return ((Math.PI - Math.asin(ratio)) / (2 * Math.PI)) * 24
+  }
+  if (shapeIndex === 1) return 55 / 2
+
+  let previousX = 0
+  let previousY = complexWaveY(previousX)
+  for (let x = 0.2; x <= COMPLEX_PERIOD; x += 0.2) {
+    const y = complexWaveY(x)
+    if (previousY >= rawTriggerY && y <= rawTriggerY) {
+      const span = previousY - y || 1
+      return previousX + ((previousY - rawTriggerY) / span) * (x - previousX)
+    }
+    previousX = x
+    previousY = y
+  }
+  return 0
+}
 
 function voltsGainFromNorm(t) {
   return 0.35 + t * 1.65
@@ -116,7 +214,7 @@ function timeScaleFromNorm(t) {
 }
 
 /** Continuous 0–1 knob: drag to rotate (analog-style) */
-function ScopeKnobDial({ label, value, onChange, ariaLabel }) {
+function ScopeKnobDial({ label, value, valueLabel, onChange, ariaLabel }) {
   const stackRef = useRef(null)
   const dragging = useRef(false)
   const lastAngle = useRef(null)
@@ -180,6 +278,7 @@ function ScopeKnobDial({ label, value, onChange, ariaLabel }) {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(value * 100)}
+      aria-valuetext={valueLabel}
       onPointerDown={startDrag}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
@@ -202,7 +301,10 @@ function ScopeKnobDial({ label, value, onChange, ariaLabel }) {
           <span className="scope-knob-indicator" />
         </span>
       </span>
-      <span className="scope-knob-text mono">{label}</span>
+      <span className="scope-knob-text mono">
+        <span>{label}</span>
+        {valueLabel ? <span className="scope-knob-value">{valueLabel}</span> : null}
+      </span>
     </button>
   )
 }
@@ -621,12 +723,16 @@ export default function Oscilloscope({
   // it settles into the normal "on" state and the power button can be used.
   const [powerState, setPowerState] = useState('booting')
   const powerTimerRef = useRef(null)
-  const [knobIntensity, setKnobIntensity] = useState(0.5)
+  const [triggerLevel, setTriggerLevel] = useState(1)
   const [knobVolts, setKnobVolts] = useState(0.5)
   const [knobVPos, setKnobVPos] = useState(0.5)
   const [knobSec, setKnobSec] = useState(0.5)
   const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
+  const triggerSlotRef = useRef(null)
+  const triggerDraggingRef = useRef(false)
+  const wavePhaseGroupRef = useRef(null)
+  const streamPhaseRef = useRef(0)
   // Per-project build log counts, shown as a small chip on each project card.
   const blogEntryCountsByProject = useMemo(() => {
     const counts = new Map()
@@ -836,10 +942,100 @@ export default function Oscilloscope({
     return { vGain, hScale, vOff, hOff }
   }, [knobVolts, knobSec, knobVPos, knobHPos])
 
-  const glowVar = useMemo(() => (isPoweredOn ? 0.35 + knobIntensity * 0.65 : 0.03), [isPoweredOn, knobIntensity])
+  const glowVar = isPoweredOn ? 0.68 : 0.03
+  const voltsLabelIdx = Math.min(
+    VOLTS_DIV_OPTIONS.length - 1,
+    Math.round(knobVolts * (VOLTS_DIV_OPTIONS.length - 1)),
+  )
+  const secLabelIdx = Math.min(
+    TIME_DIV_OPTIONS.length - 1,
+    Math.round(knobSec * (TIME_DIV_OPTIONS.length - 1)),
+  )
+  const voltsOption = VOLTS_DIV_OPTIONS[voltsLabelIdx]
+  const timeOption = TIME_DIV_OPTIONS[secLabelIdx]
+  const offsetLabel = formatVolts((knobVPos - 0.5) * voltsOption.volts * 8)
+  const delayLabel = formatSeconds((knobHPos - 0.5) * timeOption.seconds * 8)
+  const triggerY = 92 - triggerLevel * 84
+  const waveLimits = WAVE_LIMITS[selectedWave.shapeIndex]
+  const displayedWaveMin = 50 + waveTransform.vGain * (waveLimits.min - 50) + waveTransform.vOff
+  const displayedWaveMax = 50 + waveTransform.vGain * (waveLimits.max - 50) + waveTransform.vOff
+  const triggerLocked =
+    isPoweredOn && triggerY >= displayedWaveMin - 0.5 && triggerY <= displayedWaveMax + 0.5
+  const rawTriggerY = (triggerY - waveTransform.vOff - 50) / waveTransform.vGain + 50
+  const lockedPhase = 110 - risingCrossingX(selectedWave.shapeIndex, rawTriggerY)
 
-  const voltsLabelIdx = Math.min(VOLTS_DIV_LABELS.length - 1, Math.round(knobVolts * (VOLTS_DIV_LABELS.length - 1)))
-  const secLabelIdx = Math.min(TIME_DIV_LABELS.length - 1, Math.round(knobSec * (TIME_DIV_LABELS.length - 1)))
+  const updateTriggerFromPointer = useCallback((event) => {
+    const rect = triggerSlotRef.current?.getBoundingClientRect()
+    if (!rect || rect.height <= 0) return
+    const y = Math.min(rect.bottom, Math.max(rect.top, event.clientY))
+    const svgY = ((y - rect.top) / rect.height) * 100
+    setTriggerLevel(Math.min(1, Math.max(0, (92 - svgY) / 84)))
+  }, [])
+
+  const startTriggerDrag = useCallback(
+    (event) => {
+      event.preventDefault()
+      triggerDraggingRef.current = true
+      event.currentTarget.setPointerCapture(event.pointerId)
+      updateTriggerFromPointer(event)
+    },
+    [updateTriggerFromPointer],
+  )
+
+  const moveTrigger = useCallback(
+    (event) => {
+      if (!triggerDraggingRef.current) return
+      updateTriggerFromPointer(event)
+    },
+    [updateTriggerFromPointer],
+  )
+
+  const endTriggerDrag = useCallback((event) => {
+    triggerDraggingRef.current = false
+    try {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId)
+      }
+    } catch {
+      /* Pointer capture may already have been released by the browser. */
+    }
+  }, [])
+
+  // A triggered sweep is phase-locked. If the level moves beyond the signal,
+  // update the SVG transform directly on animation frames so the React tree is
+  // not re-rendered continuously while the trace free-runs.
+  useEffect(() => {
+    const group = wavePhaseGroupRef.current
+    if (!group) return undefined
+
+    if (triggerLocked || !isPoweredOn) {
+      streamPhaseRef.current = lockedPhase
+      group.setAttribute('transform', `translate(${lockedPhase} 0)`)
+      return undefined
+    }
+
+    let frameId = 0
+    let lastTime = performance.now()
+    const period = waveLimits.period
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) {
+      group.setAttribute('transform', `translate(${streamPhaseRef.current} 0)`)
+      return undefined
+    }
+
+    const tick = (now) => {
+      const elapsedSeconds = Math.min(0.05, (now - lastTime) / 1000)
+      lastTime = now
+      const baseSpeed = 28 / Math.max(0.3, waveTransform.hScale)
+      let nextPhase = streamPhaseRef.current - elapsedSeconds * baseSpeed
+      while (nextPhase < lockedPhase - period) nextPhase += period
+      streamPhaseRef.current = nextPhase
+      group.setAttribute('transform', `translate(${nextPhase.toFixed(3)} 0)`)
+      frameId = window.requestAnimationFrame(tick)
+    }
+    frameId = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(frameId)
+  }, [isPoweredOn, lockedPhase, triggerLocked, waveLimits.period, waveTransform.hScale])
 
   const { profile, links } = siteContent
 
@@ -919,7 +1115,7 @@ export default function Oscilloscope({
                         </div>
                       </div>
 
-                      <div className="scope-crt-wave-slot">
+                      <div className="scope-crt-wave-slot" ref={triggerSlotRef}>
                         <svg
                           className="scope-wave"
                           viewBox="0 0 220 100"
@@ -929,14 +1125,45 @@ export default function Oscilloscope({
                         >
                           <g transform={`translate(${waveTransform.hOff} ${waveTransform.vOff})`}>
                             <g transform={`translate(110 50) scale(${waveTransform.hScale} ${waveTransform.vGain}) translate(-110 -50)`}>
-                              <path
-                                d={waveBase}
-                                className={`scope-wave-path ${selectedWave.shapeIndex !== 1 ? 'scope-wave-path--smooth' : ''}`}
-                                shapeRendering="geometricPrecision"
-                              />
+                              <g ref={wavePhaseGroupRef}>
+                                <path
+                                  d={waveBase}
+                                  className={`scope-wave-path ${selectedWave.shapeIndex !== 1 ? 'scope-wave-path--smooth' : ''}`}
+                                  shapeRendering="geometricPrecision"
+                                />
+                              </g>
                             </g>
                           </g>
                         </svg>
+                        <button
+                          type="button"
+                          className={`scope-trigger-marker ${triggerLocked ? 'is-locked' : 'is-searching'}`}
+                          style={{ top: `${triggerY}%` }}
+                          aria-label={`Trigger level, ${Math.round(triggerLevel * 100)} percent. Drag vertically to adjust.`}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={Math.round(triggerLevel * 100)}
+                          onPointerDown={startTriggerDrag}
+                          onPointerMove={moveTrigger}
+                          onPointerUp={endTriggerDrag}
+                          onPointerCancel={endTriggerDrag}
+                          onLostPointerCapture={endTriggerDrag}
+                          onKeyDown={(event) => {
+                            const step = event.shiftKey ? 0.05 : 0.02
+                            if (event.key === 'ArrowUp') {
+                              event.preventDefault()
+                              setTriggerLevel((value) => Math.min(1, value + step))
+                            } else if (event.key === 'ArrowDown') {
+                              event.preventDefault()
+                              setTriggerLevel((value) => Math.max(0, value - step))
+                            }
+                          }}
+                        >
+                          <svg viewBox="0 0 18 14" aria-hidden="true">
+                            <path d="M17 7H7M11 2 6 7l5 5" />
+                          </svg>
+                          <span className="scope-trigger-marker-label mono">T</span>
+                        </button>
                         <span className="scope-crt-trace-badge mono">{selectedWave.name}</span>
                       </div>
 
@@ -959,60 +1186,73 @@ export default function Oscilloscope({
               {/* Horizontal scale under CRT */}
               <div className="scope-hscale mono">
                 <span>
-                  {VOLTS_DIV_LABELS[voltsLabelIdx]}/div
+                  {voltsOption.label}/div
                 </span>
-                <span className="scope-hscale-center">TRIG CH1 · EDGE ↑</span>
+                <span className={`scope-hscale-center ${triggerLocked ? 'is-locked' : 'is-searching'}`}>
+                  {triggerLocked ? 'TRIG’D' : 'AUTO · SCANNING'} · {selectedWave.label} · EDGE ↑
+                </span>
                 <span>
-                  {TIME_DIV_LABELS[secLabelIdx]}/div
+                  {timeOption.label}/div
                 </span>
               </div>
             </div>
 
             {/* Right control column */}
             <div className="scope-controls-column">
-              <div className="scope-controls-section">
+              <div className="scope-controls-section scope-controls-section--trigger">
+                <span className="scope-section-label mono">TRIGGER</span>
+                <div className="scope-knob-grid scope-knob-grid--single">
+                  <ScopeKnobDial
+                    label="LEVEL"
+                    value={triggerLevel}
+                    valueLabel={`${Math.round(triggerLevel * 100)}%`}
+                    onChange={setTriggerLevel}
+                    ariaLabel="Trigger level — drag to rotate"
+                  />
+                </div>
+              </div>
+
+              <div className="scope-controls-section scope-controls-section--vertical">
                 <span className="scope-section-label mono">VERTICAL</span>
                 <div className="scope-knob-grid">
                   <ScopeKnobDial
-                    label="INT"
-                    value={knobIntensity}
-                    onChange={setKnobIntensity}
-                    ariaLabel="Intensity — drag to rotate (trace brightness)"
-                  />
-                  <ScopeKnobDial
-                    label="V/DIV"
+                    label="SCALE"
                     value={knobVolts}
+                    valueLabel={`${voltsOption.label}/div`}
                     onChange={setKnobVolts}
                     ariaLabel="Volts per division — drag to rotate (vertical gain)"
                   />
                   <ScopeKnobDial
-                    label="V-POS"
+                    label="OFFSET"
                     value={knobVPos}
+                    valueLabel={offsetLabel}
                     onChange={setKnobVPos}
-                    ariaLabel="Vertical position — drag to rotate"
+                    ariaLabel="Vertical offset — drag to rotate"
                   />
                 </div>
               </div>
 
-              <div className="scope-controls-section">
+              <div className="scope-controls-section scope-controls-section--horizontal">
                 <span className="scope-section-label mono">HORIZONTAL</span>
                 <div className="scope-knob-grid scope-knob-grid-2">
                   <ScopeKnobDial
-                    label="SEC/DIV"
+                    label="SCALE"
                     value={knobSec}
+                    valueLabel={`${timeOption.label}/div`}
                     onChange={setKnobSec}
                     ariaLabel="Seconds per division — drag to rotate (timebase)"
                   />
                   <ScopeKnobDial
-                    label="H-POS"
+                    label="DELAY"
                     value={knobHPos}
+                    valueLabel={delayLabel}
                     onChange={setKnobHPos}
-                    ariaLabel="Horizontal position — drag to rotate"
+                    ariaLabel="Horizontal delay — drag to rotate"
                   />
                 </div>
               </div>
 
-              <div className="scope-controls-section scope-input-section">
+              <div className="scope-controls-section scope-controls-section--input scope-input-section">
                 <span className="scope-section-label mono">INPUTS · WAVEFORM</span>
                 <div className="scope-bnc-grid">
                   {WAVE_INPUTS.map((inp) => {
