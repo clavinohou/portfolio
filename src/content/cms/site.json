@@ -25,10 +25,10 @@
     ],
     "about": [
       {
-        "paragraph": "I'm an Electrical Engineering student with a strong background in building reliable robotics + hardware systems. My passion mostly lies in building self-sufficient autonomous systems. My technical background consists mostly of various hardware projects, designing, building, debugging, and validating."
+        "paragraph": "I'm an Electrical Engineering student at Georgia Tech, and I feel most at home when I'm building and debugging real hardware. Robotics and autonomous systems are where that interest keeps leading me. As AI software becomes more capable, I think a lot of the interesting work will happen in the hardware that lets those systems sense, move, and interact with the physical world. That's where I want to contribute and make an impact. I can write firmware as well, but I naturally gravitate toward hardware design, board bring-up, and problems I can work through with a scope and a soldering iron."
       },
       {
-        "paragraph": "My work background includes the validation and assembly of cutting-edge AI server hardware, robot design and development, and electrical system design for various on-campus competition teams, such as our FSAE and Rocketry Teams."
+        "paragraph": "Most of my professional experience so far has been with AI data center hardware, but I want to move towards consumer electronics and build products that people can use in their daily lives. Most of what I know about embedded systems came from building projects and sticking with them through board design, assembly, bring-up, and validation. I also want to explore FPGA development because it opens up a different side of digital design, and I'm curious about how it could change the kinds of systems I can build."
       }
     ]
   },
