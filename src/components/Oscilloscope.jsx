@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
 import { thumbPreloadUrl } from '../utils/imageSources'
@@ -184,26 +184,40 @@ const WAVE_LIMITS = [
   sampledWaveLimits(complexWaveY, COMPLEX_PERIOD),
 ]
 
-/** Find a consistent crossing used to lock the trace. */
-function risingCrossingX(shapeIndex, rawTriggerY) {
+/** Find a consistent visually-rising crossing used to lock the trace. */
+function triggerCrossingX(shapeIndex, rawTriggerY) {
+  const limits = WAVE_LIMITS[shapeIndex]
+  const triggerY = Math.min(limits.max, Math.max(limits.min, rawTriggerY))
+
   if (shapeIndex === 0) {
-    const ratio = Math.min(1, Math.max(-1, (rawTriggerY - 50) / 23))
+    const ratio = Math.min(1, Math.max(-1, (triggerY - 50) / 23))
     return ((Math.PI - Math.asin(ratio)) / (2 * Math.PI)) * 24
   }
   if (shapeIndex === 1) return 55 / 2
 
   let previousX = 0
   let previousY = complexWaveY(previousX)
-  for (let x = 0.2; x <= COMPLEX_PERIOD; x += 0.2) {
+  let nearestX = previousX
+  let nearestDistance = Math.abs(previousY - triggerY)
+  for (let x = 0.05; x <= COMPLEX_PERIOD; x += 0.05) {
     const y = complexWaveY(x)
-    if (previousY >= rawTriggerY && y <= rawTriggerY) {
+    const distance = Math.abs(y - triggerY)
+    if (distance < nearestDistance) {
+      nearestDistance = distance
+      nearestX = x
+    }
+    if (previousY >= triggerY && y <= triggerY) {
       const span = previousY - y || 1
-      return previousX + ((previousY - rawTriggerY) / span) * (x - previousX)
+      return previousX + ((previousY - triggerY) / span) * (x - previousX)
     }
     previousX = x
     previousY = y
   }
-  return 0
+
+  // At an exact peak or valley the trace touches the level without crossing
+  // it. Lock to that nearest contact so the visible edge still behaves like
+  // a valid trigger point.
+  return nearestX
 }
 
 function voltsGainFromNorm(t) {
@@ -746,10 +760,12 @@ export default function Oscilloscope({
   const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
   const triggerSlotRef = useRef(null)
+  const scopeChassisRef = useRef(null)
   const triggerDraggingRef = useRef(false)
   const triggerPositionDraggingRef = useRef(false)
   const wavePhaseGroupRef = useRef(null)
   const streamPhaseRef = useRef(0)
+  const [scopeFit, setScopeFit] = useState({ scale: 1, width: 0, height: 0 })
   // Per-project build log counts, shown as a small chip on each project card.
   const blogEntryCountsByProject = useMemo(() => {
     const counts = new Map()
@@ -793,6 +809,70 @@ export default function Oscilloscope({
   const isHome = activeChannel == null
   const isPoweredOn = powerState !== 'off'
   const currentChannel = activeChannel ?? 'about'
+
+  useLayoutEffect(() => {
+    if (!isHome) {
+      setScopeFit({ scale: 1, width: 0, height: 0 })
+      return undefined
+    }
+
+    const chassis = scopeChassisRef.current
+    if (!chassis) return undefined
+
+    let frameId = 0
+    const fitChassis = () => {
+      window.cancelAnimationFrame(frameId)
+      frameId = window.requestAnimationFrame(() => {
+        const viewportWidth = window.visualViewport?.width ?? window.innerWidth
+        const viewportHeight = window.visualViewport?.height ?? window.innerHeight
+
+        // Portrait layouts intentionally scroll. Landscape layouts keep the
+        // complete front panel in one view, using the same uniform scale a
+        // browser zoom-out would apply instead of squeezing either axis.
+        if (viewportWidth / viewportHeight <= 4 / 3) {
+          setScopeFit({ scale: 1, width: 0, height: 0 })
+          return
+        }
+
+        const naturalWidth = chassis.offsetWidth
+        const naturalHeight = chassis.offsetHeight
+        if (naturalWidth <= 0 || naturalHeight <= 0) return
+
+        const horizontalPadding = Math.min(20, Math.max(8, viewportWidth * 0.02))
+        const verticalPadding = Math.min(14, Math.max(6, Math.min(viewportWidth, viewportHeight) * 0.015))
+        const scale = Math.min(
+          1,
+          (viewportWidth - horizontalPadding * 2) / naturalWidth,
+          (viewportHeight - verticalPadding * 2) / naturalHeight,
+        )
+        const next = {
+          scale,
+          width: naturalWidth * scale,
+          height: naturalHeight * scale,
+        }
+        setScopeFit((current) =>
+          Math.abs(current.scale - next.scale) < 0.001 &&
+          Math.abs(current.width - next.width) < 0.5 &&
+          Math.abs(current.height - next.height) < 0.5
+            ? current
+            : next,
+        )
+      })
+    }
+
+    const resizeObserver = new ResizeObserver(fitChassis)
+    resizeObserver.observe(chassis)
+    window.addEventListener('resize', fitChassis)
+    window.visualViewport?.addEventListener('resize', fitChassis)
+    fitChassis()
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', fitChassis)
+      window.visualViewport?.removeEventListener('resize', fitChassis)
+    }
+  }, [isHome])
 
   const togglePower = useCallback(() => {
     // Ignore clicks while any transition animation is running (including the
@@ -984,17 +1064,20 @@ export default function Oscilloscope({
   const offsetLabel = formatVolts((knobVPos - 0.5) * voltsOption.volts * 8)
   const delayLabel = formatSeconds((knobHPos - 0.5) * timeOption.seconds * 8)
   const waveLimits = WAVE_LIMITS[selectedWave.shapeIndex]
-  // This portfolio control is deliberately normalized to the signal instead
-  // of modeling an absolute voltage threshold. It remains a full 0–100% range
-  // and vertical offset only moves the displayed waveform.
   const triggerY = 92 - triggerLevel * 84
-  const rawTriggerY = triggerY
+  // The marker lives in screen coordinates while the trace is scaled and
+  // translated inside the SVG. Invert that transform before testing the
+  // waveform, otherwise visible edge contacts are incorrectly marked as
+  // "searching" whenever gain or vertical position changes.
+  const rawTriggerY =
+    50 + (triggerY - waveTransform.vOff - 50) / waveTransform.vGain
   const triggerX = 10 + knobHPos * 80
+  const triggerEdgeTolerance = 0.35
   const triggerLocked =
     isPoweredOn &&
-    rawTriggerY >= waveLimits.min - 0.5 &&
-    rawTriggerY <= waveLimits.max + 0.5
-  const lockedPhase = 110 - risingCrossingX(selectedWave.shapeIndex, rawTriggerY)
+    rawTriggerY >= waveLimits.min - triggerEdgeTolerance &&
+    rawTriggerY <= waveLimits.max + triggerEdgeTolerance
+  const lockedPhase = 110 - triggerCrossingX(selectedWave.shapeIndex, rawTriggerY)
 
   const updateTriggerFromPointer = useCallback((event) => {
     const rect = triggerSlotRef.current?.getBoundingClientRect()
@@ -1129,7 +1212,23 @@ export default function Oscilloscope({
           delay: isHome ? 0.48 : 0,
         }}
       >
-        <div className="scope-chassis">
+        <div
+          className={`scope-fit-frame ${scopeFit.width > 0 ? 'is-fitted' : ''}`}
+          style={
+            scopeFit.width > 0
+              ? { width: scopeFit.width, height: scopeFit.height }
+              : undefined
+          }
+        >
+        <div
+          ref={scopeChassisRef}
+          className="scope-chassis"
+          style={
+            scopeFit.width > 0
+              ? { transform: `scale(${scopeFit.scale})` }
+              : undefined
+          }
+        >
           {/* Top strip: model + power */}
           <div className="scope-chassis-top">
             <div className="scope-model-block">
@@ -1444,6 +1543,7 @@ export default function Oscilloscope({
             >
               Contact
             </button>
+          </div>
           </div>
           </div>
         </div>

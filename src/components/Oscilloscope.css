@@ -26,15 +26,15 @@
 }
 
 .bench-stage--home .scope-chassis {
-  max-height: calc(100dvh - clamp(12px, 3vmin, 28px));
-  overflow: hidden;
+  max-height: none;
+  overflow: visible;
 }
 
 .bench-stage--home .scope-phosphor {
   min-height: clamp(240px, min(36vh, 50vmin), 520px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (max-aspect-ratio: 4 / 3) {
   .bench-stage {
     min-height: auto;
     overflow: visible;
@@ -92,6 +92,23 @@
   will-change: transform;
 }
 
+.scope-fit-frame {
+  flex: 0 0 auto;
+}
+
+.scope-fit-frame.is-fitted {
+  position: relative;
+  min-width: 0;
+  overflow: visible;
+}
+
+.scope-fit-frame.is-fitted .scope-chassis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
 .scope-chassis {
   --scope-accent-orange: #ff6b35;
   --scope-accent-yellow: #f4c542;
@@ -100,8 +117,9 @@
   --scope-accent-cyan: #5eead4;
   --scope-accent-red: #ef4444;
 
-  /* Scale with viewport but keep proportions similar to laptop view */
-  width: min(1100px, 94vw, 124vh);
+  /* Width follows the display. Short landscape screens are fitted by scaling
+     the complete chassis uniformly, rather than narrowing this one axis. */
+  width: min(1100px, 94vw);
   border-radius: 6px;
   background: linear-gradient(165deg, #d8d8dc 0%, #b8b8c0 40%, #a8a8b0 100%);
   border: 1px solid rgba(0, 0, 0, 0.18);
@@ -2245,7 +2263,7 @@
   background: rgba(255, 255, 255, 0.8);
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (max-aspect-ratio: 4 / 3) {
   .scope-chassis-main {
     grid-template-columns: 1fr;
   }
@@ -2275,7 +2293,9 @@
   .scope-phosphor {
     min-height: clamp(240px, min(40vmin, 48vh), 500px);
   }
+}
 
+@media (max-width: 1000px) {
   .project-card {
     grid-template-columns: 140px 1fr;
   }
@@ -2303,7 +2323,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 640px) and (max-aspect-ratio: 4 / 3) {
   .scope-channel-panel {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2316,7 +2336,9 @@
   .scope-controls-section.scope-input-section {
     grid-column: auto;
   }
+}
 
+@media (max-width: 640px) {
   .project-card {
     grid-template-columns: 1fr;
   }
