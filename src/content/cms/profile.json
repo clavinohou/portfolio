@@ -1,0 +1,23 @@
+{
+  "name": "Calvin Hou",
+  "title": "Electrical Engineering major",
+  "scopeBrief": "EE @ Georgia Tech · robotics · PCBs · embedded control. Pick a channel below.",
+  "school": "Georgia Institute of Technology",
+  "location": "From Seattle, WA",
+  "year": "Junior (Graduating May 2028)",
+  "interests": [
+    { "interest": "Robotics + Automation" },
+    { "interest": "PCB Design" },
+    { "interest": "Embedded Systems" },
+    { "interest": "FPGA's & ASIC's" },
+    { "interest": "Rocketry + Space" }
+  ],
+  "about": [
+    {
+      "paragraph": "I'm an Electrical Engineering student at Georgia Tech, and I feel most at home when I'm building and debugging real hardware. Robotics and autonomous systems are where that interest keeps leading me. As AI software becomes more capable, I think a lot of the interesting work will happen in the hardware that lets those systems sense, move, and interact with the physical world. That's where I want to contribute and make an impact. I can write firmware as well, but I naturally gravitate toward hardware design, board bring-up, and problems I can work through with a scope and a soldering iron."
+    },
+    {
+      "paragraph": "Most of my professional experience so far has been with AI data center hardware, but I want to move towards consumer electronics and build products that people can use in their daily lives. Most of what I know about embedded systems came from building projects and sticking with them through board design, assembly, bring-up, and validation. I also want to explore FPGA development because it opens up a different side of digital design, and I'm curious about how it could change the kinds of systems I can build."
+    }
+  ]
+}

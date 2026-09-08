@@ -4,56 +4,72 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>Portfolio — Content</title>
+    <title>Portfolio Studio</title>
+    <link rel="stylesheet" href="/admin/studio.css" />
   </head>
   <body>
-    <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
-    <script>
-      ;(function () {
-        function todayISO() {
-          var d = new Date()
-          return (
-            d.getFullYear() +
-            '-' +
-            String(d.getMonth() + 1).padStart(2, '0') +
-            '-' +
-            String(d.getDate()).padStart(2, '0')
-          )
-        }
+    <div id="studio-shell" class="studio-shell" aria-hidden="true">
+      <aside class="studio-rail">
+        <a class="studio-brand" href="#/collections/projects">
+          <strong>Calvin Hou</strong>
+          <span>Portfolio Studio</span>
+        </a>
 
-        function attachPreSave(CMS) {
-          if (!CMS || typeof CMS.registerEventListener !== 'function') return
-          CMS.registerEventListener('preSave', function (opts) {
-            var entry = opts.entry
-            if (!entry || typeof entry.getIn !== 'function') return entry
+        <nav class="studio-nav" aria-label="Portfolio Studio">
+          <a href="#/collections/projects" data-studio-route="projects">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.75 6.75h5l1.7 2h9.8v9.5a2 2 0 0 1-2 2H5.75a2 2 0 0 1-2-2V6.75Z"/><path d="M3.75 10.25h16.5"/></svg>
+            <span>Projects</span>
+          </a>
+          <a href="#/collections/blog" data-studio-route="blog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.75h10.5l2 2v14.5H6a2 2 0 0 1-2-2V5.75a2 2 0 0 1 2-2Z"/><path d="M8 9h6.5M8 12.5h8M8 16h6"/></svg>
+            <span>Build notes</span>
+          </a>
+          <a href="#/collections/experience" data-studio-route="experience">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.75" y="6.75" width="16.5" height="12.5" rx="1.75"/><path d="M8.5 6.75v-2h7v2M3.75 11.5h16.5M10 11.5v2h4v-2"/></svg>
+            <span>Experience</span>
+          </a>
+          <a href="#/collections/profile/entries/profile" data-studio-route="profile">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.25"/><path d="M5.25 20a6.75 6.75 0 0 1 13.5 0"/></svg>
+            <span>Profile</span>
+          </a>
+          <a href="#/collections/links/entries/links" data-studio-route="links">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.25 14.75 14.75 9.25M7.1 16.9l-1.15 1.15a3.2 3.2 0 0 1-4.5-4.55l3.15-3.15a3.2 3.2 0 0 1 4.5 0M16.9 7.1l1.15-1.15a3.2 3.2 0 0 1 4.5 4.55l-3.15 3.15a3.2 3.2 0 0 1-4.5 0"/></svg>
+            <span>Contact links</span>
+          </a>
+          <a href="#/collections/resume/entries/resume" data-studio-route="resume">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.75h9l3 3v13.5H6a2 2 0 0 1-2-2V5.75a2 2 0 0 1 2-2Z"/><path d="M14.5 3.75v4h3.5M8 12h6M8 15.5h6"/></svg>
+            <span>Résumé</span>
+          </a>
+          <button id="studio-media" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.75" y="4.25" width="16.5" height="15.5" rx="1.75"/><circle cx="8.5" cy="9" r="1.4"/><path d="m5.5 17 4.25-4.5 3.1 3 2.2-2.2L18.5 17"/></svg>
+            <span>Media</span>
+          </button>
+        </nav>
 
-            var data = entry.get('data')
-            if (!data || typeof data.getIn !== 'function') return entry
+        <div class="studio-rail-footer">
+          <a href="/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 13v6.25a.75.75 0 0 1-.75.75H4.75a.75.75 0 0 1-.75-.75V5.75A.75.75 0 0 1 4.75 5H11"/></svg>
+            <span>Preview site</span>
+          </a>
+        </div>
+      </aside>
 
-            var resume = entry.getIn(['data', 'resume'])
-            if (!resume) return entry
+      <header class="studio-topbar">
+        <span id="studio-location" class="studio-location">Projects</span>
+        <label class="studio-search-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.25"/><path d="m15.25 15.25 4.5 4.5"/></svg>
+          <span class="studio-visually-hidden">Search</span>
+          <input id="studio-search" type="search" placeholder="Search projects" autocomplete="off" />
+        </label>
+        <a id="studio-primary-action" class="studio-primary-action" href="#/collections/projects/new">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>New project</span>
+        </a>
+      </header>
+    </div>
 
-            var next = String(entry.getIn(['data', 'resume', 'downloadUrl']) || '').trim()
-            var baseline = String(entry.getIn(['data', 'resume', 'internalPrevUrl']) || '').trim()
-
-            if (next === baseline) return entry
-
-            var e = entry
-            if (next) {
-              e = e.setIn(['data', 'resume', 'lastUpdated'], todayISO())
-            }
-            e = e.setIn(['data', 'resume', 'internalPrevUrl'], next)
-            return e
-          })
-        }
-
-        attachPreSave(window.CMS)
-        if (!window.CMS) {
-          document.addEventListener('DOMContentLoaded', function () {
-            attachPreSave(window.CMS)
-          })
-        }
-      })()
-    </script>
+    <div id="nc-root"></div>
+    <script defer src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
+    <script defer src="/admin/studio.js"></script>
   </body>
 </html>

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
+import { thumbPreloadUrl } from '../utils/imageSources'
 import { ImageCarousel } from './ImageCarousel'
 import { MarkdownBlock } from './MarkdownBlock'
 import { ErrorBoundary } from './ErrorBoundary'
@@ -183,7 +184,7 @@ const WAVE_LIMITS = [
   sampledWaveLimits(complexWaveY, COMPLEX_PERIOD),
 ]
 
-/** Find the rising-voltage crossing (decreasing SVG y) used to lock the trace. */
+/** Find a consistent crossing used to lock the trace. */
 function risingCrossingX(shapeIndex, rawTriggerY) {
   if (shapeIndex === 0) {
     const ratio = Math.min(1, Math.max(-1, (rawTriggerY - 50) / 23))
@@ -214,7 +215,8 @@ function timeScaleFromNorm(t) {
 }
 
 /** Continuous 0–1 knob: drag to rotate (analog-style) */
-function ScopeKnobDial({ label, value, valueLabel, onChange, ariaLabel }) {
+function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel }) {
+  const buttonRef = useRef(null)
   const stackRef = useRef(null)
   const dragging = useRef(false)
   const lastAngle = useRef(null)
@@ -270,8 +272,32 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, ariaLabel }) {
     }
   }, [])
 
+  const handleWheel = useCallback(
+    (event) => {
+      event.preventDefault()
+      const rawDelta = event.deltaY || event.deltaX
+      if (!rawDelta) return
+
+      // Normalize mouse-wheel lines and trackpad pixels to a controlled turn.
+      const modeScale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 100 : 1
+      const magnitude = Math.abs(rawDelta * modeScale)
+      const step = Math.min(0.04, Math.max(0.005, magnitude * 0.0005))
+      const direction = rawDelta < 0 ? 1 : -1
+      onChange((current) => Math.min(1, Math.max(0, current + direction * step)))
+    },
+    [onChange],
+  )
+
+  useEffect(() => {
+    const button = buttonRef.current
+    if (!button) return undefined
+    button.addEventListener('wheel', handleWheel, { passive: false })
+    return () => button.removeEventListener('wheel', handleWheel)
+  }, [handleWheel])
+
   return (
     <button
+      ref={buttonRef}
       type="button"
       className="scope-knob"
       aria-label={ariaLabel ?? label}
@@ -284,6 +310,7 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, ariaLabel }) {
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       onLostPointerCapture={endDrag}
+      onDoubleClick={onReset}
       onKeyDown={(e) => {
         const step = e.shiftKey ? 0.05 : 0.02
         if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
@@ -393,7 +420,12 @@ const ProjectsModule = ({
             <>
               <div className="project-image">
                 {p.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
-                  <ImageCarousel images={p.images} altPrefix={p.title} stackSize={p.stackSize} />
+                  <ImageCarousel
+                    images={p.images}
+                    altPrefix={p.title}
+                    stackSize={p.stackSize}
+                    thumbSizes="(max-width: 640px) 90vw, (max-width: 900px) 140px, 160px"
+                  />
                 ) : p.images.length > 0 ? (
                   <div className="project-media-placeholder" aria-hidden="true" />
                 ) : (
@@ -441,22 +473,6 @@ const ProjectsModule = ({
                           href={p.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={(e) => {
-                            // This <a> sits inside the card's outer <Link>
-                            // (also an <a>). Nested anchors are invalid HTML
-                            // and browsers handle them inconsistently — the
-                            // outer href can still fire on left click. Cancel
-                            // both anchors' default navigation, stop React
-                            // bubbling, and open the external URL ourselves.
-                            // Only intercept plain left clicks so cmd/ctrl/
-                            // middle-click still use the browser's native
-                            // "open in new tab" behaviour.
-                            if (e.button !== 0) return
-                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-                            e.preventDefault()
-                            e.stopPropagation()
-                            window.open(p.link, '_blank', 'noopener,noreferrer')
-                          }}
                         >
                           External ↗
                         </a>
@@ -472,28 +488,28 @@ const ProjectsModule = ({
 
           if (inBuildLog) {
             return (
-              <Link
-                key={p.id}
-                to={`/log/${encodeURIComponent(p.id)}`}
-                className="project-card project-card--clickable"
-                aria-label={`Open ${p.title} build log`}
-              >
+              <div key={p.id} className="project-card project-card--clickable">
                 {cardInner}
-              </Link>
+                <Link
+                  to={`/log/${encodeURIComponent(p.id)}`}
+                  className="project-card-hitarea"
+                  aria-label={`Open ${p.title} build log`}
+                />
+              </div>
             )
           }
           if (p.link) {
             return (
-              <a
-                key={p.id}
-                href={p.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="project-card project-card--clickable"
-                aria-label={`Visit ${p.title}`}
-              >
+              <div key={p.id} className="project-card project-card--clickable">
                 {cardInner}
-              </a>
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="project-card-hitarea"
+                  aria-label={`Visit ${p.title}`}
+                />
+              </div>
             )
           }
           return (
@@ -723,7 +739,7 @@ export default function Oscilloscope({
   // it settles into the normal "on" state and the power button can be used.
   const [powerState, setPowerState] = useState('booting')
   const powerTimerRef = useRef(null)
-  const [triggerLevel, setTriggerLevel] = useState(1)
+  const [triggerLevel, setTriggerLevel] = useState(0.5)
   const [knobVolts, setKnobVolts] = useState(0.5)
   const [knobVPos, setKnobVPos] = useState(0.5)
   const [knobSec, setKnobSec] = useState(0.5)
@@ -731,6 +747,7 @@ export default function Oscilloscope({
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
   const triggerSlotRef = useRef(null)
   const triggerDraggingRef = useRef(false)
+  const triggerPositionDraggingRef = useRef(false)
   const wavePhaseGroupRef = useRef(null)
   const streamPhaseRef = useRef(0)
   // Per-project build log counts, shown as a small chip on each project card.
@@ -846,10 +863,14 @@ export default function Oscilloscope({
       const fresh = []
       for (const raw of urls) {
         if (!raw) continue
-        const resolved = publicUrl(raw)
-        if (preloadCache.has(resolved) || queued.has(resolved)) continue
-        queued.add(resolved)
-        fresh.push(resolved)
+        // Warm the derivative the card will actually paint, not the camera
+        // original. Passing srcSet/sizes makes the preloader resolve the same
+        // candidate the DOM will, so the warmed entry is the one that gets hit.
+        const candidate = thumbPreloadUrl(raw)
+        if (!candidate.src) continue
+        if (preloadCache.has(candidate.src) || queued.has(candidate.src)) continue
+        queued.add(candidate.src)
+        fresh.push(candidate)
       }
       if (fresh.length === 0) return
       if (front) queue.unshift(...fresh)
@@ -860,7 +881,7 @@ export default function Oscilloscope({
     const pump = () => {
       if (cancelled) return
       while (active < CONCURRENCY && queue.length > 0) {
-        const url = queue.shift()
+        const { src, srcSet, sizes } = queue.shift()
         active += 1
         const img = new Image()
         img.decoding = 'async'
@@ -871,8 +892,8 @@ export default function Oscilloscope({
         const done = () => {
           if (cancelled) return
           active -= 1
-          preloadCache.add(url)
-          queued.delete(url)
+          preloadCache.add(src)
+          queued.delete(src)
           pump()
         }
         img.onload = async () => {
@@ -884,7 +905,11 @@ export default function Oscilloscope({
           done()
         }
         img.onerror = done
-        img.src = url
+        if (srcSet) {
+          if (sizes) img.sizes = sizes
+          img.srcset = srcSet
+        }
+        img.src = src
       }
     }
 
@@ -938,7 +963,10 @@ export default function Oscilloscope({
     const vGain = voltsGainFromNorm(knobVolts)
     const hScale = timeScaleFromNorm(knobSec)
     const vOff = (knobVPos - 0.5) * 40
-    const hOff = (knobHPos - 0.5) * 88
+    // Four divisions of pre/post-trigger travel in either direction. This
+    // matches the ±4 div time readout below and places the trigger point from
+    // 10% to 90% across the graticule.
+    const hOff = (knobHPos - 0.5) * 176
     return { vGain, hScale, vOff, hOff }
   }, [knobVolts, knobSec, knobVPos, knobHPos])
 
@@ -955,13 +983,17 @@ export default function Oscilloscope({
   const timeOption = TIME_DIV_OPTIONS[secLabelIdx]
   const offsetLabel = formatVolts((knobVPos - 0.5) * voltsOption.volts * 8)
   const delayLabel = formatSeconds((knobHPos - 0.5) * timeOption.seconds * 8)
-  const triggerY = 92 - triggerLevel * 84
   const waveLimits = WAVE_LIMITS[selectedWave.shapeIndex]
-  const displayedWaveMin = 50 + waveTransform.vGain * (waveLimits.min - 50) + waveTransform.vOff
-  const displayedWaveMax = 50 + waveTransform.vGain * (waveLimits.max - 50) + waveTransform.vOff
+  // This portfolio control is deliberately normalized to the signal instead
+  // of modeling an absolute voltage threshold. It remains a full 0–100% range
+  // and vertical offset only moves the displayed waveform.
+  const triggerY = 92 - triggerLevel * 84
+  const rawTriggerY = triggerY
+  const triggerX = 10 + knobHPos * 80
   const triggerLocked =
-    isPoweredOn && triggerY >= displayedWaveMin - 0.5 && triggerY <= displayedWaveMax + 0.5
-  const rawTriggerY = (triggerY - waveTransform.vOff - 50) / waveTransform.vGain + 50
+    isPoweredOn &&
+    rawTriggerY >= waveLimits.min - 0.5 &&
+    rawTriggerY <= waveLimits.max + 0.5
   const lockedPhase = 110 - risingCrossingX(selectedWave.shapeIndex, rawTriggerY)
 
   const updateTriggerFromPointer = useCallback((event) => {
@@ -992,6 +1024,43 @@ export default function Oscilloscope({
 
   const endTriggerDrag = useCallback((event) => {
     triggerDraggingRef.current = false
+    try {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId)
+      }
+    } catch {
+      /* Pointer capture may already have been released by the browser. */
+    }
+  }, [])
+
+  const updateTriggerPositionFromPointer = useCallback((event) => {
+    const rect = triggerSlotRef.current?.getBoundingClientRect()
+    if (!rect || rect.width <= 0) return
+    const x = Math.min(rect.right, Math.max(rect.left, event.clientX))
+    const screenPosition = (x - rect.left) / rect.width
+    setKnobHPos(Math.min(1, Math.max(0, (screenPosition - 0.1) / 0.8)))
+  }, [])
+
+  const startTriggerPositionDrag = useCallback(
+    (event) => {
+      event.preventDefault()
+      triggerPositionDraggingRef.current = true
+      event.currentTarget.setPointerCapture(event.pointerId)
+      updateTriggerPositionFromPointer(event)
+    },
+    [updateTriggerPositionFromPointer],
+  )
+
+  const moveTriggerPosition = useCallback(
+    (event) => {
+      if (!triggerPositionDraggingRef.current) return
+      updateTriggerPositionFromPointer(event)
+    },
+    [updateTriggerPositionFromPointer],
+  )
+
+  const endTriggerPositionDrag = useCallback((event) => {
+    triggerPositionDraggingRef.current = false
     try {
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId)
@@ -1135,11 +1204,47 @@ export default function Oscilloscope({
                             </g>
                           </g>
                         </svg>
+                        <span
+                          className={`scope-trigger-guide scope-trigger-position-guide ${triggerLocked ? 'is-locked' : 'is-searching'}`}
+                          style={{ left: `${triggerX}%` }}
+                          aria-hidden="true"
+                        />
+                        <button
+                          type="button"
+                          className="scope-trigger-position-marker"
+                          style={{ left: `${triggerX}%` }}
+                          aria-label={`Trigger position, ${Math.round(triggerX)} percent from the left. Drag horizontally to adjust; double-click to center.`}
+                          aria-valuemin={10}
+                          aria-valuemax={90}
+                          aria-valuenow={Math.round(triggerX)}
+                          onPointerDown={startTriggerPositionDrag}
+                          onPointerMove={moveTriggerPosition}
+                          onPointerUp={endTriggerPositionDrag}
+                          onPointerCancel={endTriggerPositionDrag}
+                          onLostPointerCapture={endTriggerPositionDrag}
+                          onDoubleClick={() => setKnobHPos(0.5)}
+                          onKeyDown={(event) => {
+                            const step = event.shiftKey ? 0.05 : 0.02
+                            if (event.key === 'ArrowRight') {
+                              event.preventDefault()
+                              setKnobHPos((value) => Math.min(1, value + step))
+                            } else if (event.key === 'ArrowLeft') {
+                              event.preventDefault()
+                              setKnobHPos((value) => Math.max(0, value - step))
+                            } else if (event.key === 'Home') {
+                              event.preventDefault()
+                              setKnobHPos(0.5)
+                            }
+                          }}
+                        >
+                          <span className="scope-trigger-position-label mono">T</span>
+                          <span className="scope-trigger-position-caret" aria-hidden="true" />
+                        </button>
                         <button
                           type="button"
                           className={`scope-trigger-marker ${triggerLocked ? 'is-locked' : 'is-searching'}`}
                           style={{ top: `${triggerY}%` }}
-                          aria-label={`Trigger level, ${Math.round(triggerLevel * 100)} percent. Drag vertically to adjust.`}
+                          aria-label={`Trigger level, ${Math.round(triggerLevel * 100)} percent. Drag vertically to adjust; double-click to set 50 percent.`}
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-valuenow={Math.round(triggerLevel * 100)}
@@ -1148,6 +1253,7 @@ export default function Oscilloscope({
                           onPointerUp={endTriggerDrag}
                           onPointerCancel={endTriggerDrag}
                           onLostPointerCapture={endTriggerDrag}
+                          onDoubleClick={() => setTriggerLevel(0.5)}
                           onKeyDown={(event) => {
                             const step = event.shiftKey ? 0.05 : 0.02
                             if (event.key === 'ArrowUp') {
@@ -1189,7 +1295,7 @@ export default function Oscilloscope({
                   {voltsOption.label}/div
                 </span>
                 <span className={`scope-hscale-center ${triggerLocked ? 'is-locked' : 'is-searching'}`}>
-                  {triggerLocked ? 'TRIG’D' : 'AUTO · SCANNING'} · {selectedWave.label} · EDGE ↑
+                  {triggerLocked ? 'TRIG’D' : 'AUTO · SCANNING'} · {selectedWave.label}
                 </span>
                 <span>
                   {timeOption.label}/div
@@ -1207,7 +1313,8 @@ export default function Oscilloscope({
                     value={triggerLevel}
                     valueLabel={`${Math.round(triggerLevel * 100)}%`}
                     onChange={setTriggerLevel}
-                    ariaLabel="Trigger level — drag to rotate"
+                    onReset={() => setTriggerLevel(0.5)}
+                    ariaLabel="Trigger level. Drag to rotate; double-click to set 50 percent."
                   />
                 </div>
               </div>
@@ -1243,11 +1350,12 @@ export default function Oscilloscope({
                     ariaLabel="Seconds per division — drag to rotate (timebase)"
                   />
                   <ScopeKnobDial
-                    label="DELAY"
+                    label="POSITION"
                     value={knobHPos}
                     valueLabel={delayLabel}
                     onChange={setKnobHPos}
-                    ariaLabel="Horizontal delay — drag to rotate"
+                    onReset={() => setKnobHPos(0.5)}
+                    ariaLabel="Horizontal trigger position. Drag to rotate; double-click to center."
                   />
                 </div>
               </div>

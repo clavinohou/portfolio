@@ -4,8 +4,9 @@
   "description": "Personal portfolio website for Calvin Hou",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "node scripts/updateResumeMeta.mjs && vite build",
+    "dev": "npm run images && vite",
+    "images": "node scripts/generateImageDerivatives.mjs",
+    "build": "node scripts/updateResumeMeta.mjs && npm run images && vite build",
     "preview": "vite preview",
     "cms": "decap-server"
   },
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.2",
     "decap-server": "^3.3.0",
+    "sharp": "^0.35.3",
     "vite": "^7.3.0"
   }
 }

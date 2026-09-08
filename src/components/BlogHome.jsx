@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { siteContent } from '../content/siteContent'
-import { publicUrl } from '../utils/publicUrl'
+import { imageSources } from '../utils/imageSources'
 import { Link } from '../router'
 import './BlogHome.css'
 
@@ -101,13 +101,7 @@ export default function BlogHome() {
             <span className="bloghome-title-main">Build Log</span>
           </h1>
 
-          <p className="bloghome-lede">
-            Have you ever thought to yourself, "Dang, I wonder what projects Calvin is working on?"
-          </p>
-          <p className="bloghome-lede" style={{ marginTop: 4 }}>No?</p>
-          <p className="bloghome-lede" style={{ marginTop: 4 }}>
-            Well, that's fine I guess... but if you do find yourself wondering, here you go.
-          </p>
+          <p className="bloghome-lede">Calvin's latest projects. More to come.</p>
 
           <div className="bloghome-stats mono" aria-label="Notebook statistics">
             <div className="bloghome-stat">
@@ -167,7 +161,10 @@ export default function BlogHome() {
                       <div className="bloghome-card-media">
                         {p.images[0] ? (
                           <img
-                            src={publicUrl(p.images[0])}
+                            {...imageSources(p.images[0], {
+                              role: 'thumb',
+                              sizes: '(max-width: 640px) 92vw, 360px',
+                            })}
                             alt=""
                             loading="lazy"
                             decoding="async"

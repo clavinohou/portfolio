@@ -1,4 +1,6 @@
-import rawSite from './cms/site.json'
+import rawProfile from './cms/profile.json'
+import rawLinks from './cms/links.json'
+import rawResume from './cms/resume.json'
 
 // —— Folder collections ————————————————————————————————————
 // Each project / blog entry is its own JSON file, authored through Decap CMS
@@ -6,6 +8,7 @@ import rawSite from './cms/site.json'
 // so new files just need to be dropped in — no loader changes required.
 const projectModules = import.meta.glob('./cms/projects/*.json', { eager: true, import: 'default' })
 const blogModules = import.meta.glob('./cms/blog/*.json', { eager: true, import: 'default' })
+const experienceModules = import.meta.glob('./cms/experience/*.json', { eager: true, import: 'default' })
 
 // —— Helpers ——————————————————————————————————————————————
 function flatList(arr, key) {
@@ -138,8 +141,31 @@ function buildBlog() {
     .sort((a, b) => b.dateMs - a.dateMs)
 }
 
-function normalize(rawData) {
-  const p = rawData.profile || {}
+function buildExperience() {
+  return Object.entries(experienceModules)
+    .map(([path, mod]) => {
+      const ex = mod ?? {}
+      return {
+        id: (ex.id ?? '').toString().trim() || idFromPath(path),
+        order: Number.isFinite(Number(ex.order)) ? Number(ex.order) : Number.POSITIVE_INFINITY,
+        type: ex.type ?? '',
+        title: ex.title ?? '',
+        company: ex.company ?? '',
+        location: ex.location ?? '',
+        date: ex.date ?? '',
+        description: ex.description ?? '',
+        tags: flatList(ex.tags, 'tag'),
+        images: flatList(ex.gallery, 'src'),
+        stackSize: normalizeStackSize(ex.stackSize),
+      }
+    })
+    .filter((experience) => experience.id && experience.title)
+    .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id))
+    .map(({ order: _order, ...experience }) => experience)
+}
+
+function normalize() {
+  const p = rawProfile || {}
   const allProjects = buildProjects()
   return {
     profile: {
@@ -159,31 +185,20 @@ function normalize(rawData) {
     // the build log can stay on the portfolio without polluting the notebook.
     buildLogProjects: allProjects.filter((proj) => proj.showInBuildLog !== false),
     blog: buildBlog(),
-    experience: (rawData.experience || []).map((ex) => ({
-      id: ex.id ?? '',
-      type: ex.type ?? '',
-      title: ex.title ?? '',
-      company: ex.company ?? '',
-      location: ex.location ?? '',
-      date: ex.date ?? '',
-      description: ex.description ?? '',
-      tags: flatList(ex.tags, 'tag'),
-      images: flatList(ex.gallery, 'src'),
-      stackSize: normalizeStackSize(ex.stackSize),
-    })),
+    experience: buildExperience(),
     links: {
-      email: rawData.links?.email ?? '',
-      github: rawData.links?.github ?? '',
-      linkedin: rawData.links?.linkedin ?? '',
-      instagram: rawData.links?.instagram ?? '',
+      email: rawLinks.email ?? '',
+      github: rawLinks.github ?? '',
+      linkedin: rawLinks.linkedin ?? '',
+      instagram: rawLinks.instagram ?? '',
     },
     resume: {
-      downloadLabel: rawData.resume?.downloadLabel ?? 'Download Resume',
-      downloadUrl: rawData.resume?.downloadUrl ?? '/resume/CalvinHouResume.pdf',
-      lastUpdated: String(rawData.resume?.lastUpdated ?? '').trim(),
-      highlights: flatList(rawData.resume?.highlights, 'highlight'),
+      downloadLabel: rawResume.downloadLabel ?? 'Download Resume',
+      downloadUrl: rawResume.downloadUrl ?? '/resume/CalvinHouResume.pdf',
+      lastUpdated: String(rawResume.lastUpdated ?? '').trim(),
+      highlights: flatList(rawResume.highlights, 'highlight'),
     },
   }
 }
 
-export const siteContent = normalize(rawSite)
+export const siteContent = normalize()

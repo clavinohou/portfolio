@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const siteJsonPath = path.join(__dirname, '..', 'src', 'content', 'cms', 'site.json')
+const resumeJsonPath = path.join(__dirname, '..', 'src', 'content', 'cms', 'resume.json')
 
 function formatDateYYYYMMDD(date) {
   const y = date.getFullYear()
@@ -15,16 +15,16 @@ function formatDateYYYYMMDD(date) {
 }
 
 function main() {
-  if (!fs.existsSync(siteJsonPath)) {
-    console.warn('[updateResumeMeta] site.json not found, skipping.')
+  if (!fs.existsSync(resumeJsonPath)) {
+    console.warn('[updateResumeMeta] resume.json not found, skipping.')
     return
   }
 
   let raw
   try {
-    raw = fs.readFileSync(siteJsonPath, 'utf8')
+    raw = fs.readFileSync(resumeJsonPath, 'utf8')
   } catch (err) {
-    console.warn('[updateResumeMeta] Failed to read site.json, skipping.', err)
+    console.warn('[updateResumeMeta] Failed to read resume.json, skipping.', err)
     return
   }
 
@@ -32,11 +32,11 @@ function main() {
   try {
     data = JSON.parse(raw)
   } catch (err) {
-    console.warn('[updateResumeMeta] Invalid JSON in site.json, skipping.', err)
+    console.warn('[updateResumeMeta] Invalid JSON in resume.json, skipping.', err)
     return
   }
 
-  const resume = data.resume || {}
+  const resume = data || {}
   const currentUrl = (resume.downloadUrl || '').trim()
 
   if (!currentUrl) {
@@ -80,17 +80,14 @@ function main() {
   resume.lastUpdated = fileDate
   // Keep this around for potential future use, but don't rely on it for detection.
   resume.internalPrevUrl = currentUrl
-  data.resume = resume
-
   try {
-    fs.writeFileSync(siteJsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8')
+    fs.writeFileSync(resumeJsonPath, JSON.stringify(resume, null, 2) + '\n', 'utf8')
     console.log(
       `[updateResumeMeta] Updated resume lastUpdated=${fileDate} based on PDF mtime at ${pdfPath}`,
     )
   } catch (err) {
-    console.warn('[updateResumeMeta] Failed to write updated site.json.', err)
+    console.warn('[updateResumeMeta] Failed to write updated resume.json.', err)
   }
 }
 
 main()
-

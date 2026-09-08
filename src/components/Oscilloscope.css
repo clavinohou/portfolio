@@ -630,6 +630,77 @@
   overflow: visible;
 }
 
+.scope-trigger-guide {
+  --trigger-color: var(--scope-accent-orange);
+  position: absolute;
+  z-index: 4;
+  color: var(--trigger-color);
+  opacity: 0.62;
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--trigger-color) 60%, transparent));
+  pointer-events: none;
+}
+
+.scope-trigger-position-guide {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    currentColor 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.scope-trigger-guide.is-searching {
+  --trigger-color: var(--scope-accent-yellow);
+  opacity: 0.42;
+}
+
+.scope-trigger-position-marker {
+  --trigger-color: var(--scope-accent-orange);
+  appearance: none;
+  position: absolute;
+  top: -11px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 28px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--trigger-color);
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--trigger-color) 65%, transparent));
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.scope-trigger-position-label {
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scope-trigger-position-caret {
+  width: 0;
+  height: 0;
+  margin-top: 2px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid currentColor;
+}
+
+.scope-trigger-position-marker:focus-visible {
+  outline: 1px solid var(--trigger-color);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
 .scope-trigger-marker {
   --trigger-color: var(--scope-accent-orange);
   appearance: none;
@@ -1692,7 +1763,9 @@
   background: rgba(255, 255, 255, 0.7);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   content-visibility: auto;
-  contain-intrinsic-size: 260px;
+  /* Close to the real rendered average (~325px); a low guess makes the first
+     reveal of the panel do a large layout correction in one frame. */
+  contain-intrinsic-size: auto 320px;
 }
 
 .project-card:hover {
@@ -1730,10 +1803,35 @@
   box-shadow: 0 16px 44px rgba(255, 107, 53, 0.14);
 }
 
-.project-card--clickable:focus-visible {
+.project-card--clickable:has(.project-card-hitarea:focus-visible) {
   outline: none;
   border-color: rgba(255, 107, 53, 0.6);
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.25), 0 14px 40px rgba(0, 0, 0, 0.08);
+}
+
+.project-card-hitarea {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.project-card-hitarea:focus-visible {
+  outline: none;
+}
+
+/* Let the card-sized link receive ordinary clicks while keeping the gallery
+   and the explicit external link independently interactive above it. */
+.project-card--clickable > .project-image,
+.project-card--clickable > .project-content {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.project-card--clickable > .project-image,
+.project-card--clickable .project-external-link {
+  pointer-events: auto;
 }
 
 .project-card-toprow {
@@ -2049,7 +2147,7 @@
   gap: 12px;
   align-items: stretch;
   content-visibility: auto;
-  contain-intrinsic-size: 230px;
+  contain-intrinsic-size: auto 380px;
 }
 
 .experience-item--with-media {

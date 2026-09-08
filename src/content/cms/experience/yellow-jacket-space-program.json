@@ -1,0 +1,12 @@
+{
+  "order": 2,
+  "date": "Jan 2026 - Present",
+  "gallery": [{ "src": "/uploads/1630580805380.jpeg" }],
+  "location": "Atlanta, GA",
+  "title": "Avionics Responsible Engineer",
+  "tags": [{ "tag": "Aviation" }, { "tag": "PCB Design" }, { "tag": "Embedded Systems" }],
+  "type": "Club",
+  "id": "yellow-jacket-space-program",
+  "description": "* Responsible Engineer on the Control Test Vehicle, leading design and integration of an STM32-based PCB for controlling various actuators and fans.\n* Leading Ethernet implementation on board, optimizing packaging and signal integrity for noisy EMI environments\n* Designed buck converters & LDOs (22.2V to 12V/4.4V/3.3V) using STM32's integrated ADCs for real-time power rail telemetry.",
+  "company": "Yellow Jacket Space Program"
+}

@@ -21,32 +21,30 @@ editor:
   preview: true
 
 # —— Collections ——————————————————————————————————————————————————————————
-# Three top-level collections, each with its own "New" button in the sidebar:
+# Focused top-level collections keep each save limited to one kind of content:
 #
-#   1. Projects       — one JSON file per project      (src/content/cms/projects/*.json)
-#   2. Build Log      — one JSON file per blog entry   (src/content/cms/blog/*.json)
-#   3. Site settings  — single file for the bits you rarely touch
+#   1. Projects       — one JSON file per project
+#   2. Build notes    — one JSON file per note
+#   3. Experience     — one JSON file per role
+#   4. Profile        — one focused profile file
+#   5. Contact links  — one focused links file
+#   6. Résumé         — one focused résumé file
 #
-# Projects and Build Log are folder collections, so creating a new one is just
-# "click the + button → fill in the form → Save". Under the hood Decap writes
-# `src/content/cms/<collection>/<slug>.json` and Vite's import.meta.glob picks
-# it up on the next build (or HMR reload in dev).
+# Folder collections support adding one item at a time. The three single-file
+# collections open directly from the Portfolio Studio navigation.
 collections:
   # ————————————————————————— PROJECTS ——————————————————————————
   - name: projects
     label: Projects
     label_singular: Project
-    description: >-
-      One file per project. Click “New Project” to add one — the filename
-      will match the ID slug you enter below. Projects show up on the
-      oscilloscope “PROJECTS” channel AND on the Build Log site at /log.
+    description: Edit the projects shown on your portfolio and Build Log.
     folder: src/content/cms/projects
     create: true
     format: json
     extension: json
     slug: '{{fields.id}}'
     identifier_field: title
-    summary: '{{title}}  ·  {{sortOrder}}'
+    summary: '{{title}}'
     sortable_fields: ['sortOrder', 'title', 'date']
     view_groups:
       - label: By pinned date
@@ -54,15 +52,15 @@ collections:
         pattern: '\d{4}'
     fields:
       - {
-          label: ID (URL slug),
+          label: Page address,
           name: id,
           widget: string,
           pattern: ['^[a-z0-9][a-z0-9-]*$', 'Use lowercase letters, numbers, and dashes only — e.g. my-cool-project'],
-          hint: 'This becomes the filename and the URL (/log/<id>). Lowercase, dashes only. DO NOT change this after a project is published or external links will break.',
+          hint: 'The last part of this project’s web address. Use lowercase letters and dashes, such as my-cool-project. Leave it unchanged after publishing so old links keep working.',
         }
       - { label: Title, name: title, widget: string }
       - {
-          label: Pinned date (sort key),
+          label: Portfolio order date,
           name: sortOrder,
           widget: datetime,
           format: 'YYYY-MM-DDTHH:mm',
@@ -70,7 +68,7 @@ collections:
           time_format: 'HH:mm',
           picker_utc: false,
           required: false,
-          hint: 'Projects show newest-first using this value. New entries default to right now, so they land at the top automatically. To bump an old project back to the front, just edit this field and press "Now" — no need to renumber anything else.',
+          hint: 'Projects with newer dates appear first. Press “Now” to move a project to the top.',
         }
       - {
           label: Date,
@@ -87,7 +85,7 @@ collections:
           hint: 'Optional — full URL to the project (GitHub repo, live site, etc.). Leave empty if there isn’t one.',
         }
       - {
-          label: Show on Build Log site,
+          label: Give this project a Build Log page,
           name: showInBuildLog,
           widget: boolean,
           default: true,
@@ -158,13 +156,9 @@ collections:
 
   # ————————————————————————— BUILD LOG —————————————————————————
   - name: blog
-    label: Build log entries
-    label_singular: Build log entry
-    description: >-
-      One file per build log entry. Each entry attaches to one project via
-      the “Related project” field and appears on that project’s page at
-      /log/<project-id>. Newest first. Keep entries small and frequent —
-      notes-to-self, failures, breakthroughs, calculations that held up.
+    label: Build notes
+    label_singular: Build note
+    description: Add short progress updates, discoveries, failures, and breakthroughs to a project.
     folder: src/content/cms/blog
     create: true
     format: json
@@ -188,11 +182,11 @@ collections:
         pattern: '2025'
     fields:
       - {
-          label: ID (URL slug),
+          label: Note address,
           name: id,
           widget: string,
           pattern: ['^[a-z0-9][a-z0-9-]*$', 'Use lowercase letters, numbers, and dashes only — e.g. climber-v3-tuning'],
-          hint: 'Stable slug for the filename. Lowercase, dashes only. Not shown on the site but visible in git.',
+          hint: 'A short permanent name using lowercase letters and dashes, such as climber-v3-tuning.',
         }
       - { label: Title, name: title, widget: string, hint: 'The headline for this entry. Keep it punchy.' }
       - {
@@ -260,118 +254,145 @@ collections:
           hint: 'How many images show in the stack on this entry. Leave blank to show all.',
         }
 
-  # ————————————————————————— SITE SETTINGS —————————————————————————
-  - name: site
-    label: Site settings
-    description: >-
-      The stuff you set once and rarely touch: profile / about, experience,
-      social links, resume. New projects and build log entries live in their
-      own collections above — use those instead of editing this file.
+  # ————————————————————————— EXPERIENCE —————————————————————————
+  - name: experience
+    label: Experience
+    label_singular: Role
+    description: Edit one job, internship, research role, or club position at a time.
+    folder: src/content/cms/experience
+    create: true
+    format: json
+    extension: json
+    slug: '{{fields.id}}'
+    identifier_field: title
+    summary: '{{order}} · {{title}} — {{company}}'
+    sortable_fields: ['order', 'company', 'title']
+    fields:
+      - {
+          label: Page address,
+          name: id,
+          widget: string,
+          pattern: ['^[a-z0-9][a-z0-9-]*$', 'Use lowercase letters, numbers, and dashes only.'],
+          hint: 'A permanent internal name, such as delta-electronics. Leave it unchanged after publishing.',
+        }
+      - {
+          label: Portfolio position,
+          name: order,
+          widget: number,
+          value_type: int,
+          min: 1,
+          hint: '1 appears first, 2 appears second, and so on.',
+        }
+      - { label: Role type, name: type, widget: string, hint: 'For example: Internship, Club, or Externship.' }
+      - { label: Role title, name: title, widget: string }
+      - { label: Organization, name: company, widget: string }
+      - { label: Location, name: location, widget: string }
+      - { label: Dates, name: date, widget: string, hint: 'For example: Jun 2026 – Aug 2026.' }
+      - { label: Description, name: description, widget: markdown }
+      - label: Skills & topics
+        name: tags
+        widget: list
+        required: false
+        summary: '{{fields.tag}}'
+        fields:
+          - { label: Skill or topic, name: tag, widget: string }
+      - label: Photos
+        name: gallery
+        widget: list
+        required: false
+        summary: '{{fields.src}}'
+        hint: 'Logos, team photos, or work samples shown with this role.'
+        fields:
+          - { label: Image, name: src, widget: image, choose_url: true }
+      - {
+          label: Visible photos,
+          name: stackSize,
+          widget: number,
+          value_type: int,
+          min: 1,
+          max: 8,
+          required: false,
+          hint: 'Leave blank to show every uploaded photo.',
+        }
+
+  # ————————————————————————— PROFILE —————————————————————————
+  - name: profile
+    label: Profile
+    description: Edit your name, headline, school details, interests, and About text.
     files:
-      - label: Site data (profile, experience, links, resume)
-        name: site
-        file: src/content/cms/site.json
+      - label: Edit profile
+        name: profile
+        file: src/content/cms/profile.json
         format: json
         fields:
-          - label: Profile
-            name: profile
-            widget: object
-            collapsed: false
-            fields:
-              - { label: Name, name: name, widget: string }
-              - { label: Title / headline, name: title, widget: string }
-              - {
-                  label: Scope brief (CRT subtitle text),
-                  name: scopeBrief,
-                  widget: text,
-                  required: false,
-                }
-              - { label: School, name: school, widget: string }
-              - { label: Location, name: location, widget: string }
-              - { label: Year, name: year, widget: string }
-              - label: Interests
-                name: interests
-                widget: list
-                summary: '{{fields.interest}}'
-                fields:
-                  - { label: Interest, name: interest, widget: string }
-              - label: About paragraphs
-                name: about
-                widget: list
-                summary: '{{fields.paragraph}}'
-                fields:
-                  - { label: Paragraph (Markdown), name: paragraph, widget: markdown }
-          - label: Experience
-            name: experience
+          - { label: Name, name: name, widget: string }
+          - { label: Title / headline, name: title, widget: string }
+          - {
+              label: Homepage introduction,
+              name: scopeBrief,
+              widget: text,
+              required: false,
+              hint: 'The short line shown near your name on the oscilloscope screen.',
+            }
+          - { label: School, name: school, widget: string }
+          - { label: Location, name: location, widget: string }
+          - { label: Year, name: year, widget: string }
+          - label: Interests
+            name: interests
             widget: list
-            summary: '{{fields.title}} — {{fields.company}}'
-            hint: 'Jobs, internships, and clubs. Shown on the EXPERIENCE channel.'
+            summary: '{{fields.interest}}'
             fields:
-              - { label: ID (slug), name: id, widget: string }
-              - { label: Type, name: type, widget: string, hint: 'e.g. Internship, Club, Externship' }
-              - { label: Title, name: title, widget: string }
-              - { label: Company, name: company, widget: string }
-              - { label: Location, name: location, widget: string }
-              - { label: Date, name: date, widget: string }
-              - { label: Description (Markdown), name: description, widget: markdown }
-              - label: Tags
-                name: tags
-                widget: list
-                required: false
-                fields:
-                  - { label: Tag, name: tag, widget: string }
-              - label: Photos (carousel)
-                name: gallery
-                widget: list
-                required: false
-                summary: '{{fields.src}}'
-                fields:
-                  - {
-                      label: Image,
-                      name: src,
-                      widget: image,
-                      choose_url: true,
-                      hint: 'Logos, team photos, or work samples.',
-                    }
-              - {
-                  label: Visible images in stack,
-                  name: stackSize,
-                  widget: number,
-                  value_type: int,
-                  min: 1,
-                  max: 8,
-                  required: false,
-                }
-          - label: Links & social
-            name: links
-            widget: object
+              - { label: Interest, name: interest, widget: string }
+          - label: About paragraphs
+            name: about
+            widget: list
+            summary: '{{fields.paragraph}}'
             fields:
-              - { label: Email, name: email, widget: string }
-              - { label: GitHub URL, name: github, widget: string }
-              - { label: LinkedIn URL, name: linkedin, widget: string }
-              - { label: Instagram URL, name: instagram, widget: string }
-          - label: Resume
-            name: resume
-            widget: object
+              - { label: Paragraph, name: paragraph, widget: markdown }
+
+  # ————————————————————————— CONTACT LINKS —————————————————————————
+  - name: links
+    label: Contact links
+    description: Edit the email and social profiles shown across the portfolio.
+    files:
+      - label: Edit contact links
+        name: links
+        file: src/content/cms/links.json
+        format: json
+        fields:
+          - { label: Email, name: email, widget: string }
+          - { label: GitHub URL, name: github, widget: string }
+          - { label: LinkedIn URL, name: linkedin, widget: string }
+          - { label: Instagram URL, name: instagram, widget: string, required: false }
+
+  # ————————————————————————— RESUME —————————————————————————
+  - name: resume
+    label: Résumé
+    description: Replace your résumé PDF and edit the highlights shown beside it.
+    files:
+      - label: Edit résumé
+        name: resume
+        file: src/content/cms/resume.json
+        format: json
+        fields:
+          - { label: Download button label, name: downloadLabel, widget: string }
+          - {
+              label: Résumé PDF,
+              name: downloadUrl,
+              widget: file,
+              choose_url: true,
+              hint: 'Upload a PDF or choose an existing one.',
+            }
+          - {
+              label: Last updated,
+              name: lastUpdated,
+              widget: string,
+              required: false,
+              hint: 'Updated automatically when the PDF changes. You can edit it if needed.',
+            }
+          - { label: '', name: internalPrevUrl, widget: hidden, default: '' }
+          - label: Highlight bullets
+            name: highlights
+            widget: list
             fields:
-              - { label: Download button label, name: downloadLabel, widget: string }
-              - {
-                  label: Resume PDF,
-                  name: downloadUrl,
-                  widget: file,
-                  choose_url: true,
-                  hint: 'Upload a PDF or keep a path like /resume/CalvinHouResume.pdf',
-                }
-              - {
-                  label: Last updated,
-                  name: lastUpdated,
-                  widget: string,
-                  required: false,
-                  hint: 'Set automatically when you change the PDF (YYYY-MM-DD). You can edit if needed.',
-                }
-              - { label: '', name: internalPrevUrl, widget: hidden, default: '' }
-              - label: Highlight bullets
-                name: highlights
-                widget: list
-                fields:
-                  - { label: Highlight, name: highlight, widget: string }
+              - { label: Highlight, name: highlight, widget: string }
