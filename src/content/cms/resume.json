@@ -1,11 +1,404 @@
 {
-  "downloadLabel": "Download Resume",
-  "downloadUrl": "/uploads/calvin-hou-resume-aug6.pdf",
-  "lastUpdated": "2026-09-01",
-  "internalPrevUrl": "/uploads/calvinresume21326b.pdf",
-  "highlights": [
-    { "highlight": "Electrical Engineering (B.S.) — Georgia Tech" },
-    { "highlight": "Robotics + Embedded systems experience" },
-    { "highlight": "PCB design and hardware validation" }
-  ]
+  "partial": false,
+  "path": "src/content/cms/resume.json",
+  "meta": {
+    "path": "src/content/cms/resume.json"
+  },
+  "isModification": null,
+  "raw": "{\n  \"downloadLabel\": \"Download Resume\",\n  \"downloadUrl\": \"/uploads/calvin-hou-resume-aug6.pdf\",\n  \"lastUpdated\": \"2026-09-01\",\n  \"internalPrevUrl\": \"/uploads/calvinresume21326b.pdf\",\n  \"highlights\": [\n    { \"highlight\": \"Electrical Engineering (B.S.) — Georgia Tech\" },\n    { \"highlight\": \"Robotics + Embedded systems experience\" },\n    { \"highlight\": \"PCB design and hardware validation\" }\n  ]\n}\n",
+  "data": {
+    "downloadLabel": "Download Resume",
+    "downloadUrl": "/uploads/calvin-hou-resume-105.pdf",
+    "lastUpdated": "2026-10-08",
+    "internalPrevUrl": "/uploads/calvin-hou-resume-105.pdf",
+    "highlights": [
+      {
+        "highlight": "Electrical Engineering (B.S.) — Georgia Tech"
+      },
+      {
+        "highlight": "Robotics + Embedded systems experience"
+      },
+      {
+        "highlight": "PCB design and hardware validation"
+      }
+    ]
+  },
+  "author": "",
+  "slug": "resume",
+  "newRecord": false,
+  "status": "",
+  "mediaFiles": [
+    {
+      "size": 134506,
+      "draft": true,
+      "path": "public/uploads/calvin-hou-resume-105.pdf",
+      "name": "calvin-hou-resume-105.pdf",
+      "displayURL": "blob:http://127.0.0.1:5173/8ce701ea-cfff-4e3c-94a7-7a1715d1b85a",
+      "url": "blob:http://127.0.0.1:5173/8ce701ea-cfff-4e3c-94a7-7a1715d1b85a",
+      "field": {
+        "label": "Résumé PDF",
+        "name": "downloadUrl",
+        "widget": "file",
+        "choose_url": true,
+        "hint": "Upload a PDF or choose an existing one."
+      },
+      "id": "5554db44a949d29a018c35bccbb2b410e4714230001b4b3bae56fea1007113f9",
+      "file": {}
+    },
+    {
+      "id": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": ".gitkeep",
+      "path": "public/uploads/.gitkeep",
+      "file": {},
+      "size": 0,
+      "url": "blob:http://127.0.0.1:5173/1d758b2b-b2d2-44b3-b9c4-c4cd0bc7cc42",
+      "displayURL": "blob:http://127.0.0.1:5173/1d758b2b-b2d2-44b3-b9c4-c4cd0bc7cc42"
+    },
+    {
+      "id": "fbc9e33395c05786ff3592fe87cc072ecfaa65a03886655896c52dd2171135cf",
+      "name": "1630580805380.jpeg",
+      "path": "public/uploads/1630580805380.jpeg",
+      "file": {},
+      "size": 11060,
+      "url": "blob:http://127.0.0.1:5173/b7e2e6a4-b401-42bb-afd2-1ba5e5785700",
+      "displayURL": "blob:http://127.0.0.1:5173/b7e2e6a4-b401-42bb-afd2-1ba5e5785700"
+    },
+    {
+      "id": "5f18d5c683fe1c234c4a93671c7666bd5564fad0c96dca4433a157202d6f89c8",
+      "name": "1s-lipo-charger-review-v0-20vwdr4ny7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-20vwdr4ny7ug1.webp",
+      "file": {},
+      "size": 70934,
+      "url": "blob:http://127.0.0.1:5173/d2e4a436-5fa8-4344-91e4-c7bcf6f1a115",
+      "displayURL": "blob:http://127.0.0.1:5173/d2e4a436-5fa8-4344-91e4-c7bcf6f1a115"
+    },
+    {
+      "id": "5e622202a2c40609d7a8f23e88179491ea77a558927ca122a21c86949bfce1e3",
+      "name": "1s-lipo-charger-review-v0-3h6acsvsy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-3h6acsvsy7ug1.webp",
+      "file": {},
+      "size": 85748,
+      "url": "blob:http://127.0.0.1:5173/627512af-c1df-4099-90d2-cdd56969102e",
+      "displayURL": "blob:http://127.0.0.1:5173/627512af-c1df-4099-90d2-cdd56969102e"
+    },
+    {
+      "id": "a15c2c23911fc21904e0f9d6bae11f603bb960b0ac1010accb8314fa021e367e",
+      "name": "1s-lipo-charger-review-v0-67c7h0qry7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-67c7h0qry7ug1.webp",
+      "file": {},
+      "size": 119290,
+      "url": "blob:http://127.0.0.1:5173/301df538-b404-44f6-bed2-a6760281ce69",
+      "displayURL": "blob:http://127.0.0.1:5173/301df538-b404-44f6-bed2-a6760281ce69"
+    },
+    {
+      "id": "3fa92d01ca11fd35104b37bedd200d6f012b5a1ece7866f74813b3cdcb01d040",
+      "name": "1s-lipo-charger-review-v0-ckvclkoqy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-ckvclkoqy7ug1.webp",
+      "file": {},
+      "size": 24764,
+      "url": "blob:http://127.0.0.1:5173/7d35a774-3fc0-4f22-8419-807b25e362e1",
+      "displayURL": "blob:http://127.0.0.1:5173/7d35a774-3fc0-4f22-8419-807b25e362e1"
+    },
+    {
+      "id": "16bf6c297788079059334482396b4cc1988dec1d8f9ae7d2a5e10df87a863726",
+      "name": "1s-lipo-charger-review-v0-fmpxhkepy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-fmpxhkepy7ug1.webp",
+      "file": {},
+      "size": 67542,
+      "url": "blob:http://127.0.0.1:5173/7c139e31-6442-4145-bdc5-28fa70076b72",
+      "displayURL": "blob:http://127.0.0.1:5173/7c139e31-6442-4145-bdc5-28fa70076b72"
+    },
+    {
+      "id": "51fc535e08d1c75b0c2e0b5596a8fb827b95a10e6707704001263fc7745094cb",
+      "name": "1s-lipo-charger-review-v0-ljtswmwpy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-ljtswmwpy7ug1.webp",
+      "file": {},
+      "size": 33732,
+      "url": "blob:http://127.0.0.1:5173/5f37873e-2a3b-401c-8aa6-734f5c1f0826",
+      "displayURL": "blob:http://127.0.0.1:5173/5f37873e-2a3b-401c-8aa6-734f5c1f0826"
+    },
+    {
+      "id": "3a35b98dca2d93a4dba83ff29ef40a9eabf8321153bf77d986d5f61338d17863",
+      "name": "1s-lipo-charger-review-v0-q7arvvlmy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-q7arvvlmy7ug1.webp",
+      "file": {},
+      "size": 142042,
+      "url": "blob:http://127.0.0.1:5173/11ddc9be-3c95-4d1f-95f9-79234e5d8221",
+      "displayURL": "blob:http://127.0.0.1:5173/11ddc9be-3c95-4d1f-95f9-79234e5d8221"
+    },
+    {
+      "id": "8b8f064714609f9d54d1c18a0e778f845c9c868e6bbcca86c105aff701a8cf70",
+      "name": "1s-lipo-charger-review-v0-yw9z4w5sy7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-yw9z4w5sy7ug1.webp",
+      "file": {},
+      "size": 69590,
+      "url": "blob:http://127.0.0.1:5173/64fa87ce-80a1-4690-b0c4-bfcd1bb5c9ea",
+      "displayURL": "blob:http://127.0.0.1:5173/64fa87ce-80a1-4690-b0c4-bfcd1bb5c9ea"
+    },
+    {
+      "id": "2574a6ce0431040f8a49e3808a00efb0d6d96d8e7c9a74dee397241a01b4308a",
+      "name": "1s-lipo-charger-review-v0-zfpb2d2my7ug1.webp",
+      "path": "public/uploads/1s-lipo-charger-review-v0-zfpb2d2my7ug1.webp",
+      "file": {},
+      "size": 42244,
+      "url": "blob:http://127.0.0.1:5173/178b0278-5b7f-489d-a9c7-3f80cb2b60af",
+      "displayURL": "blob:http://127.0.0.1:5173/178b0278-5b7f-489d-a9c7-3f80cb2b60af"
+    },
+    {
+      "id": "f6ec908ef409c315d06b785a7a4f8b6c436cc3cc68cac82a797fabea1b5435e1",
+      "name": "1slipocad.png",
+      "path": "public/uploads/1slipocad.png",
+      "file": {},
+      "size": 72930,
+      "url": "blob:http://127.0.0.1:5173/45e1f1c8-32ac-42d3-b86e-eceff01e2c10",
+      "displayURL": "blob:http://127.0.0.1:5173/45e1f1c8-32ac-42d3-b86e-eceff01e2c10"
+    },
+    {
+      "id": "f1d9c7baeb7575190efab616a9c463d52b36f3453817b8ab4c973d8aad9f66cb",
+      "name": "2020-logo.webp",
+      "path": "public/uploads/2020-logo.webp",
+      "file": {},
+      "size": 50562,
+      "url": "blob:http://127.0.0.1:5173/a96b3df8-7731-48c2-8970-863159b38f65",
+      "displayURL": "blob:http://127.0.0.1:5173/a96b3df8-7731-48c2-8970-863159b38f65"
+    },
+    {
+      "id": "d6d74e67f3e16663ac1b67dc7f8a4650ba047f34607507a1914dc152b316d66f",
+      "name": "9442-awards.jpg",
+      "path": "public/uploads/9442-awards.jpg",
+      "file": {},
+      "size": 848070,
+      "url": "blob:http://127.0.0.1:5173/3d5689ed-b73b-4626-bd89-cbea0f973aa0",
+      "displayURL": "blob:http://127.0.0.1:5173/3d5689ed-b73b-4626-bd89-cbea0f973aa0"
+    },
+    {
+      "id": "c1cd64a0b8b0c37e66a27843a4b9ba549ae6cead54ff1142331566c83d8d0a2a",
+      "name": "9442-logo.png",
+      "path": "public/uploads/9442-logo.png",
+      "file": {},
+      "size": 153662,
+      "url": "blob:http://127.0.0.1:5173/7a8193fe-4cac-40ad-a248-4825a35c9e98",
+      "displayURL": "blob:http://127.0.0.1:5173/7a8193fe-4cac-40ad-a248-4825a35c9e98"
+    },
+    {
+      "id": "8f581a847c19f72b96c48100d973ec156c02ac77d4f000a402250fd13bd33735",
+      "name": "amazon-future-engineer-featured.png",
+      "path": "public/uploads/amazon-future-engineer-featured.png",
+      "file": {},
+      "size": 102200,
+      "url": "blob:http://127.0.0.1:5173/8c843de1-cc6a-4e6c-9d2a-4d1a94044288",
+      "displayURL": "blob:http://127.0.0.1:5173/8c843de1-cc6a-4e6c-9d2a-4d1a94044288"
+    },
+    {
+      "id": "011c350c1f258545218a1d2ddd52c53b6fde4845ce855a121ba3409b6ae4c964",
+      "name": "calvin-hou-719.pdf",
+      "path": "public/uploads/calvin-hou-719.pdf",
+      "file": {},
+      "size": 147560,
+      "url": "blob:http://127.0.0.1:5173/0b7ffbc5-9c87-4350-8623-601f232ab04e",
+      "displayURL": "blob:http://127.0.0.1:5173/0b7ffbc5-9c87-4350-8623-601f232ab04e"
+    },
+    {
+      "id": "1cb2dc6ee7d36c85a3093a534c284102d6e9039d898f41ee6f052fb3f5f7980f",
+      "name": "calvin-hou-resume-7_6.pdf",
+      "path": "public/uploads/calvin-hou-resume-7_6.pdf",
+      "file": {},
+      "size": 113304,
+      "url": "blob:http://127.0.0.1:5173/0e5c6389-fbe7-4c56-9d3b-353f2f08b75e",
+      "displayURL": "blob:http://127.0.0.1:5173/0e5c6389-fbe7-4c56-9d3b-353f2f08b75e"
+    },
+    {
+      "id": "97ff8b7b814937cc7f7d8ad6eeef0ca5f1d9bbf34a73e50b4de3c41ce4ae12d8",
+      "name": "calvin-hou-resume-aug6.pdf",
+      "path": "public/uploads/calvin-hou-resume-aug6.pdf",
+      "file": {},
+      "size": 135287,
+      "url": "blob:http://127.0.0.1:5173/cff166d4-80e3-410c-ab3f-65e2dd18b68c",
+      "displayURL": "blob:http://127.0.0.1:5173/cff166d4-80e3-410c-ab3f-65e2dd18b68c"
+    },
+    {
+      "id": "369526b9a2b7ad00067f3a3a12bb008758034518460dd3aeaedd71717c29a26c",
+      "name": "calvinresume21326b.pdf",
+      "path": "public/uploads/calvinresume21326b.pdf",
+      "file": {},
+      "size": 103164,
+      "url": "blob:http://127.0.0.1:5173/db123b47-e9a7-4c56-a836-7d5503bb7f5c",
+      "displayURL": "blob:http://127.0.0.1:5173/db123b47-e9a7-4c56-a836-7d5503bb7f5c"
+    },
+    {
+      "id": "75d901b05469bf7e3996b6f39b366759619c77979ad1cfb54843f7497c3b492b",
+      "name": "calvins-resume.pdf",
+      "path": "public/uploads/calvins-resume.pdf",
+      "file": {},
+      "size": 102440,
+      "url": "blob:http://127.0.0.1:5173/114d132e-d24d-4d2d-9696-052d2e40cf38",
+      "displayURL": "blob:http://127.0.0.1:5173/114d132e-d24d-4d2d-9696-052d2e40cf38"
+    },
+    {
+      "id": "c3b931ce54002363914a136a7a3ca6df2a73058e871f7b0639caf746b4a31ec9",
+      "name": "delta_news_photo2019-02-27_15-52-29.jpg",
+      "path": "public/uploads/delta_news_photo2019-02-27_15-52-29.jpg",
+      "file": {},
+      "size": 42094,
+      "url": "blob:http://127.0.0.1:5173/fdf700aa-467b-4d45-831c-5fd9329ef576",
+      "displayURL": "blob:http://127.0.0.1:5173/fdf700aa-467b-4d45-831c-5fd9329ef576"
+    },
+    {
+      "id": "91eb874b9391f1bbb38743b30d8a2c209efd42dcec004993c913a4e34a48ed2e",
+      "name": "img_3419-copy.jpg",
+      "path": "public/uploads/img_3419-copy.jpg",
+      "file": {},
+      "size": 2767166,
+      "url": "blob:http://127.0.0.1:5173/9e418b48-becf-45b7-91c2-9e835a79d74f",
+      "displayURL": "blob:http://127.0.0.1:5173/9e418b48-becf-45b7-91c2-9e835a79d74f"
+    },
+    {
+      "id": "38ee3273ec2c3abfe426a87ea7e3b69a989bb7e93ec48dff268e9488ffbb0b71",
+      "name": "img_3900-copy.jpg",
+      "path": "public/uploads/img_3900-copy.jpg",
+      "file": {},
+      "size": 2344031,
+      "url": "blob:http://127.0.0.1:5173/525209bc-d546-405e-858c-8878c5b55ada",
+      "displayURL": "blob:http://127.0.0.1:5173/525209bc-d546-405e-858c-8878c5b55ada"
+    },
+    {
+      "id": "fe23f22ba060f89e01fa5dfec7081199c52c303ec37d877fc38626b26aced573",
+      "name": "img_3909-copy.jpg",
+      "path": "public/uploads/img_3909-copy.jpg",
+      "file": {},
+      "size": 4355960,
+      "url": "blob:http://127.0.0.1:5173/7b9a4d27-f861-43d6-b010-1587741cc108",
+      "displayURL": "blob:http://127.0.0.1:5173/7b9a4d27-f861-43d6-b010-1587741cc108"
+    },
+    {
+      "id": "1bdad9fc0962fc885bf43564ad16341ce75bc034faec89e967373c46ff60aba1",
+      "name": "img_3952.heic",
+      "path": "public/uploads/img_3952.heic",
+      "file": {},
+      "size": 1431067,
+      "url": "blob:http://127.0.0.1:5173/c8a3294a-3b51-4a54-bc82-faafb783a02b",
+      "displayURL": "blob:http://127.0.0.1:5173/c8a3294a-3b51-4a54-bc82-faafb783a02b"
+    },
+    {
+      "id": "6e7ed6280df1735f6268c4900c93358288ee4ed1041d017877fdacd3e223350c",
+      "name": "img_4239-copy-1.jpg",
+      "path": "public/uploads/img_4239-copy-1.jpg",
+      "file": {},
+      "size": 3476629,
+      "url": "blob:http://127.0.0.1:5173/6f29a213-97f2-4b08-9a58-9205556484ea",
+      "displayURL": "blob:http://127.0.0.1:5173/6f29a213-97f2-4b08-9a58-9205556484ea"
+    },
+    {
+      "id": "51adb414282cd9069f2ba657ece73be05af2b5aca72bf89231db87f2949aaca7",
+      "name": "img_4248-copy.jpg",
+      "path": "public/uploads/img_4248-copy.jpg",
+      "file": {},
+      "size": 2479880,
+      "url": "blob:http://127.0.0.1:5173/7b991f36-1c67-435e-b1b5-f5dd270e8c2e",
+      "displayURL": "blob:http://127.0.0.1:5173/7b991f36-1c67-435e-b1b5-f5dd270e8c2e"
+    },
+    {
+      "id": "347479ec7aed2b97bb4ffeb42531d6b22cecefc03cdb22f3d3bc566e16bfe336",
+      "name": "img_4705-copy.jpg",
+      "path": "public/uploads/img_4705-copy.jpg",
+      "file": {},
+      "size": 2589151,
+      "url": "blob:http://127.0.0.1:5173/5a4653da-f348-4e56-8026-46a6dd39f525",
+      "displayURL": "blob:http://127.0.0.1:5173/5a4653da-f348-4e56-8026-46a6dd39f525"
+    },
+    {
+      "id": "3130f2507103cf5caca90c821e4ffe008a6d625c1dd52437f63930a5829e5709",
+      "name": "img_4707-copy.jpg",
+      "path": "public/uploads/img_4707-copy.jpg",
+      "file": {},
+      "size": 2685718,
+      "url": "blob:http://127.0.0.1:5173/112d2e2d-2bea-4aa9-b21f-4f6a410a8850",
+      "displayURL": "blob:http://127.0.0.1:5173/112d2e2d-2bea-4aa9-b21f-4f6a410a8850"
+    },
+    {
+      "id": "f1240b1e839391f0eece94a5df05e0375c3c8c09611576779f2c22c296457685",
+      "name": "img_4912-2-copy.jpg",
+      "path": "public/uploads/img_4912-2-copy.jpg",
+      "file": {},
+      "size": 2486647,
+      "url": "blob:http://127.0.0.1:5173/9ac29c01-1935-46a6-a866-014ef4c0abb3",
+      "displayURL": "blob:http://127.0.0.1:5173/9ac29c01-1935-46a6-a866-014ef4c0abb3"
+    },
+    {
+      "id": "f1240b1e839391f0eece94a5df05e0375c3c8c09611576779f2c22c296457685",
+      "name": "img_4912-copy.jpg",
+      "path": "public/uploads/img_4912-copy.jpg",
+      "file": {},
+      "size": 2486647,
+      "url": "blob:http://127.0.0.1:5173/5557d75d-5ca4-4d76-bd5b-51fea8301406",
+      "displayURL": "blob:http://127.0.0.1:5173/5557d75d-5ca4-4d76-bd5b-51fea8301406"
+    },
+    {
+      "id": "245d38624192048d53f3d72b383e6446a5370f7b4133080d6964b0948c3c2022",
+      "name": "img_5543.png",
+      "path": "public/uploads/img_5543.png",
+      "file": {},
+      "size": 4000213,
+      "url": "blob:http://127.0.0.1:5173/71f9c176-b24f-48d4-8d43-e8224f083427",
+      "displayURL": "blob:http://127.0.0.1:5173/71f9c176-b24f-48d4-8d43-e8224f083427"
+    },
+    {
+      "id": "664ea13c8cf413dea5234fdc47df0e9e25b061f00c25e57d076b00d7514bf25d",
+      "name": "img_8017-copy.jpg",
+      "path": "public/uploads/img_8017-copy.jpg",
+      "file": {},
+      "size": 2616363,
+      "url": "blob:http://127.0.0.1:5173/1a26c399-5218-4d1f-bd5b-898af7467cb4",
+      "displayURL": "blob:http://127.0.0.1:5173/1a26c399-5218-4d1f-bd5b-898af7467cb4"
+    },
+    {
+      "id": "d0e9b0b72102745e3ea0f77f95ad4277f3a2ec55f445a9dcfcb62ef6731c3402",
+      "name": "img_9800-copy.jpg",
+      "path": "public/uploads/img_9800-copy.jpg",
+      "file": {},
+      "size": 2757127,
+      "url": "blob:http://127.0.0.1:5173/d8195634-1eb1-44dc-8925-1602b50dac9d",
+      "displayURL": "blob:http://127.0.0.1:5173/d8195634-1eb1-44dc-8925-1602b50dac9d"
+    },
+    {
+      "id": "87f5fe5b7c02122edaf4ca5e9697ff63e100ccc6a1495111da649f459bf957c9",
+      "name": "img_9862-copy.jpg",
+      "path": "public/uploads/img_9862-copy.jpg",
+      "file": {},
+      "size": 2237265,
+      "url": "blob:http://127.0.0.1:5173/4ba3eb10-f889-4527-98e4-aae1950be8ac",
+      "displayURL": "blob:http://127.0.0.1:5173/4ba3eb10-f889-4527-98e4-aae1950be8ac"
+    },
+    {
+      "id": "1ea3b4d539df54588bcfdd798a778ebea211c0dd90e4f2098521face9b4cf7de",
+      "name": "pcbimage.png",
+      "path": "public/uploads/pcbimage.png",
+      "file": {},
+      "size": 116823,
+      "url": "blob:http://127.0.0.1:5173/342455e5-d08b-4fe6-b711-18021239766d",
+      "displayURL": "blob:http://127.0.0.1:5173/342455e5-d08b-4fe6-b711-18021239766d"
+    },
+    {
+      "id": "217fe90efccbccf9e0c11701a8147c66d0e499749d5f5cbf8c6af771625a6860",
+      "name": "pcbschimg.png",
+      "path": "public/uploads/pcbschimg.png",
+      "file": {},
+      "size": 296752,
+      "url": "blob:http://127.0.0.1:5173/6afe9ede-1642-4f11-9b62-c6b0d46a16b4",
+      "displayURL": "blob:http://127.0.0.1:5173/6afe9ede-1642-4f11-9b62-c6b0d46a16b4"
+    },
+    {
+      "id": "89318b477515b393753b583b7bba2c8845a7d939a138a0232fd31a77214d263b",
+      "name": "untitled-aug-28-2024.png",
+      "path": "public/uploads/untitled-aug-28-2024.png",
+      "file": {},
+      "size": 359663,
+      "url": "blob:http://127.0.0.1:5173/512caa6d-d29b-4792-8e30-70808b4e89fd",
+      "displayURL": "blob:http://127.0.0.1:5173/512caa6d-d29b-4792-8e30-70808b4e89fd"
+    }
+  ],
+  "label": "Edit résumé",
+  "updatedOn": "",
+  "i18n": {},
+  "collection": "resume"
 }
