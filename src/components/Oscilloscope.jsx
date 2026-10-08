@@ -753,7 +753,7 @@ export default function Oscilloscope({
   // it settles into the normal "on" state and the power button can be used.
   const [powerState, setPowerState] = useState('booting')
   const powerTimerRef = useRef(null)
-  const [triggerLevel, setTriggerLevel] = useState(0.5)
+  const [triggerLevel, setTriggerLevel] = useState(1)
   const [knobVolts, setKnobVolts] = useState(0.5)
   const [knobVPos, setKnobVPos] = useState(0.5)
   const [knobSec, setKnobSec] = useState(0.5)
