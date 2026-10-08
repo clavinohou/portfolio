@@ -8,7 +8,8 @@
     "images": "node scripts/generateImageDerivatives.mjs",
     "build": "node scripts/updateResumeMeta.mjs && npm run images && vite build",
     "preview": "vite preview",
-    "cms": "decap-server"
+    "cms": "node scripts/cmsServer.mjs",
+    "test:cms": "node --test scripts/cmsGitSync.test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
