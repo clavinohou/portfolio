@@ -9,7 +9,7 @@
     "build": "node scripts/updateResumeMeta.mjs && npm run images && vite build",
     "preview": "vite preview",
     "cms": "node scripts/cmsServer.mjs",
-    "test:cms": "node --test scripts/cmsGitSync.test.mjs"
+    "test:cms": "node --test scripts/cmsGitSync.test.mjs scripts/studioSave.test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

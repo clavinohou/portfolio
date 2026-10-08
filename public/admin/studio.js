@@ -117,13 +117,18 @@
       name: 'preSave',
       handler: function (opts) {
         var entry = opts.entry
-        if (!entry || typeof entry.getIn !== 'function') return entry
-        var next = String(entry.getIn(['data', 'downloadUrl']) || '').trim()
-        var baseline = String(entry.getIn(['data', 'internalPrevUrl']) || '').trim()
-        if (next === baseline) return entry
-        var updated = entry
-        if (next) updated = updated.setIn(['data', 'lastUpdated'], todayISO())
-        return updated.setIn(['data', 'internalPrevUrl'], next)
+        if (!entry || typeof entry.get !== 'function') return
+        // Decap replaces the saved fields with this return value, so return
+        // only data, never the entry (which contains editor state and media).
+        var data = entry.get('data')
+        if (!data || typeof data.get !== 'function') return
+        if (!data.has('downloadUrl')) return data
+        var next = String(data.get('downloadUrl') || '').trim()
+        var baseline = String(data.get('internalPrevUrl') || '').trim()
+        if (next === baseline) return data
+        var updated = data
+        if (next) updated = updated.set('lastUpdated', todayISO())
+        return updated.set('internalPrevUrl', next)
       },
     })
   }
