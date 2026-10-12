@@ -322,15 +322,45 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                 ×
               </button>
             </div>
-            <div
-              ref={stageRef}
-              className={`media-lightbox__stage media-lightbox__stage--${variant} ${zoom > MIN_ZOOM ? 'is-zoomed' : ''} ${isPanning ? 'is-panning' : ''}`}
-              onWheel={(event) => {
-                if (Math.abs(event.deltaY) < 2) return
-                event.preventDefault()
-                updateZoom((value) => value + (event.deltaY < 0 ? 0.25 : -0.25))
-              }}
-            >
+            <div className="media-lightbox__viewport">
+              <div
+                ref={stageRef}
+                className={`media-lightbox__stage media-lightbox__stage--${variant} ${zoom > MIN_ZOOM ? 'is-zoomed' : ''} ${isPanning ? 'is-panning' : ''}`}
+                onWheel={(event) => {
+                  if (Math.abs(event.deltaY) < 2) return
+                  event.preventDefault()
+                  updateZoom((value) => value + (event.deltaY < 0 ? 0.25 : -0.25))
+                }}
+              >
+                <div className="media-lightbox__canvas">
+                  <motion.img
+                    key={i}
+                    {...(showOriginal
+                      ? { src: original }
+                      : { src: full.src, srcSet: full.srcSet, sizes: full.sizes })}
+                    width={full.width}
+                    height={full.height}
+                    alt={`${altPrefix}, photo ${i + 1} of ${n}`}
+                    decoding="async"
+                    draggable={false}
+                    className="media-lightbox__img"
+                    style={{ '--media-zoom': zoom }}
+                    initial={{ opacity: 0, scale: 0.985 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    onPointerDown={startPan}
+                    onPointerMove={movePan}
+                    onPointerUp={endPan}
+                    onPointerCancel={endPan}
+                    onLostPointerCapture={endPan}
+                    onDoubleClick={(e) => {
+                      swallowClick(e)
+                      updateZoom((value) => (value > MIN_ZOOM ? MIN_ZOOM : 2))
+                    }}
+                  />
+                </div>
+              </div>
               {n > 1 && (
                 <>
                   <button
@@ -357,34 +387,6 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
                   </button>
                 </>
               )}
-              <div className="media-lightbox__canvas">
-                <motion.img
-                  key={i}
-                  {...(showOriginal
-                    ? { src: original }
-                    : { src: full.src, srcSet: full.srcSet, sizes: full.sizes })}
-                  width={full.width}
-                  height={full.height}
-                  alt={`${altPrefix}, photo ${i + 1} of ${n}`}
-                  decoding="async"
-                  draggable={false}
-                  className="media-lightbox__img"
-                  style={{ '--media-zoom': zoom }}
-                  initial={{ opacity: 0, scale: 0.985 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18 }}
-                  onPointerDown={startPan}
-                  onPointerMove={movePan}
-                  onPointerUp={endPan}
-                  onPointerCancel={endPan}
-                  onLostPointerCapture={endPan}
-                  onDoubleClick={(e) => {
-                    swallowClick(e)
-                    updateZoom((value) => (value > MIN_ZOOM ? MIN_ZOOM : 2))
-                  }}
-                />
-              </div>
               <span className="media-lightbox__hint" aria-hidden="true">
                 {zoom > MIN_ZOOM ? 'Drag to move · double-click to reset' : 'Double-click or scroll to zoom'}
               </span>
