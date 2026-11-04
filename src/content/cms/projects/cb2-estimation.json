@@ -4,7 +4,7 @@
   "showInBuildLog": true,
   "showBuildNotes": false,
   "pcbViewer": {
-    "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=96B250CE-FBED-426A-AD7E-FD0BC764E3C2&activeView=3D",
+    "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=72005D3E-53E8-4C13-8D3E-1BB3C636F20E&activeView=3D",
     "defaultView": "3D"
   },
   "tags": [
@@ -14,11 +14,17 @@
   ],
   "summary": "PCB design preview. More details coming soon.",
   "description": "Project details coming soon.",
-  "imageUrl": "/uploads/cb2-estimation-layout.webp",
+  "imageUrl": "/uploads/cb2-estimation-front.webp",
   "gallery": [
     {
-      "src": "/uploads/cb2-estimation-detail.webp"
+      "src": "/uploads/cb2-estimation-rear.webp"
+    },
+    {
+      "src": "/uploads/cb2-estimation-pcb.webp"
+    },
+    {
+      "src": "/uploads/ctv-fold-and-unfold.gif"
     }
   ],
-  "buildLogStackSize": 2
+  "buildLogStackSize": 4
 }

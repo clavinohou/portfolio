@@ -135,12 +135,42 @@
       320
     ]
   },
+  "/uploads/cb2-estimation-front.webp": {
+    "w": 1200,
+    "h": 1070,
+    "base": "/media/derived/cb2-estimation-front",
+    "widths": [
+      320,
+      640,
+      960
+    ]
+  },
   "/uploads/cb2-estimation-layout.webp": {
     "w": 625,
     "h": 560,
     "base": "/media/derived/cb2-estimation-layout",
     "widths": [
       320
+    ]
+  },
+  "/uploads/cb2-estimation-pcb.webp": {
+    "w": 1200,
+    "h": 1070,
+    "base": "/media/derived/cb2-estimation-pcb",
+    "widths": [
+      320,
+      640,
+      960
+    ]
+  },
+  "/uploads/cb2-estimation-rear.webp": {
+    "w": 1200,
+    "h": 1070,
+    "base": "/media/derived/cb2-estimation-rear",
+    "widths": [
+      320,
+      640,
+      960
     ]
   },
   "/uploads/delta_news_photo2019-02-27_15-52-29.jpg": {

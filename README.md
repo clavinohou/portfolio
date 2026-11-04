@@ -66,6 +66,11 @@ assembly view. Its starter page is a standard project record at
 like any other project. Add its description, dates, and photos there; build notes
 can be linked to `cb2-estimation` through the Related project field.
 
+Its media gallery includes front and rear 3D captures, a PCB layout capture,
+and the original `ctv-fold-and-unfold.gif` showing the complete folding and
+unfolding sequence as one animation. The GIF stays animated in both the gallery
+and the full-size viewer.
+
 The charger uses a pinned archive of its public `clavinohou/1sLipo` repository
 and starts in 3D. Archives are fetched and processed by Altium, so the URL must
 be publicly reachable, without sign-in.

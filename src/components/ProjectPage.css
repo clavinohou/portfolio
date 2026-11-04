@@ -28,17 +28,6 @@
   overflow: hidden;
 }
 
-.projectlog-hero::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--pp-accent);
-  box-shadow: 0 0 22px color-mix(in oklab, var(--pp-accent) 45%, transparent);
-}
-
 .projectlog-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
