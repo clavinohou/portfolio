@@ -1,0 +1,19 @@
+{
+  "id": "pcb-project",
+  "title": "New PCB Project",
+  "showInBuildLog": true,
+  "showBuildNotes": false,
+  "pcbViewer": {
+    "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=2BEBF4AC-EAA4-4706-9312-3F6095B6BDD4&activeView=3D",
+    "defaultView": "3D"
+  },
+  "tags": [
+    {
+      "tag": "PCB Design"
+    }
+  ],
+  "summary": "PCB design preview. More details coming soon.",
+  "description": "Project details coming soon.",
+  "imageUrl": "",
+  "gallery": []
+}

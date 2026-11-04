@@ -72,8 +72,13 @@ unfolding sequence as one animation. The GIF stays animated in both the gallery
 and the full-size viewer. Its timing adds a one-second pause at the fully folded
 and fully unfolded positions, while keeping the original movement speed.
 
-The charger uses a pinned archive of its public `clavinohou/1sLipo` repository
-and starts in 3D. Archives are fetched and processed by Altium, so the URL must
+The charger uses its saved Altium 365 Personal Space embed and starts in 3D.
+The additional **New PCB Project** starter is at `/log/pcb-project`, backed by
+`src/content/cms/projects/pcb-project.json`. Its title, description, dates,
+and media can be filled in through Portfolio Studio → Projects. It starts in
+3D with build notes off.
+
+For archive-based viewers, archives are fetched and processed by Altium, so the URL must
 be publicly reachable, without sign-in.
 For local archive uploads, processing needs the deployed website URL; Altium
 cannot fetch files from your local preview. Use a persistent Personal Space
