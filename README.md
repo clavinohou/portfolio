@@ -49,8 +49,8 @@ Build Log page shows an **Explore PCB** panel above the build notes. Altium only
 loads when the visitor clicks the button. Projects without a valid source show
 no viewer. The viewer can expand or open in a separate tab.
 
-CB2 Estimation uses its saved Altium 365 Personal Space embed and starts in PCB
-layout view. Its starter page is a standard project record at
+CB2 Estimation uses its saved Altium 365 Personal Space embed and starts in 3D
+assembly view. Its starter page is a standard project record at
 `src/content/cms/projects/cb2-estimation.json`, editable through Portfolio Studio
 like any other project. Add its description, dates, and photos there; build notes
 can be linked to `cb2-estimation` through the Related project field.
