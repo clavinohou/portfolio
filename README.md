@@ -69,7 +69,8 @@ can be linked to `cb2-estimation` through the Related project field.
 Its media gallery includes front and rear 3D captures, a PCB layout capture,
 and the original `ctv-fold-and-unfold.gif` showing the complete folding and
 unfolding sequence as one animation. The GIF stays animated in both the gallery
-and the full-size viewer.
+and the full-size viewer. Its timing adds a one-second pause at the fully folded
+and fully unfolded positions, while keeping the original movement speed.
 
 The charger uses a pinned archive of its public `clavinohou/1sLipo` repository
 and starts in 3D. Archives are fetched and processed by Altium, so the URL must
