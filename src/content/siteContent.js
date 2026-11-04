@@ -73,6 +73,8 @@ function normalizeProject(proj, path) {
     // /log/<id>) — it still appears on the portfolio. Defaults to true so
     // existing content without the field keeps showing everywhere.
     showInBuildLog: proj.showInBuildLog === false ? false : true,
+    // Build notes are independent from having a project overview page.
+    showBuildNotes: proj.showBuildNotes !== false,
     imageUrl: proj.imageUrl ?? '',
     images: projectImages(proj),
     // Two independent stack sizes so the narrow oscilloscope card and the

@@ -85,18 +85,26 @@ collections:
           hint: 'Optional — full URL to the project (GitHub repo, live site, etc.). Leave empty if there isn’t one.',
         }
       - {
-          label: Give this project a Build Log page,
+          label: Give this project a page,
           name: showInBuildLog,
           widget: boolean,
           default: true,
-          hint: 'ON (default) → project appears on the Build Log at /log and clicking the card on the portfolio opens its build log page. OFF → project only shows on the portfolio; the card becomes a link to the External URL above (or non-clickable if none). Use OFF for older projects that predate the build log.',
+          hint: 'ON → project has its own page with a description, gallery, and optional PCB viewer. OFF → portfolio card opens the External link above, or stays as an information card if no link is set. Build notes are optional using the separate switch below.',
+        }
+      - {
+          label: Show build notes,
+          name: showBuildNotes,
+          widget: boolean,
+          default: true,
+          required: false,
+          hint: 'Add a Build log section and progress updates to this project’s page. Leave OFF for a project overview with photos and an optional PCB viewer. Turning this off preserves existing notes so you can enable them again later.',
         }
       - label: PCB design viewer
         name: pcbViewer
         widget: object
         required: false
         collapsed: true
-        hint: 'Optional interactive Altium viewer on this project’s Build Log page. Add an embed link or a public design archive.'
+        hint: 'Optional interactive Altium viewer on this project’s page. Add an embed link or a public design archive.'
         fields:
           - label: Altium embed link
             name: embedUrl
@@ -137,7 +145,7 @@ collections:
           label: Description (Markdown),
           name: description,
           widget: markdown,
-          hint: 'Long-form description shown on the Build Log project page (/log/<id>). Supports bold, lists, links, code blocks, etc.',
+          hint: 'Long-form description shown on the project page (/log/<id>). Supports bold, lists, links, code blocks, etc.',
         }
       - {
           label: Cover image,
@@ -171,7 +179,7 @@ collections:
           hint: 'Shown on the oscilloscope PROJECTS card (calvinhou.com). That card is narrow and sits next to a short summary, so 1–3 images usually looks best. Leave blank to show all.',
         }
       - {
-          label: Visible gallery thumbnails on Build Log page,
+          label: Visible gallery thumbnails on project page,
           name: buildLogStackSize,
           widget: number,
           value_type: int,

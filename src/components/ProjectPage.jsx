@@ -164,18 +164,20 @@ export default function ProjectPage({ projectId }) {
                     Visit project externally <span aria-hidden>↗</span>
                   </a>
                 ) : null}
-                <a
-                  className="projectlog-cta projectlog-cta--ghost mono"
-                  href="#build-log"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    document
-                      .getElementById('build-log')
-                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  }}
-                >
-                  ↓ JUMP TO BUILD LOG ({pad(entries.length)})
-                </a>
+                {project.showBuildNotes ? (
+                  <a
+                    className="projectlog-cta projectlog-cta--ghost mono"
+                    href="#build-log"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      document
+                        .getElementById('build-log')
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }}
+                  >
+                    ↓ JUMP TO BUILD LOG ({pad(entries.length)})
+                  </a>
+                ) : null}
               </div>
             </div>
 
@@ -203,31 +205,33 @@ export default function ProjectPage({ projectId }) {
         {project.pcbViewer ? <PcbViewer key={project.id} viewer={project.pcbViewer} projectTitle={project.title} /> : null}
 
         {/* —— Build log —— */}
-        <motion.section
-          id="build-log"
-          className="projectlog-log"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.4, ease: [0.33, 0, 0.2, 1] }}
-        >
-          <header className="projectlog-log-head">
-            <div className="projectlog-log-title">
-              <span className="projectlog-log-title-icon mono" aria-hidden>
-                <span className="projectlog-log-title-led" />
-                LOG
-              </span>
-              <h2>Build log</h2>
-              <span className="projectlog-log-counter mono">
-                {pad(entries.length)} {entries.length === 1 ? 'ENTRY' : 'ENTRIES'}
-              </span>
-            </div>
-            <p className="projectlog-log-sub mono">
-              // chronological · newest first
-            </p>
-          </header>
+        {project.showBuildNotes ? (
+          <motion.section
+            id="build-log"
+            className="projectlog-log"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08, duration: 0.4, ease: [0.33, 0, 0.2, 1] }}
+          >
+            <header className="projectlog-log-head">
+              <div className="projectlog-log-title">
+                <span className="projectlog-log-title-icon mono" aria-hidden>
+                  <span className="projectlog-log-title-led" />
+                  LOG
+                </span>
+                <h2>Build log</h2>
+                <span className="projectlog-log-counter mono">
+                  {pad(entries.length)} {entries.length === 1 ? 'ENTRY' : 'ENTRIES'}
+                </span>
+              </div>
+              <p className="projectlog-log-sub mono">
+                // chronological · newest first
+              </p>
+            </header>
 
-          <BuildLog entries={entries} channelLabel={channelLabel} accent={accent} />
-        </motion.section>
+            <BuildLog entries={entries} channelLabel={channelLabel} accent={accent} />
+          </motion.section>
+        ) : null}
 
         {/* —— Next / prev + foot —— */}
         <section className="projectlog-nextprev">

@@ -40,10 +40,14 @@ export default function BlogHome() {
   const { buildLogProjects: projects, blog, profile, links } = siteContent
 
   const stats = useMemo(() => {
+    const noteProjects = new Set(projects.filter((project) => project.showBuildNotes).map((project) => project.id))
     const byProject = new Map()
+    let total = 0
     let latestMs = 0
     let latestIso = ''
     for (const entry of blog) {
+      if (!noteProjects.has(entry.project)) continue
+      total += 1
       if (entry.project) {
         const next = (byProject.get(entry.project) || { count: 0, latestMs: 0, latestIso: '' })
         next.count += 1
@@ -58,8 +62,8 @@ export default function BlogHome() {
         latestIso = entry.dateIso
       }
     }
-    return { byProject, total: blog.length, latestIso }
-  }, [blog])
+    return { byProject, total, latestIso }
+  }, [blog, projects])
 
   return (
     <div className="bloghome">
@@ -125,7 +129,7 @@ export default function BlogHome() {
             <span className="bloghome-section-rule" aria-hidden />
             <h2 className="bloghome-section-title mono">PROJECT INDEX</h2>
             <span className="bloghome-section-hint mono">
-              {pad(projects.length, 2)} CHANNELS · click a card to open the log
+              {pad(projects.length, 2)} CHANNELS · click a card to open the project
             </span>
           </header>
 
@@ -156,7 +160,7 @@ export default function BlogHome() {
                       to={`/log/${encodeURIComponent(p.id)}`}
                       className="bloghome-card"
                       style={{ '--card-accent': accent }}
-                      aria-label={`Open ${p.title} build log`}
+                      aria-label={`Open ${p.title} ${p.showBuildNotes ? 'build log' : 'project'}`}
                     >
                       <div className="bloghome-card-media">
                         {p.images[0] ? (
@@ -208,27 +212,33 @@ export default function BlogHome() {
 
                         <div className="bloghome-card-foot">
                           <div className="bloghome-card-foot-meta mono">
-                            <span className="bloghome-card-log">
-                              <span className="bloghome-card-log-led" aria-hidden />
-                              <span className="bloghome-card-log-count">
-                                {pad(entryCount, 2)}
-                              </span>
-                              <span className="bloghome-card-log-label">
-                                {entryCount === 1 ? 'ENTRY' : 'ENTRIES'}
-                              </span>
-                            </span>
-                            {lastDate ? (
-                              <span className="bloghome-card-latest">
-                                LAST · {lastDate}
-                              </span>
+                            {p.showBuildNotes ? (
+                              <>
+                                <span className="bloghome-card-log">
+                                  <span className="bloghome-card-log-led" aria-hidden />
+                                  <span className="bloghome-card-log-count">
+                                    {pad(entryCount, 2)}
+                                  </span>
+                                  <span className="bloghome-card-log-label">
+                                    {entryCount === 1 ? 'ENTRY' : 'ENTRIES'}
+                                  </span>
+                                </span>
+                                {lastDate ? (
+                                  <span className="bloghome-card-latest">
+                                    LAST · {lastDate}
+                                  </span>
+                                ) : (
+                                  <span className="bloghome-card-latest bloghome-card-latest--empty">
+                                    NO ENTRIES YET
+                                  </span>
+                                )}
+                              </>
                             ) : (
-                              <span className="bloghome-card-latest bloghome-card-latest--empty">
-                                NO ENTRIES YET
-                              </span>
+                              <span className="bloghome-card-latest">PROJECT OVERVIEW</span>
                             )}
                           </div>
                           <span className="bloghome-card-open mono" aria-hidden>
-                            OPEN LOG →
+                            {p.showBuildNotes ? 'OPEN LOG →' : 'OPEN PROJECT →'}
                           </span>
                         </div>
                       </div>

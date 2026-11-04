@@ -2,6 +2,7 @@
   "id": "cb2-estimation",
   "title": "CB2 Estimation",
   "showInBuildLog": true,
+  "showBuildNotes": false,
   "pcbViewer": {
     "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=96B250CE-FBED-426A-AD7E-FD0BC764E3C2&activeView=3D",
     "defaultView": "3D"

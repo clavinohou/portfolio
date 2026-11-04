@@ -24,6 +24,17 @@ reports an error; the local changes are retained and saving again retries the pu
 The backend requires `main`, no staged changes, and a branch that includes the
 latest remote changes. It preserves unrelated unstaged work and never force-pushes.
 
+## Optional project pages and build notes
+
+In Portfolio Studio → Projects, **Give this project a page** enables its overview
+page, gallery, and optional PCB viewer. Turn it off to keep a portfolio-only card
+that opens its external link instead.
+
+**Show build notes** independently enables the Build log section, jump link, and
+entry counts. Turn it off on any project to show only its overview; older projects
+retain their existing behavior. Turning notes off preserves their content for later. CB2
+Estimation starts with an overview and PCB viewer, without a build log.
+
 ## PCB design viewer
 
 Project pages show one large photo beside the description, with a thumbnail
@@ -33,7 +44,7 @@ and the carousel; reduced-motion preferences skip the movement. Click the large
 photo to use the existing full-size viewer and zoom controls.
 
 Cover images and gallery photos still use the standard Decap project fields.
-The Build Log thumbnail count controls how many appear in the carousel at once.
+The project-page thumbnail count controls how many appear in the carousel at once.
 The interactive PCB viewer remains a separate section below the project hero.
 
 In Portfolio Studio → Projects, open **PCB design viewer**. Supply either:
@@ -45,7 +56,7 @@ In Portfolio Studio → Projects, open **PCB design viewer**. Supply either:
   files, or paste a public HTTPS URL ending in `.zip`, `.rar`, or `.7z`.
 
 Choose the starting view: 3D assembly, PCB layout, or schematics. The project’s
-Build Log page shows an **Explore PCB** panel above the build notes. Altium only
+page shows an **Explore PCB** panel below the photo gallery. Altium only
 loads when the visitor clicks the button. Projects without a valid source show
 no viewer. The viewer can expand or open in a separate tab.
 

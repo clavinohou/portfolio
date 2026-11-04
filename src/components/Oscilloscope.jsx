@@ -414,7 +414,7 @@ const ProjectsModule = ({
       title="PROJECTS"
       subtitle={
         <>
-          Open a project to read its build log — or{' '}
+          Explore a project — or{' '}
           <Link to="/log" className="projects-subtitle-link mono">
             visit the full Build Log ↗
           </Link>
@@ -449,7 +449,7 @@ const ProjectsModule = ({
               <div className="project-content">
                 <div className="project-card-toprow">
                   <div className="project-title">{p.title}</div>
-                  {inBuildLog && entryCount > 0 ? (
+                  {inBuildLog && p.showBuildNotes && entryCount > 0 ? (
                     <span
                       className="project-card-logchip mono"
                       title={`${entryCount} build log ${entryCount === 1 ? 'entry' : 'entries'}`}
@@ -480,7 +480,7 @@ const ProjectsModule = ({
                 <div className="project-card-footer">
                   {inBuildLog ? (
                     <>
-                      <span className="project-card-open mono">OPEN BUILD LOG →</span>
+                      <span className="project-card-open mono">{p.showBuildNotes ? 'OPEN BUILD LOG →' : 'OPEN PROJECT →'}</span>
                       {p.link ? (
                         <a
                           className="project-external-link"
@@ -507,7 +507,7 @@ const ProjectsModule = ({
                 <Link
                   to={`/log/${encodeURIComponent(p.id)}`}
                   className="project-card-hitarea"
-                  aria-label={`Open ${p.title} build log`}
+                  aria-label={`Open ${p.title} ${p.showBuildNotes ? 'build log' : 'project'}`}
                 />
               </div>
             )
