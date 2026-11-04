@@ -34,8 +34,8 @@
   "imageUrl": "/uploads/1slipocad.png",
   "showInBuildLog": true,
   "pcbViewer": {
-    "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=96B250CE-FBED-426A-AD7E-FD0BC764E3C2&activeView=PCB",
-    "defaultView": "PCB"
+    "archiveUrl": "https://github.com/clavinohou/1sLipo/archive/28af956558fb2a83940c336dccb137c028d3c893.zip",
+    "defaultView": "3D"
   },
   "title": "4 Channel 1S LiPo Battery Charger",
   "tags": [

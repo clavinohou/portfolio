@@ -1,0 +1,18 @@
+{
+  "id": "cb2-estimation",
+  "title": "CB2 Estimation",
+  "showInBuildLog": true,
+  "pcbViewer": {
+    "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=96B250CE-FBED-426A-AD7E-FD0BC764E3C2&activeView=PCB",
+    "defaultView": "PCB"
+  },
+  "tags": [
+    {
+      "tag": "PCB Design"
+    }
+  ],
+  "summary": "PCB design preview. More details coming soon.",
+  "description": "Project details and build notes coming soon.",
+  "imageUrl": "",
+  "gallery": []
+}

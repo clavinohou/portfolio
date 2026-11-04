@@ -39,9 +39,15 @@ Build Log page shows an **Explore PCB** panel above the build notes. Altium only
 loads when the visitor clicks the button. Projects without a valid source show
 no viewer. The viewer can expand or open in a separate tab.
 
-The charger uses its saved Altium 365 Personal Space embed and starts in PCB
-layout view. Update its embed link to show a different saved design. Archives
-are fetched and processed by Altium, so the URL must be publicly reachable, without sign-in.
+CB2 Estimation uses its saved Altium 365 Personal Space embed and starts in PCB
+layout view. Its starter page is a standard project record at
+`src/content/cms/projects/cb2-estimation.json`, editable through Portfolio Studio
+like any other project. Add its description, dates, and photos there; build notes
+can be linked to `cb2-estimation` through the Related project field.
+
+The charger uses a pinned archive of its public `clavinohou/1sLipo` repository
+and starts in 3D. Archives are fetched and processed by Altium, so the URL must
+be publicly reachable, without sign-in.
 For local archive uploads, processing needs the deployed website URL; Altium
 cannot fetch files from your local preview. Use a persistent Personal Space
 embed for preprocessed designs; standalone upload share links expire in 48 hours.
