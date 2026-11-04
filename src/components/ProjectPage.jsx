@@ -80,7 +80,7 @@ export default function ProjectPage({ projectId }) {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') navigate('/log')
+      if (e.key === 'Escape' && !document.fullscreenElement && !document.querySelector('[role="dialog"]')) navigate('/log')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -179,10 +179,12 @@ export default function ProjectPage({ projectId }) {
               </div>
             </div>
 
-            <div className="projectlog-hero-media">
+            <div id="project-media" className="projectlog-hero-media">
               {project.images.length > 0 ? (
                 <ImageCarousel
+                  key={project.id}
                   images={project.images}
+                  presentation="preview"
                   altPrefix={project.title}
                   stackSize={
                     project.buildLogStackSize

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { imageSources } from '../utils/imageSources'
 import { publicUrl } from '../utils/publicUrl'
+import { ProjectGallery } from './ProjectGallery'
 import './ImageCarousel.css'
 
 const MIN_ZOOM = 1
@@ -13,7 +14,7 @@ function clampZoom(value) {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value))
 }
 
-function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', stackSize, thumbSizes }) {
+function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', stackSize, thumbSizes, presentation = 'stack' }) {
   const list = useMemo(
     () => (Array.isArray(images) ? images : []).map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean),
     [images],
@@ -437,6 +438,9 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
 
   return (
     <>
+      {presentation === 'preview' ? (
+        <ProjectGallery key={list.join('\n')} images={list} altPrefix={altPrefix} onOpenImage={openAt} visibleSlots={stackSize} />
+      ) : (
       <div className={rootClass} onClick={swallowClick}>
         <div className="media-carousel__grid" aria-label={altPrefix}>
           {(n <= visibleSlots
@@ -499,6 +503,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
           </>
         )}
       </div>
+      )}
       {expanded && typeof document !== 'undefined' ? createPortal(lightbox, document.body) : null}
     </>
   )

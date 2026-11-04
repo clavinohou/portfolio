@@ -26,6 +26,16 @@ latest remote changes. It preserves unrelated unstaged work and never force-push
 
 ## PCB design viewer
 
+Project pages show one large photo beside the description, with a thumbnail
+carousel directly underneath. The arrows, thumbnail buttons, and left/right
+keyboard keys change the main photo. Photos animate between the main preview
+and the carousel; reduced-motion preferences skip the movement. Click the large
+photo to use the existing full-size viewer and zoom controls.
+
+Cover images and gallery photos still use the standard Decap project fields.
+The Build Log thumbnail count controls how many appear in the carousel at once.
+The interactive PCB viewer remains a separate section below the project hero.
+
 In Portfolio Studio → Projects, open **PCB design viewer**. Supply either:
 
 - An **Altium embed link**: save the design to Altium 365 Personal Space, choose

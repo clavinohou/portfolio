@@ -13,6 +13,11 @@
   ],
   "summary": "PCB design preview. More details coming soon.",
   "description": "Project details and build notes coming soon.",
-  "imageUrl": "",
-  "gallery": []
+  "imageUrl": "/uploads/cb2-estimation-layout.webp",
+  "gallery": [
+    {
+      "src": "/uploads/cb2-estimation-detail.webp"
+    }
+  ],
+  "buildLogStackSize": 2
 }

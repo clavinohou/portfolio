@@ -48,13 +48,19 @@ export function imageSources(rawPath, { role = 'thumb', sizes } = {}) {
   const chosen = widths.length > 0 ? widths : [Math.min(...entry.widths)]
 
   const url = (w) => publicUrl(`${entry.base}-${w}.webp`)
-  const widest = chosen[chosen.length - 1]
+  // Small diagrams need their natural resolution in the large preview. Their
+  // only derivative may be 320px; using the original here avoids upscaling it.
+  // Keep camera originals deferred by requiring both dimensions to fit the cap.
+  const includeOriginal = !isThumb && Math.max(entry.w, entry.h) <= cap && entry.w > chosen[chosen.length - 1]
+  const candidates = chosen.map((w) => `${url(w)} ${w}w`)
+  if (includeOriginal) candidates.push(`${publicUrl(rawPath)} ${entry.w}w`)
+  const widest = includeOriginal ? entry.w : chosen[chosen.length - 1]
 
   return {
     // `src` is the fallback for browsers that ignore srcSet; keep it small so
     // it is never the expensive choice.
     src: url(chosen[0]),
-    srcSet: chosen.map((w) => `${url(w)} ${w}w`).join(', '),
+    srcSet: candidates.join(', '),
     sizes: sizes ?? (isThumb ? DEFAULT_THUMB_SIZES : DEFAULT_FULL_SIZES),
     width: widest,
     height: Math.round((entry.h / entry.w) * widest),

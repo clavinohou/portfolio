@@ -184,6 +184,8 @@
 }
 
 .projectlog-hero-media {
+  min-width: 0;
+  scroll-margin-top: 85px;
   position: relative;
   border-radius: 14px;
   overflow: visible;

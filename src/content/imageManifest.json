@@ -127,6 +127,22 @@
       960
     ]
   },
+  "/uploads/cb2-estimation-detail.webp": {
+    "w": 435,
+    "h": 280,
+    "base": "/media/derived/cb2-estimation-detail",
+    "widths": [
+      320
+    ]
+  },
+  "/uploads/cb2-estimation-layout.webp": {
+    "w": 625,
+    "h": 560,
+    "base": "/media/derived/cb2-estimation-layout",
+    "widths": [
+      320
+    ]
+  },
   "/uploads/delta_news_photo2019-02-27_15-52-29.jpg": {
     "w": 1200,
     "h": 780,
