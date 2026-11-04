@@ -1,6 +1,7 @@
 import rawProfile from './cms/profile.json'
 import rawLinks from './cms/links.json'
 import rawResume from './cms/resume.json'
+import { resolvePcbViewer } from '../lib/pcbViewer.js'
 
 // —— Folder collections ————————————————————————————————————
 // Each project / blog entry is its own JSON file, authored through Decap CMS
@@ -79,6 +80,7 @@ function normalizeProject(proj, path) {
     // buildLogStackSize falls back to stackSize if unset.
     stackSize: normalizeStackSize(proj.stackSize),
     buildLogStackSize: normalizeStackSize(proj.buildLogStackSize),
+    pcbViewer: resolvePcbViewer(proj.pcbViewer),
     _sortOrderMs: hasSortOrder ? sortOrderMs : null,
     _legacyOrder: legacyOrder,
   }

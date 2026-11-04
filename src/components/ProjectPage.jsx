@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { siteContent } from '../content/siteContent'
 import { ImageCarousel } from './ImageCarousel'
 import { MarkdownBlock } from './MarkdownBlock'
+import { PcbViewer } from './PcbViewer'
 import { Link, useRouter } from '../router'
 import { Nav } from './BlogHome'
 import './BlogHome.css'
@@ -150,6 +151,9 @@ export default function ProjectPage({ projectId }) {
               ) : null}
 
               <div className="projectlog-hero-actions">
+                {project.pcbViewer ? (
+                  <a className="projectlog-cta projectlog-cta--ghost mono" href="#pcb-design">↓ EXPLORE PCB</a>
+                ) : null}
                 {project.link ? (
                   <a
                     className="projectlog-cta projectlog-cta--primary"
@@ -193,6 +197,8 @@ export default function ProjectPage({ projectId }) {
             </div>
           </div>
         </motion.section>
+
+        {project.pcbViewer ? <PcbViewer key={project.id} viewer={project.pcbViewer} projectTitle={project.title} /> : null}
 
         {/* —— Build log —— */}
         <motion.section

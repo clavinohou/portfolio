@@ -91,6 +91,33 @@ collections:
           default: true,
           hint: 'ON (default) → project appears on the Build Log at /log and clicking the card on the portfolio opens its build log page. OFF → project only shows on the portfolio; the card becomes a link to the External URL above (or non-clickable if none). Use OFF for older projects that predate the build log.',
         }
+      - label: PCB design viewer
+        name: pcbViewer
+        widget: object
+        required: false
+        collapsed: true
+        hint: 'Optional interactive Altium viewer on this project’s Build Log page. Add an embed link or a public design archive.'
+        fields:
+          - label: Altium embed link
+            name: embedUrl
+            widget: string
+            required: false
+            hint: 'In Altium 365 Personal Space, choose Embed and allow embedding anywhere on the web. Paste only the https://personal-viewer.365.altium.com/client/index.html?... address from the iframe source, not the full HTML. Takes priority over the archive below.'
+          - label: Public design archive
+            name: archiveUrl
+            widget: file
+            required: false
+            choose_url: true
+            hint: 'Upload a ZIP containing the Altium project, PCB, and schematic files, or paste a public HTTPS link to a ZIP, RAR, or 7z archive. Altium processes these files to create the viewer.'
+          - label: Starting view
+            name: defaultView
+            widget: select
+            default: '3D'
+            required: false
+            options:
+              - { label: 3D assembly, value: '3D' }
+              - { label: PCB layout, value: PCB }
+              - { label: Schematics, value: SCH }
       - label: Tags
         name: tags
         widget: list

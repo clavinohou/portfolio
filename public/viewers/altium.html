@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PCB design · Altium 365</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #f6f6f6; font: 15px/1.6 system-ui, sans-serif; }
+      #viewer { width: 100%; height: 100%; max-height: none !important; max-width: none !important; }
+      #status { padding: 24px; }
+      a { color: #a83b17; }
+    </style>
+  </head>
+  <body>
+    <div id="viewer"><p id="status" role="status">Preparing the PCB viewer…</p></div>
+    <script type="module">
+      const params = new URLSearchParams(location.search)
+      let source = null
+      try {
+        const url = new URL(params.get('source'), location.origin)
+        const localUpload = url.origin === location.origin && url.pathname.startsWith('/uploads/')
+        if ((url.protocol === 'https:' || localUpload) && !url.username && !url.password
+          && /\.(zip|rar|7z)$/i.test(url.pathname)) source = url.href
+      } catch { /* An invalid direct link displays the unavailable state below. */ }
+      const viewer = document.getElementById('viewer')
+      const status = document.getElementById('status')
+      if (!source) {
+        status.textContent = 'This PCB design source is unavailable.'
+      } else {
+        // A document per viewer keeps Altium's DOM lifecycle separate from React.
+        viewer.className = 'altium-ecad-viewer'
+        viewer.dataset.projectSrc = new URL(source, location.origin).href
+        viewer.dataset.activeView = ['3D', 'PCB', 'SCH'].includes(params.get('view')) ? params.get('view') : '3D'
+        viewer.dataset.enabledViews = 'sch,pcb,3d,bom'
+        viewer.setAttribute('use-border', 'false')
+        const link = document.createElement('a')
+        link.href = new URL(source, location.origin).href
+        link.textContent = 'Download the design files'
+        status.append(document.createElement('br'), link)
+        const script = document.createElement('script')
+        script.src = 'https://viewer.altium.com/client/static/js/embed.js'
+        script.onerror = () => { status.firstChild.textContent = 'Altium could not be reached. ' }
+        // Remove the status only once the official loader creates its frame.
+        const observer = new MutationObserver(() => {
+          const frame = viewer.querySelector('iframe')
+          if (!frame) return
+          frame.title = 'Interactive Altium PCB design'
+          status.remove()
+          observer.disconnect()
+        })
+        observer.observe(viewer, { childList: true })
+        document.body.append(script)
+      }
+    </script>
+  </body>
+</html>

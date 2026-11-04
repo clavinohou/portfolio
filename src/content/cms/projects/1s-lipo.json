@@ -33,6 +33,10 @@
   "buildLogStackSize": 4,
   "imageUrl": "/uploads/1slipocad.png",
   "showInBuildLog": true,
+  "pcbViewer": {
+    "archiveUrl": "https://github.com/clavinohou/1sLipo/archive/28af956558fb2a83940c336dccb137c028d3c893.zip",
+    "defaultView": "3D"
+  },
   "title": "4 Channel 1S LiPo Battery Charger",
   "tags": [
     {
