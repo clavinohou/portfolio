@@ -216,17 +216,6 @@ html.bloglog-open body {
   overflow: hidden;
 }
 
-.bloghome-hero::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--bl-accent);
-  box-shadow: 0 0 24px color-mix(in oklab, var(--bl-accent) 40%, transparent);
-}
-
 /* "Property of..." stamp in the corner */
 .bloghome-hero-stamp {
   position: absolute;
@@ -390,18 +379,6 @@ html.bloglog-open body {
   text-decoration: none;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.bloghome-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 4px;
-  background: var(--card-accent);
-  box-shadow: 0 0 14px color-mix(in oklab, var(--card-accent) 55%, transparent);
-  opacity: 0.85;
 }
 
 .bloghome-card:hover {
