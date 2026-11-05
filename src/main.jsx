@@ -19,6 +19,26 @@ if (typeof window !== 'undefined') {
   }
 }
 
+// Start analytics after restoring a deep link so GA4 records the actual page.
+const measurementId = import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim()
+if (
+  import.meta.env.PROD &&
+  window.location.hostname === 'calvinhou.com' &&
+  /^G-[A-Z0-9]+$/.test(measurementId ?? '')
+) {
+  window.dataLayer = window.dataLayer || []
+  function gtag() {
+    window.dataLayer.push(arguments)
+  }
+  gtag('js', new Date())
+  gtag('config', measurementId, { allow_google_signals: false, allow_ad_personalization_signals: false })
+
+  const script = document.createElement('script')
+  script.async = true
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(script)
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
