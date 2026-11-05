@@ -1,12 +1,40 @@
 {
-  "id": "pcb-project",
-  "title": "CTV Engine Controller",
-  "showInBuildLog": true,
-  "showBuildNotes": false,
   "pcbViewer": {
     "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=2BEBF4AC-EAA4-4706-9312-3F6095B6BDD4&activeView=3D",
     "defaultView": "3D"
   },
+  "summary": "Engine controller for Hopper's propeller-driven controls test vehicle. It drives the RCS fans and thrust-vector actuators, commands the propulsion ESCs, and communicates both telemetry and control over ethernet.",
+  "stackSize": 1,
+  "date": "Spring 2026",
+  "sortOrder": "2026-10-16T18:00",
+  "showBuildNotes": false,
+  "gallery": [
+    {
+      "src": "/uploads/ctv-engine-controller-3d.webp"
+    },
+    {
+      "src": "/uploads/ctv-engine-controller-block-diagram.webp"
+    },
+    {
+      "src": "/uploads/ctv-engine-controller-pcb.webp"
+    },
+    {
+      "src": "/uploads/ctv-vehicle-cad.webp"
+    },
+    {
+      "src": "/uploads/ctv-power-rail-startup.png"
+    },
+    {
+      "src": "/uploads/ctv-current-monitor-schematic.webp"
+    },
+    {
+      "src": "/uploads/ctv-ethernet-phy-schematic.webp"
+    }
+  ],
+  "buildLogStackSize": 4,
+  "imageUrl": "/uploads/ctv-engine-controller-assembled.webp",
+  "showInBuildLog": true,
+  "title": "CTV Engine Controller",
   "tags": [
     {
       "tag": "PCB Design"
@@ -18,32 +46,6 @@
       "tag": "Ethernet"
     }
   ],
-  "summary": "Engine controller for Hopper’s propeller-driven controls test vehicle. It drives the RCS fans and thrust-vector actuators, commands the propulsion ESCs, and reports rail telemetry over Ethernet.",
-  "description": "### **Project Overview** ###\n\nAt Yellow Jacket Space Program, we built the Control Test Vehicle (CTV) as a smaller platform for tuning Hopper’s upright flight controls before testing the rocket itself. Two counter-rotating propellers provide lift, two linear actuators tilt the thrust assembly, and four reaction control system (RCS) fans control roll.\n\n### **What the Engine Controller Does** ###\n\n* **Propulsion** — Sends PWM commands to the two electronic speed controllers (ESCs). Each ESC has a separate battery feed.\n* **Roll control** — Powers and controls the four RCS fans from a shared 4.4 V rail.\n* **Thrust vector control** — Supplies 12 V and a control interface to the two linear actuators.\n* **Flight computer link** — Receives commands and sends rail telemetry over Ethernet.\n\n### **Power & Telemetry** ###\n\nThe board takes a nominal 22.2 V battery input. Two buck converters supply the 12 V actuator rail and the 4.4 V fan rail. A 3.3 V linear regulator powers the STM32. The STM32 samples rail voltage and current through its analog-to-digital converter (ADC) inputs so we can track the loads during a test. [See the buck calculations](/uploads/ctv-buck-calculations.xlsx \"Buck calculations\").\n\n### **My Role** ###\n\nI worked on the power and telemetry schematics, routed the power rails, and added temperature sensors where we needed them. I also ran the STM32 trade study, comparing Ethernet support, ADC and PWM channels, package options, and availability. We selected the STM32H745XIH6.\n\nI integrated the Ethernet PHY and handled the layout of the differential pairs, including impedance control and length tuning.\n\n*Vehicle CAD, the block diagram, and schematic excerpts come from the team’s CTV design reviews.*",
-  "imageUrl": "/uploads/ctv-engine-controller-assembled.webp",
-  "gallery": [
-    {
-      "src": "/uploads/ctv-power-rail-startup.png"
-    },
-    {
-      "src": "/uploads/ctv-engine-controller-3d.webp"
-    },
-    {
-      "src": "/uploads/ctv-vehicle-cad.webp"
-    },
-    {
-      "src": "/uploads/ctv-engine-controller-block-diagram.webp"
-    },
-    {
-      "src": "/uploads/ctv-engine-controller-pcb.webp"
-    },
-    {
-      "src": "/uploads/ctv-current-monitor-schematic.webp"
-    },
-    {
-      "src": "/uploads/ctv-ethernet-phy-schematic.webp"
-    }
-  ],
-  "stackSize": 1,
-  "buildLogStackSize": 4
+  "id": "ctv-engine-controller",
+  "description": "### **Project Overview**\n\nAt Yellow Jacket Space Program, we built the Control Test Vehicle (CTV) as a smaller platform for tuning Hopper’s upright flight controls before testing the rocket itself. Two counter-rotating propellers provide lift, two linear actuators tilt the thrust assembly, and four reaction control system (RCS) fans control roll.\n\n### **What the Engine Controller Does**\n\n* **Propulsion** — Sends PWM commands to the two electronic speed controllers (ESCs). Each ESC has a separate battery feed.\n* **Roll control** — Powers and controls the four RCS fans from a shared 4.4 V rail.\n* **Thrust vector control** — Supplies 12 V and a control interface to the two linear actuators.\n* **Flight computer link** — Receives commands and sends rail telemetry over Ethernet.\n\n### **Power & Telemetry**\n\nThe board takes a nominal 22.2 V battery input. Two buck converters supply the 12 V actuator rail and the 4.4 V fan rail. A 3.3 V linear regulator powers the STM32. The STM32 samples rail voltage and current through its analog-to-digital converter (ADC) inputs so we can track the loads during a test. [See the buck calculations](/uploads/ctv-buck-calculations.xlsx \"Buck calculations\").\n\n### **My Role**\n\n* **Power and telemetry** — I designed the board’s power rails, including both buck converters, and added supporting circuitry so the STM32 could read rail current and voltage. I added temperature sensors near the converters and the STM32 to get live board conditions during flight.\n* **Trade studies and project requirements** — I worked to define what the board needed to do for the vehicle, then compared STM32 options for Ethernet support, ADC and PWM channels, package, and availability. Ultimately, we went with the STM32H745XIH6 in a BGA package.\n* **Layout** — I helped lay out the buck converters and handled the Ethernet layout from the STM32’s MAC through the PHY to the MagJack. I routed the differential pairs to the MagJack with controlled impedance and length-tuned the clock trace."
 }

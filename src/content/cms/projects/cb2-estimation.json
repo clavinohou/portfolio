@@ -1,20 +1,13 @@
 {
-  "id": "cb2-estimation",
-  "title": "CB2 Estimation",
-  "showInBuildLog": true,
-  "showBuildNotes": false,
   "pcbViewer": {
     "embedUrl": "https://personal-viewer.365.altium.com/client/index.html?feature=embed&source=72005D3E-53E8-4C13-8D3E-1BB3C636F20E&activeView=3D",
     "defaultView": "3D"
   },
-  "tags": [
-    {
-      "tag": "PCB Design"
-    }
-  ],
   "summary": "PCB design preview. More details coming soon.",
-  "description": "Project details coming soon.",
-  "imageUrl": "/uploads/cb2-estimation-front.webp",
+  "stackSize": 1,
+  "date": "Fall 2026",
+  "sortOrder": "2026-11-02T10:00",
+  "showBuildNotes": false,
   "gallery": [
     {
       "src": "/uploads/cb2-estimation-rear.webp"
@@ -26,5 +19,21 @@
       "src": "/uploads/ctv-fold-and-unfold.gif"
     }
   ],
-  "buildLogStackSize": 4
+  "buildLogStackSize": 4,
+  "imageUrl": "/uploads/cb2-estimation-front.webp",
+  "showInBuildLog": true,
+  "title": "Core Body Temperature (CBT) Estimation ",
+  "tags": [
+    {
+      "tag": "PCB Design"
+    },
+    {
+      "tag": "Biomedical Sensing"
+    },
+    {
+      "tag": "Consumer Electronics"
+    }
+  ],
+  "id": "cbt-estimation",
+  "description": "Project details coming soon."
 }

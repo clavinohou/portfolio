@@ -60,11 +60,11 @@ page shows an **Explore PCB** panel below the photo gallery. Altium only
 loads when the visitor clicks the button. Projects without a valid source show
 no viewer. The viewer can expand or open in a separate tab.
 
-CB2 Estimation uses its saved Altium 365 Personal Space embed and starts in 3D
+Core Body Temperature (CBT) Estimation uses its saved Altium 365 Personal Space embed and starts in 3D
 assembly view. Its starter page is a standard project record at
 `src/content/cms/projects/cb2-estimation.json`, editable through Portfolio Studio
 like any other project. Add its description, dates, and photos there; build notes
-can be linked to `cb2-estimation` through the Related project field.
+can be linked to `cbt-estimation` through the Related project field.
 
 Its media gallery includes front and rear 3D captures, a PCB layout capture,
 and the original `ctv-fold-and-unfold.gif` showing the complete folding and
@@ -73,7 +73,7 @@ and the full-size viewer. Its timing adds a one-second pause at the fully folded
 and fully unfolded positions, while keeping the original movement speed.
 
 The charger uses its saved Altium 365 Personal Space embed and starts in 3D.
-The **CTV Engine Controller** is at `/log/pcb-project`, backed by
+The **CTV Engine Controller** is at `/log/ctv-engine-controller`, backed by
 `src/content/cms/projects/pcb-project.json`. Its gallery combines Altium board
 captures with vehicle CAD, a block diagram, and schematic excerpts from the
 team’s design reviews. Its viewer starts in 3D.
