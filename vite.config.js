@@ -27,6 +27,8 @@ function decapAdminRoute() {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [decapAdminRoute(), react()],
+  // Let Vite resolve the spreadsheet viewer’s worker next to the package.
+  optimizeDeps: { exclude: ['@extend-ai/react-xlsx'], include: ['react', 'react-dom', 'react/jsx-runtime'] },
   base: '/', // Change to '/your-repo-name/' if deploying to GitHub Pages with a repo name
   build: {
     outDir: 'dist',

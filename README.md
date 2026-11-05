@@ -73,10 +73,10 @@ and the full-size viewer. Its timing adds a one-second pause at the fully folded
 and fully unfolded positions, while keeping the original movement speed.
 
 The charger uses its saved Altium 365 Personal Space embed and starts in 3D.
-The additional **New PCB Project** starter is at `/log/pcb-project`, backed by
-`src/content/cms/projects/pcb-project.json`. Its title, description, dates,
-and media can be filled in through Portfolio Studio → Projects. It starts in
-3D with build notes off.
+The **CTV Engine Controller** is at `/log/pcb-project`, backed by
+`src/content/cms/projects/pcb-project.json`. Its gallery combines Altium board
+captures with vehicle CAD, a block diagram, and schematic excerpts from the
+team’s design reviews. Its viewer starts in 3D.
 
 For archive-based viewers, archives are fetched and processed by Altium, so the URL must
 be publicly reachable, without sign-in.
@@ -90,8 +90,14 @@ document validate their source URLs. Run `npm run test:pcb` to check URL handlin
 
 [Altium embedding documentation](https://www.altium.com/documentation/altium-365/standalone-viewer#embedding-altium-365-viewer-on-your-own-website)
 
+### Spreadsheet previews
 
+Upload an `.xlsx` workbook to the Decap media library and link its `/uploads/`
+path in any project description or build note. For example:
 
+```markdown
+[See the buck calculations](/uploads/ctv-buck-calculations.xlsx "Buck calculations")
+```
 
-
-
+A regular click opens the read-only workbook preview, with a download link for
+the original file. The optional Markdown link title names the preview window.

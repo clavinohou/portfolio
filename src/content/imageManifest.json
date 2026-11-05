@@ -176,6 +176,67 @@
       1600
     ]
   },
+  "/uploads/ctv-current-monitor-schematic.webp": {
+    "w": 755,
+    "h": 428,
+    "base": "/media/derived/ctv-current-monitor-schematic",
+    "widths": [
+      320,
+      640
+    ]
+  },
+  "/uploads/ctv-engine-controller-3d.webp": {
+    "w": 2560,
+    "h": 2580,
+    "base": "/media/derived/ctv-engine-controller-3d",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/ctv-engine-controller-block-diagram.webp": {
+    "w": 2443,
+    "h": 1560,
+    "base": "/media/derived/ctv-engine-controller-block-diagram",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/ctv-engine-controller-pcb.webp": {
+    "w": 2560,
+    "h": 2580,
+    "base": "/media/derived/ctv-engine-controller-pcb",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/ctv-ethernet-phy-schematic.webp": {
+    "w": 1670,
+    "h": 1154,
+    "base": "/media/derived/ctv-ethernet-phy-schematic",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/ctv-vehicle-cad.webp": {
+    "w": 561,
+    "h": 807,
+    "base": "/media/derived/ctv-vehicle-cad",
+    "widths": [
+      320
+    ]
+  },
   "/uploads/delta_news_photo2019-02-27_15-52-29.jpg": {
     "w": 1200,
     "h": 780,
