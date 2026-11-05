@@ -500,10 +500,22 @@
 }
 
 .projectlog-entry-gallery .media-carousel {
+  width: fit-content;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   padding: 6px;
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.projectlog-entry-gallery .media-carousel__grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.projectlog-entry-gallery .media-carousel__thumb {
+  width: 112px;
+  max-width: 100%;
 }
 
 .projectlog-entry-tags {

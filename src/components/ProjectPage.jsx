@@ -363,6 +363,7 @@ function BuildLog({ entries, channelLabel, accent }) {
                         images={entry.images}
                         altPrefix={entry.title}
                         stackSize={entry.stackSize ?? Math.min(entry.images.length, 3)}
+                        thumbSizes="112px"
                         variant="cover"
                       />
                     </div>
