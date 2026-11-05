@@ -1,0 +1,24 @@
+{
+  "id": "1s-lipo-first-power-on",
+  "title": "First power-on",
+  "date": "2026-05-11T16:06",
+  "project": "1s-lipo",
+  "summary": "USB-C PD negotiated 9 V on the first try. A MOSFET kept it from reaching the buck converter.",
+  "tags": [
+    {
+      "tag": "Board Bring-up"
+    },
+    {
+      "tag": "USB PD"
+    }
+  ],
+  "body": "When I plugged the board in for the first time, the USB-C PD controller got the 9 V I’d asked for instead of the default 5 V. Then I looked down and saw that the display and all four charger LEDs were still dark.\n\nI tried powering the ESP32 directly. It shares a supply rail with the charging ICs, so that brought up the charger circuits too. Three LEDs lit up and one stayed dark. All four channels use the same circuit, and this was my first time soldering DFN parts, so my first guess is a bad solder joint on that IC.\n\nI put the meter on the power path between the PD controller and the buck converter.\n\n- I measured 9 V at the PD output and on the input side of the MOSFET.\n- The 9 V stopped at the MOSFET. The buck converter had no input, so the 5 V rail stayed off.\n\nI went back to the schematic to see how I was driving the gate. I’d picked a P-channel MOSFET for a circuit that called for an N-channel part. I updated the schematic and ordered a drop-in N-channel replacement in the same SOIC-8 package.\n\nI was about to leave for my internship in Thailand, so the swap had to wait until I got back to school. Once the new part is in, I’ll check that USB-C power brings up the 5 V rail, then test charging on all four channels.",
+  "gallery": [
+    {
+      "src": "/uploads/1s-lipo-first-power-on-usb-pd.jpg"
+    },
+    {
+      "src": "/uploads/1s-lipo-first-power-on-charger-leds.jpg"
+    }
+  ]
+}
