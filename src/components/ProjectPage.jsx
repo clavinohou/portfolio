@@ -80,7 +80,7 @@ export default function ProjectPage({ projectId }) {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape' && !document.fullscreenElement && !document.querySelector('[role="dialog"]')) navigate('/log')
+      if (e.key === 'Escape' && !document.fullscreenElement && !document.querySelector('dialog:modal, [role="dialog"]')) navigate('/log')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

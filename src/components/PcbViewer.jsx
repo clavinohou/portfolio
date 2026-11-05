@@ -1,12 +1,28 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import './ImageCarousel.css'
 import './PcbViewer.css'
 
 export function PcbViewer({ viewer, projectTitle }) {
   const [opened, setOpened] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+  const dialog = useRef(null)
+  const expandButton = useRef(null)
+  const closeButton = useRef(null)
+
+  function expand() {
+    // Move the same dialog into the top layer without remounting the iframe.
+    dialog.current.close()
+    dialog.current.showModal()
+    closeButton.current.focus()
+  }
+
+  function collapse() {
+    dialog.current.close()
+    dialog.current.show()
+    expandButton.current.focus({ preventScroll: true })
+  }
 
   return (
-    <section id="pcb-design" className={`pcb-viewer${expanded ? ' pcb-viewer--expanded' : ''}`} aria-labelledby="pcb-design-title">
+    <section id="pcb-design" className="pcb-viewer" aria-labelledby="pcb-design-title">
       <header className="pcb-viewer-head">
         <div>
           <span className="pcb-viewer-eyebrow mono">INSIDE THE BOARD · ALTIUM 365</span>
@@ -15,16 +31,40 @@ export function PcbViewer({ viewer, projectTitle }) {
         </div>
         {opened ? (
           <div className="pcb-viewer-actions">
-            <button type="button" className="projectlog-cta projectlog-cta--ghost" aria-pressed={expanded} onClick={() => setExpanded(!expanded)}>
-              {expanded ? 'Collapse viewer' : 'Expand viewer'}
+            <button ref={expandButton} type="button" className="projectlog-cta projectlog-cta--ghost" aria-haspopup="dialog" onClick={expand}>
+              Expand viewer
             </button>
             <a className="projectlog-cta projectlog-cta--ghost" href={viewer.externalUrl} target="_blank" rel="noopener noreferrer">Open in new tab ↗</a>
           </div>
         ) : null}
       </header>
       {opened ? (
-        <div className="pcb-viewer-frame">
-          <iframe src={viewer.src} title={`${projectTitle} — interactive PCB design`} allowFullScreen />
+        <div className="pcb-viewer-slot">
+          <dialog
+            open
+            ref={dialog}
+            className="media-lightbox__panel pcb-viewer-dialog"
+            aria-label={`${projectTitle} PCB viewer`}
+            onCancel={(event) => {
+              event.preventDefault()
+              collapse()
+            }}
+            onClick={(event) => {
+              if (event.target === event.currentTarget && dialog.current.matches(':modal')) collapse()
+            }}
+          >
+            <header className="media-lightbox__chrome">
+              <div className="media-lightbox__heading">
+                <span className="media-lightbox__eyebrow">PCB viewer</span>
+                <span className="media-lightbox__title">{projectTitle}</span>
+              </div>
+              <a className="pcb-viewer-external" href={viewer.externalUrl} target="_blank" rel="noopener noreferrer">Open in new tab ↗</a>
+              <button ref={closeButton} className="media-lightbox__close" type="button" aria-label="Close expanded PCB viewer" onClick={collapse}>×</button>
+            </header>
+            <div className="media-lightbox__viewport pcb-viewer-frame">
+              <iframe src={viewer.src} title={`${projectTitle} — interactive PCB design`} allowFullScreen />
+            </div>
+          </dialog>
         </div>
       ) : (
         <div className="pcb-viewer-cover">

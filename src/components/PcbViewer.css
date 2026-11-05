@@ -36,7 +36,7 @@
 
 .pcb-viewer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .pcb-viewer-actions button, .pcb-viewer-cover button { font-family: inherit; }
-.pcb-viewer button:focus-visible, .pcb-viewer a:focus-visible { outline: 3px solid var(--pp-accent); outline-offset: 4px; }
+.pcb-viewer-actions :focus-visible, .pcb-viewer-cover button:focus-visible { outline: 3px solid var(--pp-accent); outline-offset: 4px; }
 
 .pcb-viewer-cover {
   display: flex;
@@ -56,13 +56,62 @@
 .pcb-viewer-cover svg { color: var(--pp-accent); }
 .pcb-viewer-cover h3 { margin: 0; font-size: 1.5rem; color: var(--bl-ink); }
 .pcb-viewer-note { font-size: 0.75rem; color: var(--bl-ink-muted); }
-.pcb-viewer-frame { height: 620px; border-top: 1px solid rgba(0, 0, 0, 0.08); background: #f6f6f6; }
+.pcb-viewer-slot {
+  height: min(620px, 72dvh);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.pcb-viewer-dialog:not(:modal) {
+  position: static;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pcb-viewer-dialog:not(:modal) .media-lightbox__chrome { display: none; }
+
+.pcb-viewer-dialog:modal {
+  position: fixed;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: calc(100vw - 32px);
+  height: calc(100dvh - 32px);
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  margin: auto;
+}
+
+.pcb-viewer-dialog::backdrop {
+  background: rgba(8, 9, 12, 0.72);
+  backdrop-filter: blur(16px) saturate(0.75);
+}
+
+html:has(.pcb-viewer-dialog:modal) { overflow: hidden; }
+
+.pcb-viewer-frame { height: 100%; background: #f6f6f6; }
 .pcb-viewer-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
-.pcb-viewer--expanded .pcb-viewer-frame { height: 82vh; min-height: 620px; }
+
+.pcb-viewer-external {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: .78rem;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.pcb-viewer-external:focus-visible { outline: 2px solid #ff7a47; outline-offset: 3px; }
 .pcb-viewer-help { margin: 0; padding: 14px 20px; color: var(--bl-ink-soft); font-size: 0.8rem; line-height: 1.6; }
 
 @media (max-width: 600px) {
-  .pcb-viewer-frame { height: 540px; }
+  .pcb-viewer-slot { height: min(540px, 72dvh); }
   .pcb-viewer-actions { width: 100%; }
   .pcb-viewer-actions .projectlog-cta { padding: 9px 12px; font-size: 0.72rem; }
+}
+
+@media (max-width: 640px) {
+  .pcb-viewer-dialog:modal { width: 100%; height: 100dvh; }
+  .pcb-viewer-dialog .media-lightbox__title { max-width: none; }
 }
