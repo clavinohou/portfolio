@@ -48,6 +48,9 @@ function OscilloscopeApp() {
     const nextIndex = channelOrder.indexOf(nextId)
     setDirection(nextIndex > currentIndex ? 1 : -1)
     setActiveChannel(nextId)
+    if (nextIndex !== -1 && nextId !== activeChannel) {
+      window.gtag?.('event', 'portfolio_channel_select', { portfolio_channel: nextId })
+    }
   }
 
   const handleHome = () => {
