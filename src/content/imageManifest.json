@@ -196,6 +196,17 @@
       1600
     ]
   },
+  "/uploads/ctv-engine-controller-assembled.webp": {
+    "w": 2700,
+    "h": 2700,
+    "base": "/media/derived/ctv-engine-controller-assembled",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
   "/uploads/ctv-engine-controller-block-diagram.webp": {
     "w": 2443,
     "h": 1560,
@@ -227,6 +238,15 @@
       640,
       960,
       1600
+    ]
+  },
+  "/uploads/ctv-power-rail-startup.png": {
+    "w": 800,
+    "h": 632,
+    "base": "/media/derived/ctv-power-rail-startup",
+    "widths": [
+      320,
+      640
     ]
   },
   "/uploads/ctv-vehicle-cad.webp": {
