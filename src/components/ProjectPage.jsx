@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { siteContent } from '../content/siteContent'
 import { ImageCarousel } from './ImageCarousel'
@@ -283,6 +283,70 @@ export default function ProjectPage({ projectId }) {
   )
 }
 
+function BuildLogMedia({ entry }) {
+  const { images, title, video } = entry
+  const dialog = useRef(null)
+  const [playing, setPlaying] = useState(false)
+  const poster = imageSources(video?.poster, { sizes: '112px' })
+
+  return (
+    <div className="projectlog-entry-gallery">
+      <ImageCarousel
+        images={images}
+        altPrefix={title}
+        stackSize={entry.stackSize ?? Math.min(images.length, 3)}
+        thumbSizes="112px"
+        leadingThumbnail={video ? (
+          <button
+            type="button"
+            className="media-carousel__thumb"
+            aria-label={`Play ${title} video`}
+            aria-haspopup="dialog"
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true })
+              dialog.current.showModal()
+              setPlaying(true)
+            }}
+          >
+            {poster.src ? <img {...poster} alt="" decoding="async" /> : null}
+            <span className="media-carousel__thumb-icon projectlog-video-play" aria-hidden="true">▶</span>
+          </button>
+        ) : null}
+      />
+
+      {video ? (
+        <dialog
+          ref={dialog}
+          className="media-lightbox__panel projectlog-video-dialog"
+          aria-label={`${title} video`}
+          onClose={() => setPlaying(false)}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) dialog.current.close()
+          }}
+        >
+          <header className="media-lightbox__chrome">
+            <div className="media-lightbox__heading">
+              <span className="media-lightbox__eyebrow">Video</span>
+              <span className="media-lightbox__title">{title}</span>
+            </div>
+            <button
+              className="media-lightbox__close"
+              type="button"
+              aria-label="Close video"
+              onClick={() => dialog.current.close()}
+            >
+              ×
+            </button>
+          </header>
+          {playing ? (
+            <video className="projectlog-entry-video" src={publicUrl(video.src)} controls playsInline autoPlay />
+          ) : null}
+        </dialog>
+      ) : null}
+    </div>
+  )
+}
+
 function BuildLog({ entries, channelLabel, accent }) {
   if (entries.length === 0) {
     return (
@@ -359,29 +423,7 @@ function BuildLog({ entries, channelLabel, accent }) {
                     </div>
                   ) : null}
 
-                  {entry.video ? (
-                    <video
-                      className="projectlog-entry-video"
-                      aria-label={`${entry.title} video`}
-                      src={publicUrl(entry.video.src)}
-                      poster={imageSources(entry.video.poster).src || undefined}
-                      controls
-                      playsInline
-                      preload="none"
-                    />
-                  ) : null}
-
-                  {entry.images.length > 0 ? (
-                    <div className="projectlog-entry-gallery">
-                      <ImageCarousel
-                        images={entry.images}
-                        altPrefix={entry.title}
-                        stackSize={entry.stackSize ?? Math.min(entry.images.length, 3)}
-                        thumbSizes="112px"
-                        variant="cover"
-                      />
-                    </div>
-                  ) : null}
+                  {entry.video || entry.images.length > 0 ? <BuildLogMedia entry={entry} /> : null}
 
                   {entry.tags.length > 0 ? (
                     <div className="projectlog-entry-tags">

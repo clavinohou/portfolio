@@ -14,7 +14,7 @@ function clampZoom(value) {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value))
 }
 
-function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', stackSize, thumbSizes, presentation = 'stack' }) {
+function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', stackSize, thumbSizes, presentation = 'stack', leadingThumbnail }) {
   const list = useMemo(
     () => (Array.isArray(images) ? images : []).map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean),
     [images],
@@ -167,7 +167,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
     return () => window.removeEventListener('keydown', onKey)
   }, [expanded, goPrev, goNext, updateZoom])
 
-  if (n === 0) return null
+  if (n === 0 && !leadingThumbnail) return null
 
   const full = imageSources(list[i], { role: 'full' })
   const original = publicUrl(list[i])
@@ -443,6 +443,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
       ) : (
       <div className={rootClass} onClick={swallowClick}>
         <div className="media-carousel__grid" aria-label={altPrefix}>
+          {leadingThumbnail}
           {(n <= visibleSlots
             ? list
             : Array.from({ length: visibleSlots }, (_, offset) => {
