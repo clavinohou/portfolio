@@ -3,7 +3,7 @@
   "title": "Bring-up and debugging",
   "date": "2026-09-25T19:01",
   "project": "ctv-engine-controller",
-  "summary": "We drilled out a bad connection under the STM32 before first power-on. The buck converters checked out, but we couldn’t reach the chip over SWD.",
+  "summary": "To remedy an overlooked schematic error, we drilled out a bad connection under the STM32 before first power-on. The buck converters checked out, but we couldn’t reach the chip over SWD.",
   "tags": [
     {
       "tag": "Board Bring-up"
