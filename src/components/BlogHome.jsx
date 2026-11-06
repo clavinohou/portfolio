@@ -18,17 +18,22 @@ const TRACE_COLORS = [
   '#f472b6',
 ]
 
-const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
+const DATE_OPTIONS = {
   year: 'numeric',
   month: 'short',
   day: '2-digit',
+}
+const DATE_FORMATTER = new Intl.DateTimeFormat(undefined, DATE_OPTIONS)
+const LAST_UPDATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  ...DATE_OPTIONS,
+  timeZone: 'America/New_York',
 })
 
-function formatDate(iso) {
+function formatDate(iso, formatter = DATE_FORMATTER) {
   if (!iso) return ''
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  return DATE_FORMATTER.format(d).toUpperCase()
+  return formatter.format(d).toUpperCase()
 }
 
 function pad(n, w = 3) {
@@ -118,7 +123,9 @@ export default function BlogHome() {
             </div>
             <div className="bloghome-stat">
               <span className="bloghome-stat-label">LAST UPDATE</span>
-              <span className="bloghome-stat-value">{formatDate(stats.latestIso) || '—'}</span>
+              <span className="bloghome-stat-value">
+                {formatDate(__PROJECT_LAST_UPDATE__, LAST_UPDATE_FORMATTER) || formatDate(stats.latestIso) || '—'}
+              </span>
             </div>
           </div>
         </motion.section>
