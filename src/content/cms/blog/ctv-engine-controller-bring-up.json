@@ -1,0 +1,21 @@
+{
+  "id": "ctv-engine-controller-bring-up",
+  "title": "Bring-up and debugging",
+  "date": "2026-11-06T00:36",
+  "project": "ctv-engine-controller",
+  "summary": "We drilled out a bad connection under the STM32 before first power-on. The buck converters checked out, but we couldn’t reach the chip over SWD.",
+  "tags": [
+    {
+      "tag": "Board Bring-up"
+    },
+    {
+      "tag": "PCB Rework"
+    }
+  ],
+  "body": "Shortly after we ordered the CTV engine controller boards from JLCPCB, a teammate caught an error in the STM32 reference schematic we’d used. The pads that should have grounded two of the STM32’s internal LDO decoupling capacitors were tied to 3.3 V. We hadn’t powered the boards yet, so we had a chance to fix it before risking damage to the chip.\n\nWe’d picked the STM32 because the team was planning to move its avionics from BeagleBone single-board computers to STM32s. The engine controller was meant to be a pilot board. We could validate the reference schematic on real hardware and get some experience with the design before the rest of the team started using it.\n\nThe connections ran through vias in the BGA pads straight into an internal power plane, so there was no exposed trace at the chip that we could just cut. We talked about pulling the STM32 and running magnet wire, but we didn’t have a stencil or enough BGA rework experience to feel good about removing, reballing, and resoldering it.\n\nThere looked to be enough clearance around the vias to drill them out from the back without hitting the neighboring pads. We removed the capacitors and used the PCB mill to line up the drill. Once we’d drilled out the vias, we cut a trace on the top side and resoldered the capacitors to ground.\n\nThere was no magic smoke on first power-up, which was a relief. We still couldn’t connect to the STM32 over SWD or flash it. We were able to verify the buck converters’ startup sequence and output voltages, so we’ll pick up the rest of bring-up when the respin comes in.\n\nThanks for reading :)",
+  "gallery": [
+    {
+      "src": "/uploads/ctv-power-rail-startup.png"
+    }
+  ]
+}

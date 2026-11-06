@@ -7,7 +7,7 @@
   "stackSize": 1,
   "date": "Spring 2026",
   "sortOrder": "2026-10-16T18:00",
-  "showBuildNotes": false,
+  "showBuildNotes": true,
   "gallery": [
     {
       "src": "/uploads/ctv-engine-controller-3d.webp"
