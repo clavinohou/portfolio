@@ -93,6 +93,7 @@ function normalizeBlogEntry(entry, path) {
   const dateRaw = (entry.date ?? '').toString().trim()
   const dateObj = dateRaw ? new Date(dateRaw) : null
   const hasValidDate = dateObj && !Number.isNaN(dateObj.getTime())
+  const videoSrc = typeof entry.video?.src === 'string' ? entry.video.src.trim() : ''
   return {
     id,
     title: (entry.title ?? '').toString(),
@@ -103,6 +104,7 @@ function normalizeBlogEntry(entry, path) {
     tags: flatList(entry.tags, 'tag'),
     summary: (entry.summary ?? '').toString(),
     body: (entry.body ?? '').toString(),
+    video: videoSrc ? { src: videoSrc, poster: entry.video.poster } : null,
     images: flatList(entry.gallery, 'src'),
     stackSize: normalizeStackSize(entry.stackSize),
   }

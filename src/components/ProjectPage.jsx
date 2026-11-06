@@ -6,6 +6,8 @@ import { MarkdownBlock } from './MarkdownBlock'
 import { PcbViewer } from './PcbViewer'
 import { Link, useRouter } from '../router'
 import { Nav } from './BlogHome'
+import { imageSources } from '../utils/imageSources'
+import { publicUrl } from '../utils/publicUrl'
 import './BlogHome.css'
 import './ProjectPage.css'
 
@@ -355,6 +357,18 @@ function BuildLog({ entries, channelLabel, accent }) {
                     <div className="projectlog-entry-text">
                       <MarkdownBlock markdown={entry.body} />
                     </div>
+                  ) : null}
+
+                  {entry.video ? (
+                    <video
+                      className="projectlog-entry-video"
+                      aria-label={`${entry.title} video`}
+                      src={publicUrl(entry.video.src)}
+                      poster={imageSources(entry.video.poster).src || undefined}
+                      controls
+                      playsInline
+                      preload="none"
+                    />
                   ) : null}
 
                   {entry.images.length > 0 ? (

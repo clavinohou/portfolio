@@ -265,6 +265,14 @@ collections:
           widget: markdown,
           hint: 'The actual entry. Supports bold, lists, headings, fenced code blocks, quotes, links, etc.',
         }
+      - label: Video
+        name: video
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: MP4 file, name: src, widget: file, required: false }
+          - { label: Preview image, name: poster, widget: image, required: false }
       - label: Photos / diagrams
         name: gallery
         widget: list
