@@ -15,6 +15,11 @@
   "body": "I’ve been back on campus for a few weeks and finally got around to finishing this project. I soldered in the N-channel MOSFET replacement and the BT2.0 connectors I got from BetaFPV, and the board powered up!\n\nI got the firmware running next. It monitors battery voltage and uses the ISET pin to track charging.\n\n- The packs charged normally, and I could see their readings on the display.\n- Plugging a pack into the battery checker takes over the screen. Unplugging it brings the charging display back.\n\nThe board is intentionally sparse to give extra room around the charging ICs because I expected them to get pretty hot. During charging, they indeed got very hot but heat spread out pretty evenly and was manageable.\n\nI’m calling the charger finished. I’m excited to get back to flying whoops and put it to use.",
   "video": {
     "src": "/uploads/1s-lipo-charger-demo.mp4",
-    "poster": "/uploads/1s-lipo-finished-charger.jpg"
-  }
+    "poster": "/uploads/1s-lipo-charger-video-preview.jpg"
+  },
+  "gallery": [
+    {
+      "src": "/uploads/1s-lipo-finished-charger.jpg"
+    }
+  ]
 }
