@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { siteContent } from '../content/siteContent'
 import { ImageCarousel } from './ImageCarousel'
@@ -314,7 +315,7 @@ function BuildLogMedia({ entry }) {
         ) : null}
       />
 
-      {video ? (
+      {video && createPortal(
         <dialog
           ref={dialog}
           className="media-lightbox__panel projectlog-video-dialog"
@@ -341,8 +342,9 @@ function BuildLogMedia({ entry }) {
           {playing ? (
             <video className="projectlog-entry-video" src={publicUrl(video.src)} controls playsInline autoPlay />
           ) : null}
-        </dialog>
-      ) : null}
+        </dialog>,
+        document.body,
+      )}
     </div>
   )
 }
