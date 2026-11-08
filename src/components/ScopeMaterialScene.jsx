@@ -483,13 +483,27 @@ function Instrument({ fit, handleRaised, handleHitRef, shadowLightRef }) {
     const hit = handleHitRef.current
     if (!hit) return
     grip.current.updateWorldMatrix(true, false)
-    const path = outline.map(({ x, y }, index) => {
-      projected.set(x, y, -HANDLE_THICKNESS / 2 * scale).applyMatrix4(grip.current.matrixWorld).project(camera)
-      const screenX = (projected.x + 1) * size.width / 2
-      const screenY = (1 - projected.y) * size.height / 2
-      return `${index ? 'L' : 'M'}${screenX.toFixed(1)},${screenY.toFixed(1)}`
+    // Project both caps and the walls between them. A single cap misses the
+    // inside face when the folded or raised handle is viewed at an angle.
+    const caps = [-1, 1].map((side) => outline.map(({ x, y }) => {
+      projected.set(x, y, side * HANDLE_THICKNESS / 2 * scale).applyMatrix4(grip.current.matrixWorld).project(camera)
+      return { x: (projected.x + 1) * size.width / 2, y: (1 - projected.y) * size.height / 2 }
+    }))
+    const polygons = [...caps, ...outline.map((_, index) => {
+      const next = (index + 1) % outline.length
+      return [caps[0][index], caps[0][next], caps[1][next], caps[1][index]]
+    })]
+    const path = polygons.map((polygon) => {
+      // Consistent winding unions overlapping faces under SVG's nonzero
+      // fill rule without making the open space inside the bow grabbable.
+      const area = polygon.reduce((sum, point, index) => {
+        const next = polygon[(index + 1) % polygon.length]
+        return sum + point.x * next.y - next.x * point.y
+      }, 0)
+      const points = area < 0 ? [...polygon].reverse() : polygon
+      return points.map(({ x, y }, index) => `${index ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`).join('') + 'Z'
     }).join('')
-    hit.setAttribute('d', `${path}Z`)
+    hit.setAttribute('d', path)
   }, -0.5)
   return (
     <group>
