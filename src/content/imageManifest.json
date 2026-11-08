@@ -78,6 +78,47 @@
       320
     ]
   },
+  "/uploads/1s-lipo-charger-video-preview.jpg": {
+    "w": 540,
+    "h": 960,
+    "base": "/media/derived/1s-lipo-charger-video-preview",
+    "widths": [
+      320
+    ]
+  },
+  "/uploads/1s-lipo-finished-charger.jpg": {
+    "w": 4284,
+    "h": 5712,
+    "base": "/media/derived/1s-lipo-finished-charger",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/1s-lipo-first-power-on-charger-leds.jpg": {
+    "w": 3024,
+    "h": 4032,
+    "base": "/media/derived/1s-lipo-first-power-on-charger-leds",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
+  "/uploads/1s-lipo-first-power-on-usb-pd.jpg": {
+    "w": 4284,
+    "h": 5712,
+    "base": "/media/derived/1s-lipo-first-power-on-usb-pd",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
   "/uploads/1slipocad.png": {
     "w": 804,
     "h": 642,
@@ -257,6 +298,25 @@
       320
     ]
   },
+  "/uploads/ctv-via-drilling-preview.jpg": {
+    "w": 540,
+    "h": 960,
+    "base": "/media/derived/ctv-via-drilling-preview",
+    "widths": [
+      320
+    ]
+  },
+  "/uploads/ctv-via-rework.jpg": {
+    "w": 3024,
+    "h": 4032,
+    "base": "/media/derived/ctv-via-rework",
+    "widths": [
+      320,
+      640,
+      960,
+      1600
+    ]
+  },
   "/uploads/delta_news_photo2019-02-27_15-52-29.jpg": {
     "w": 1200,
     "h": 780,
@@ -431,6 +491,14 @@
       1600
     ]
   },
+  "/uploads/tesla-logo.png": {
+    "w": 640,
+    "h": 828,
+    "base": "/media/derived/tesla-logo",
+    "widths": [
+      320
+    ]
+  },
   "/uploads/untitled-aug-28-2024.png": {
     "w": 2000,
     "h": 2000,
@@ -440,6 +508,14 @@
       640,
       960,
       1600
+    ]
+  },
+  "/uploads/yeo-research-group-logo.png": {
+    "w": 640,
+    "h": 336,
+    "base": "/media/derived/yeo-research-group-logo",
+    "widths": [
+      320
     ]
   }
 }

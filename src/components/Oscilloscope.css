@@ -4,11 +4,12 @@
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
-  background: var(--gray-100, #f4f4f5);
+  background: radial-gradient(ellipse at 42% 18%, #fafaf7 0%, #eeefeb 60%, #e4e5e0 100%);
 }
 
 /* Home: one screen, no vertical page scroll */
 .bench-stage--home {
+  overflow: clip;
   height: 100dvh;
   max-height: 100dvh;
   display: flex;
@@ -48,6 +49,7 @@
   }
 
   .bench-stage--home .scope-rig {
+    padding-top: 32px;
     padding-bottom: 32px;
   }
 
@@ -64,23 +66,9 @@
   right: 0;
   bottom: 0;
   height: 42%;
-  background: linear-gradient(180deg, #c4c4c8 0%, #9a9aa0 48%, #7a7a82 100%);
-  box-shadow: inset 0 8px 24px rgba(255, 255, 255, 0.15);
+  background: linear-gradient(180deg, transparent 0%, rgba(181, 184, 176, 0.16) 100%);
   pointer-events: none;
   z-index: 0;
-}
-
-.bench-surface::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 120px,
-    rgba(0, 0, 0, 0.04) 120px,
-    rgba(0, 0, 0, 0.04) 121px
-  );
 }
 
 .scope-rig {
@@ -92,8 +80,193 @@
   will-change: transform;
 }
 
+.scope-rig[data-frozen="true"] * {
+  animation-play-state: paused !important;
+}
+
 .scope-fit-frame {
+  position: relative;
   flex: 0 0 auto;
+}
+
+.scope-front-plane {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.scope-front-hardware {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--panel-skin-opacity, 1);
+}
+/* Front projection of the physical housing: 7px side lips, 9px rolled
+   edges, a 49%-wide bow, and pads centered 38% either side of the case. */
+.scope-front-hardware::before {
+  content: '';
+  position: absolute;
+  inset: -9px -7px;
+  z-index: 1;
+  border-radius: 9px;
+  background: var(--scope-panel-surface);
+  box-shadow:
+    inset 2px 2px 3px #ffffff20,
+    inset -2px -2px 3px #25312421,
+    inset 0 -4px 4px #25312428;
+  mask-image: var(--case-face-mask, linear-gradient(#fff, #fff)), linear-gradient(transparent, #fff 1.3px);
+  mask-composite: intersect;
+  mask-size: 100% 100%;
+}
+.scope-front-handle {
+  position: absolute;
+  top: -26.82px;
+  left: 50%;
+  width: calc(49% + 44px);
+  height: 26.82px;
+  transform: translateX(-50%);
+}
+.scope-front-handle-bar {
+  position: absolute;
+  top: 6.82px;
+  left: 22px;
+  right: 22px;
+  height: 18px;
+  border: 1px solid #3a433b;
+  border-radius: 5px;
+  background:
+    linear-gradient(90deg, #ffffff0b, transparent 50%, #0000000a),
+    linear-gradient(#586058, #3e473f 14%, #4e564f 30%, #464f47 55%, #3f4840);
+}
+.scope-front-handle-bar::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  bottom: 0;
+  left: 50%;
+  width: 210px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(90deg, transparent 0 9.5px, #30393166 9.5px 11px, transparent 11px 19px);
+}
+.scope-front-handle-end {
+  position: absolute;
+  top: 0;
+  width: 44px;
+  height: 27px;
+  border-radius: 10px 10px 4px 4px;
+}
+.scope-front-handle-pad {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  border: 1px solid #3d473e;
+  background: linear-gradient(90deg, #374138, #586057 35%, #50584f 55%, #343d35 88%);
+  box-shadow: inset 0 2px 2px #455046, inset 0 5px 4px #8c95842b;
+  mask-image: linear-gradient(transparent, #fff 1.5px);
+}
+.scope-front-handle-axle {
+  position: absolute;
+  top: 10.32px;
+  left: 50%;
+  width: 62px;
+  height: 9px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: linear-gradient(#899385, #69766b 42%, #58665c);
+}
+.scope-front-handle-end::before,
+.scope-front-handle-end::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 7.32px;
+  width: 8px;
+  height: 38px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #bcc3b9, #e2e5dc 45%, #aab4a6);
+}
+.scope-front-handle-end::before { left: -11px; }
+.scope-front-handle-end::after { right: -11px; }
+.scope-front-handle-end.is-left { left: 0; }
+.scope-front-handle-end.is-right { right: 0; }
+.scope-front-foot {
+  position: absolute;
+  top: 100%;
+  left: 12%;
+  width: 56px;
+  height: 18px;
+  transform: translateX(-50%);
+}
+.scope-front-foot.is-right { left: 88%; }
+.scope-front-foot::before,
+.scope-front-foot::after {
+  content: '';
+  position: absolute;
+  border-radius: 4px;
+}
+.scope-front-foot::before {
+  inset: -2px 0 10px;
+  background: linear-gradient(#e5e8e0, #bec6b8);
+}
+.scope-front-foot::after {
+  top: 4px;
+  left: 7px;
+  width: 42px;
+  height: 14px;
+  background: linear-gradient(#414840, #293229 48%, #252c25 75%, #1b211c 100%);
+  box-shadow: inset 0 -1px 1px #101a1170;
+}
+
+.scope-material-scene {
+  position: absolute;
+  width: 100vw;
+  height: 100dvh;
+  left: calc((100% - 100vw) / 2);
+  top: calc((100% - 100dvh) / 2);
+  pointer-events: none;
+}
+
+.scope-material-scene canvas {
+  pointer-events: none;
+}
+
+.scope-handle-hit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.scope-handle-hit path {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 10px;
+  stroke-linejoin: round;
+  pointer-events: painted;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scope-handle-hit path:focus,
+.scope-handle-hit path:focus-visible {
+  outline: none;
+  fill: transparent;
+  stroke: transparent;
+}
+
+.scope-is-carrying,
+.scope-is-carrying * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 .scope-fit-frame.is-fitted {
@@ -110,6 +283,11 @@
 }
 
 .scope-chassis {
+  position: relative;
+  --crt-fx: .45;
+  --crt-lens-strength: 1;
+  --knob-contact-shadow: 2px 4px 6px -1px #29312626;
+  --key-contact-shadow: 1.5px 2.5px 4px -1px #29312621;
   --scope-accent-orange: #ff6b35;
   --scope-accent-yellow: #f4c542;
   --scope-accent-blue: #4ea8ff;
@@ -121,13 +299,24 @@
      the complete chassis uniformly, rather than narrowing this one axis. */
   width: min(1100px, 94vw);
   border-radius: 6px;
-  background: linear-gradient(165deg, #d8d8dc 0%, #b8b8c0 40%, #a8a8b0 100%);
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  box-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.35) inset,
-    0 24px 48px rgba(0, 0, 0, 0.22),
-    0 4px 12px rgba(0, 0, 0, 0.12);
+  background: var(--scope-panel-surface);
+  border: 1px solid transparent;
+  box-shadow: none;
   color: var(--gray-900, #18181b);
+}
+
+/* The lightweight initial view owns this shadow. It fades once when the
+   physical renderer is adopted, then both camera views keep its lighting. */
+.scope-chassis::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: inherit;
+  box-shadow: none;
+  opacity: var(--case-shadow-opacity, 1);
+  transform: translateZ(.1px);
+  pointer-events: none;
 }
 
 .scope-chassis-top {
@@ -136,7 +325,7 @@
   align-items: center;
   padding: 10px 16px 8px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 100%);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .scope-model-block {
@@ -226,7 +415,7 @@
   font-family: var(--font-sans);
   font-size: 0.58rem;
   letter-spacing: 0.14em;
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.62);
 }
 
 .scope-power-cluster.state-off .scope-power-label {
@@ -261,21 +450,69 @@
 }
 
 .scope-crt-bezel {
-  border-radius: 4px;
-  padding: 14px;
+  position: relative;
+  z-index: 0;
+  border-radius: 22px / 19px;
+  padding: 20px;
   background: linear-gradient(145deg, #2a2a2e 0%, #0f0f12 100%);
   border: 2px solid #1a1a1f;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 8px 24px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.scope-crt-bezel::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transform: translateZ(calc(-1 * var(--crt-bezel-depth, 20px) * var(--view-depth, 0)));
+  pointer-events: none;
 }
 
 .scope-crt-glass {
-  border-radius: 2px;
+  position: relative;
+  border-radius: var(--crt-corner-x, 6.5%) / var(--crt-corner-y, 8%);
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.6);
+  background: #09110d38;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+  isolation: isolate;
+  clip-path: inset(var(--crt-clip, 0px) round var(--crt-corner-x, 6.5%) / var(--crt-corner-y, 8%));
 }
+.scope-crt-image {
+  clip-path: inset(5px round var(--crt-corner-x, 6.5%) / var(--crt-corner-y, 8%));
+}
+
+/* This is the bezel's inner lip shading. The glass's clip-path must not
+   clip it away and then reveal it abruptly when returning to 2D. */
+.scope-crt-recess {
+  position: absolute;
+  inset: 20px;
+  border-radius: var(--crt-corner-x, 6.5%) / var(--crt-corner-y, 8%);
+  box-shadow: 0 -5px 8px #000, 0 2px 1px #62695c;
+  transform: translateZ(.1px);
+  pointer-events: none;
+}
+
+.scope-crt-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: calc(1 - var(--crt-fx, 0));
+  background:
+    radial-gradient(ellipse 95% 110% at 50% 50%, transparent 62%, #0009 94%, #000d 100%),
+    radial-gradient(ellipse 90% 55% at 30% -12%, #f4fff322 0%, #e6ffed0a 46%, transparent 68%);
+  box-shadow:
+    inset 0 2px 5px #d9ffe52b,
+    inset 9px 0 18px #0008,
+    inset -9px 0 18px #0008,
+    inset 0 -10px 18px #0009;
+}
+
 
 .scope-phosphor {
   position: relative;
@@ -581,13 +818,33 @@
 .scope-screen-grid {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(rgba(115, 255, 170, 0.22) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(90deg, rgba(115, 255, 170, 0.14) 1px, transparent 1px) 0 0 / 24px 24px;
-  opacity: 0.48;
-  filter: drop-shadow(0 0 10px rgba(85, 255, 150, 0.22));
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   pointer-events: none;
 }
+.scope-vector-graticule { stroke-width: 1; }
+.scope-vector-grid-horizontal { stroke: rgba(115, 255, 170, .1056); }
+.scope-vector-grid-vertical { stroke: rgba(115, 255, 170, .0672); }
+.scope-vector-beam {
+  stroke: var(--wave-color, #91f4b4);
+  opacity: .88;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.scope-vector-beam.is-square { stroke-linecap: butt; stroke-linejoin: miter; }
+.scope-vector-beam-halo { stroke: var(--wave-color, #5fff9b); opacity: .14; stroke-width: 5; stroke-linejoin: round; }
+.scope-vector-channel {
+  fill: var(--wave-color);
+  font: 8px var(--font-mono, monospace);
+  paint-order: stroke;
+  stroke: #061008;
+  stroke-width: 3px;
+}
+.scope-vector-trigger { stroke: #ffb45c; stroke-width: 1; stroke-dasharray: 4 4; opacity: .6; }
+.scope-vector-trigger.is-searching { stroke: #f4c542; opacity: .4; }
+.scope-trigger-position-guide { visibility: hidden; }
 
 .scope-crt-layout {
   position: relative;
@@ -649,7 +906,6 @@
 }
 
 .scope-trigger-guide {
-  --trigger-color: var(--scope-accent-orange);
   position: absolute;
   z-index: 4;
   color: var(--trigger-color);
@@ -676,7 +932,6 @@
 }
 
 .scope-trigger-position-marker {
-  --trigger-color: var(--scope-accent-orange);
   appearance: none;
   position: absolute;
   top: -11px;
@@ -720,7 +975,6 @@
 }
 
 .scope-trigger-marker {
-  --trigger-color: var(--scope-accent-orange);
   appearance: none;
   position: absolute;
   right: 2px;
@@ -802,6 +1056,7 @@
     0 0 9px rgba(85, 255, 150, 0.38),
     0 0 14px rgba(85, 255, 150, 0.2);
 }
+.scope-crt-trace-badge { display: flex; gap: 10px; }
 
 .scope-crt-lower {
   flex: 0 0 auto;
@@ -839,29 +1094,11 @@
     0 0 10px rgba(85, 255, 150, 0.14);
 }
 
-.scope-wave-path {
-  fill: none;
-  stroke: rgba(128, 255, 182, calc(0.56 + var(--scope-glow) * 0.42));
-  stroke-width: calc(1.8 + var(--scope-glow) * 1.9);
-  stroke-linecap: butt;
-  stroke-linejoin: miter;
-  /* Keep beam thickness constant when timebase / volts scale the trace (real scope behavior). */
-  vector-effect: non-scaling-stroke;
-  filter:
-    drop-shadow(0 0 9px rgba(95, 255, 155, 0.82))
-    drop-shadow(0 0 22px rgba(95, 255, 155, 0.45));
-}
-
-.scope-wave-path--smooth {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .scope-crt-hint {
   position: absolute;
   left: 10px;
   right: 10px;
-  bottom: 6px;
+  bottom: 14px;
   z-index: 4;
   font-size: clamp(0.45rem, 1.1vw, 0.55rem);
   letter-spacing: 0.06em;
@@ -904,7 +1141,7 @@
   gap: clamp(10px, 2.5vw, 14px);
   padding: 4px 4px 10px clamp(8px, 1.5vw, 12px);
   border-left: 1px solid rgba(0, 0, 0, 0.1);
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0%, transparent 40%);
+  background: transparent;
   min-width: 0;
 }
 
@@ -1014,15 +1251,22 @@
   height: var(--knob-dial);
   flex-shrink: 0;
 }
+.scope-knob-stack::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: var(--knob-contact-shadow);
+  transform: translateZ(calc(-22px * var(--view-depth, 0)));
+  pointer-events: none;
+}
 
 .scope-knob-ring {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(180deg, #e4e4e8 0%, #b0b0b8 100%);
-  box-shadow:
-    0 2px 0 rgba(255, 255, 255, 0.5) inset,
-    0 6px 12px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(180deg, #e1e3dc 0%, #afb3a8 100%);
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.5) inset;
   border: 1px solid rgba(0, 0, 0, 0.2);
   pointer-events: none;
 }
@@ -1030,21 +1274,18 @@
 .scope-controls-section--trigger .scope-knob-ring {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.5) inset,
-    0 6px 12px rgba(0, 0, 0, 0.12),
     0 0 0 1px color-mix(in oklab, var(--scope-accent-orange) 32%, transparent);
 }
 
 .scope-controls-section--vertical .scope-knob-ring {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.5) inset,
-    0 6px 12px rgba(0, 0, 0, 0.12),
     0 0 0 1px color-mix(in oklab, var(--scope-accent-green) 30%, transparent);
 }
 
 .scope-controls-section--horizontal .scope-knob-ring {
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.5) inset,
-    0 6px 12px rgba(0, 0, 0, 0.12),
     0 0 0 1px color-mix(in oklab, var(--scope-accent-yellow) 35%, transparent);
 }
 
@@ -1052,7 +1293,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: linear-gradient(180deg, #f0f0f4 0%, #c8c8d0 100%);
+  background: linear-gradient(145deg, #f0f1ed 0%, #d4d7ce 100%);
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.85);
   transform-origin: 50% 50%;
   pointer-events: none;
@@ -1227,8 +1468,234 @@
   --btn-accent: var(--scope-accent-orange);
 }
 
+.scope-trigger-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(0.4rem, 1.5vw, 0.65rem);
+}
+.scope-input-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.scope-input-bank {
+  --rocker-open: 0;
+  --lamp-drive: 1;
+  --lamp-light: calc(var(--rocker-open) * var(--lamp-drive));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.scope-input-bank.is-enabled { --rocker-open: 1; }
+.scope-power-body.is-off .scope-input-bank { --lamp-drive: 0; }
+.scope-input-select {
+  --selector-press: 0;
+  --plastic-foot: color-mix(in srgb, var(--input-color) calc(45% * var(--lamp-light)), #9ca99173);
+  position: relative;
+  z-index: 3;
+  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 29px;
+  width: 100%;
+  max-width: 60px;
+  border: 1px solid #aeb8a569;
+  border-radius: 4px;
+  background: linear-gradient(155deg, #fbfff4b3, #d4ddcb63);
+  box-shadow: inset 0 1px 1px #ffffffed, inset 0 -3px 6px #95a28722, 0 2px 0 var(--plastic-foot), 0 3px 5px #28352517;
+  color: #65705f;
+  font: 500 9px var(--font-mono, monospace);
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.scope-input-select::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 115%, color-mix(in srgb, var(--input-color) 84%, transparent), color-mix(in srgb, var(--input-color) 24%, transparent) 60%, transparent 95%);
+  opacity: var(--lamp-light);
+  box-shadow: inset 0 -5px 8px color-mix(in srgb, var(--input-color) 45%, transparent);
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+.scope-input-select::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  padding: 1.4px;
+  border-radius: inherit;
+  background: linear-gradient(0deg,
+    color-mix(in srgb, var(--input-color) 40%, #fff),
+    color-mix(in srgb, var(--input-color) 28%, #fff) 38%,
+    color-mix(in srgb, var(--input-color) 12%, #fff) 100%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: var(--lamp-light);
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+.scope-input-bank.is-selected .scope-input-select {
+  --selector-press: 1;
+  color: #243229;
+  border-color: #4b5b4d;
+  box-shadow: inset 0 0 0 1px #344b3a9c, inset 0 2px 4px #23332638, inset 0 -1px 1px #ffffffc2, 0 1px 0 var(--plastic-foot);
+}
+.scope-input-rocker {
+  --rocker-state-angle: var(--rocker-tilt);
+  appearance: none;
+  position: relative;
+  isolation: auto;
+  width: 40px;
+  max-width: 100%;
+  height: var(--rocker-height);
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  transform-style: preserve-3d;
+  transform: none;
+  cursor: pointer;
+}
+.scope-rocker-seat {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 .7px #575c5442;
+  pointer-events: none;
+}
+.scope-rocker-seat::before {
+  content: '';
+  position: absolute;
+  inset: 4px 2px;
+  background: linear-gradient(#24282429, #24282412 30%, #2428241f);
+  border-radius: 3px;
+}
+.scope-rocker-lamp {
+  position: absolute;
+  top: 5px;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--input-color);
+  box-shadow: 0 0 4px var(--input-color), 0 0 9px color-mix(in srgb, var(--input-color) 50%, transparent);
+  opacity: var(--lamp-light);
+  transition: opacity 180ms ease;
+}
+.scope-rocker-hinge {
+  position: absolute;
+  top: calc(50% - 5px);
+  left: -1px;
+  right: -1px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #90958f 0 3px, transparent 3px calc(100% - 3px), #90958f calc(100% - 3px));
+}
+.scope-rocker-spill {
+  position: absolute;
+  z-index: 0;
+  left: -12px;
+  right: -12px;
+  bottom: calc(100% - 9px);
+  height: 37px;
+  background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--input-color) 72%, transparent), transparent 73%);
+  opacity: var(--lamp-light);
+  filter: blur(3px);
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+.scope-rocker-paddle {
+  position: absolute;
+  inset: var(--rocker-inset);
+  border-radius: 3px;
+  transform: translateZ(var(--rocker-pivot)) rotateX(var(--rocker-angle, var(--rocker-state-angle)));
+  transform-style: preserve-3d;
+  transition: transform 180ms cubic-bezier(.33,0,.67,1);
+}
+.scope-rocker-paddle::after {
+  content: '';
+  position: absolute;
+  inset: 38% 0;
+  border-radius: inherit;
+  background: #adb1ac;
+  transform: translateZ(calc(-1 * var(--rocker-body-depth)));
+}
+.scope-rocker-side {
+  position: absolute;
+  top: 0;
+  width: var(--rocker-side-depth);
+  height: 100%;
+  transform-origin: 0 50%;
+  transform: translateZ(var(--rocker-face-depth)) rotateY(90deg);
+  clip-path: polygon(0 0, 52% 0, 100% 38%, 100% 62%, 52% 100%, 0 100%);
+  background: linear-gradient(90deg, #d8dad5, #a8ada6);
+}
+.scope-rocker-side--left { left: 0; }
+.scope-rocker-side--right { left: 100%; }
+.scope-rocker-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(2 * var(--rocker-half-depth));
+  background: linear-gradient(#a2a79f, #d4d7d0);
+  transform-origin: 50% 0;
+}
+.scope-rocker-edge--top { top: 0; transform: rotateX(90deg) translateY(calc(-1 * var(--rocker-half-depth))); }
+.scope-rocker-edge--bottom { top: 100%; transform: rotateX(-90deg) translateY(calc(-1 * var(--rocker-half-depth))); }
+.scope-rocker-face {
+  position: absolute;
+  inset: .6px;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-radius: 2.4px;
+  transform: translateZ(var(--rocker-face-depth));
+  backface-visibility: hidden;
+  font: 6px var(--font-mono, monospace);
+  color: #51564f;
+}
+.scope-rocker-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--scope-panel-surface);
+  box-shadow: inset 0 1px 0 #ffffffb8, inset 1px 0 1px #ffffff2e, inset 0 -1px 0 #363c3324;
+  pointer-events: none;
+}
+.scope-input-bank.is-enabled .scope-input-rocker {
+  --rocker-state-angle: calc(-1 * var(--rocker-tilt));
+}
+.scope-rocker-on { padding-top: 2px; width: 16px; text-align: center; }
+.scope-rocker-grip {
+  width: 21px;
+  height: 5px;
+  background: radial-gradient(circle, #70766da6 1px, transparent 1.2px) 0 0 / 5px 5px;
+}
+.scope-rocker-symbol { width: 21px; height: 14px; fill: none; stroke: #51564f; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.scope-input-name { margin-top: 4px; text-align: center; color: #737d6d; font-size: 10px; letter-spacing: .03em; }
+.scope-input-bank.is-enabled .scope-input-name { color: color-mix(in srgb, var(--input-color) 65%, #34432e); }
+.scope-input-select:focus-visible, .scope-input-rocker:focus-visible { outline: 2px solid var(--input-color); outline-offset: 3px; }
+.has-depth-scene .scope-input-select { transform: translateZ(calc((6px - 3px * var(--selector-press)) * var(--view-depth, 0))); }
+.has-depth-scene .scope-input-rocker .scope-rocker-paddle {
+  transition: none;
+}
+.has-depth-scene .scope-rocker-spill { transform: translateZ(calc(1.5px * var(--view-depth, 0))); }
+@media (prefers-reduced-motion: reduce) {
+  .scope-input-select, .scope-input-select::before, .scope-input-select::after, .scope-rocker-paddle, .scope-rocker-spill, .scope-rocker-lamp { transition: none; }
+}
+
 /* Channel buttons */
 .scope-channel-panel {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
@@ -1236,10 +1703,24 @@
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.04) 0%, transparent 100%);
 }
+.scope-channel-shadows {
+  position: absolute;
+  inset: 10px 14px 12px;
+  display: grid;
+  grid-template-columns: inherit;
+  gap: inherit;
+  transform: translateZ(.5px);
+  pointer-events: none;
+}
+.scope-channel-shadows span {
+  border-radius: 4px;
+  box-shadow: var(--key-contact-shadow);
+}
 
 .scope-ch-btn {
   --btn-accent: var(--scope-accent-orange);
   position: relative;
+  z-index: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1248,7 +1729,7 @@
   padding: 10px 8px 8px;
   border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, 0.14);
-  background: linear-gradient(180deg, #c8c8d0 0%, #a8a8b0 100%);
+  background: linear-gradient(180deg, #e2e4dd 0%, #c9cdc1 100%);
   box-shadow:
     0 2px 0 rgba(255, 255, 255, 0.25) inset,
     0 4px 8px rgba(0, 0, 0, 0.08);
@@ -2177,6 +2658,17 @@
   border-radius: 12px;
 }
 
+.experience-item[data-experience="yeo-research-group"] .media-carousel--logo,
+.experience-item[data-experience="tesla"] .media-carousel--logo,
+.experience-item[data-experience="tesla"] .media-carousel--logo .media-carousel__thumb {
+  background: #fff;
+}
+
+.experience-item[data-experience="yeo-research-group"] .media-carousel--logo .media-carousel__thumb {
+  padding: 5%;
+  background: #fff;
+}
+
 .experience-media-placeholder {
   width: 100%;
   min-height: 150px;
@@ -2217,6 +2709,32 @@
   font-weight: 800;
   color: var(--gray-900);
   margin-bottom: 4px;
+}
+
+.experience-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.experience-status {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border: 1px solid #d4eadc;
+  border-radius: 4px;
+  background: #e7f5ec;
+  color: #227143;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.experience-status--future {
+  border-color: #d4e3f6;
+  background: #eaf2fd;
+  color: #28609e;
 }
 
 .experience-company {
@@ -2356,4 +2874,239 @@
     min-height: 180px;
     max-width: 100%;
   }
+}
+
+/* Raised caps expose their sidewalls until the mechanical latch catches. */
+.scope-ch-btn,
+.scope-power-cluster {
+  --cap-travel: -6px;
+  translate: 0 0;
+  box-shadow: 0 1px 0 #f8faf1 inset;
+  transition: translate 160ms cubic-bezier(.2,.8,.25,1), box-shadow 160ms ease, background 160ms ease;
+}
+.scope-ch-btn.active,
+.scope-power-cluster[aria-pressed="true"] {
+  --cap-travel: -1px;
+  translate: 0 0;
+  transform: none;
+  background: linear-gradient(#bbc2b3, #d0d6c8);
+  box-shadow: 0 2px 4px #18221455 inset, 0 1px 0 #f4f8ec88 inset, 0 1px 0 #697362, 0 2px 3px #18221444;
+}
+.scope-ch-btn:active,
+.scope-power-cluster:active {
+  --cap-travel: 1px;
+  transform: none;
+  box-shadow: 0 3px 5px #18221466 inset, 0 1px 0 #f4f8ec55;
+}
+.scope-ch-btn.active::before { opacity: .75; }
+@media (prefers-reduced-motion: reduce) {
+  .scope-ch-btn, .scope-power-cluster { transition: none; }
+}
+
+
+@property --scope-button-depth {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 18.5px;
+}
+
+/* The physical front-panel design stays mounted in both camera views. */
+.has-depth-scene .scope-front-plane,
+.has-depth-scene .scope-chassis,
+.has-depth-scene .scope-chassis-top,
+.has-depth-scene .scope-power-body,
+.has-depth-scene .scope-chassis-main,
+.has-depth-scene .scope-crt-column,
+.has-depth-scene .scope-crt-bezel,
+.has-depth-scene .scope-controls-column,
+.has-depth-scene .scope-controls-section,
+.has-depth-scene .scope-trigger-row,
+.has-depth-scene .scope-input-grid,
+.has-depth-scene .scope-input-bank,
+.has-depth-scene .scope-knob-grid,
+.has-depth-scene .scope-knob,
+.has-depth-scene .scope-bnc-grid,
+.has-depth-scene .scope-bnc,
+.has-depth-scene .scope-bnc-top,
+.has-depth-scene .scope-channel-panel {
+  transform-style: preserve-3d;
+}
+.has-depth-scene .scope-front-plane { width: 100%; height: 100%; }
+.has-depth-scene .scope-chassis { background: transparent; border-color: transparent; box-shadow: none; }
+.has-depth-scene .scope-chassis::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(65, 70, 60, .24);
+  border-radius: 6px;
+  background: var(--scope-panel-surface);
+  opacity: var(--panel-skin-opacity, 1);
+  mask-image: var(--panel-face-mask, linear-gradient(#fff, #fff));
+  mask-size: 100% 100%;
+  transform: translateZ(-.1px);
+  pointer-events: none;
+}
+.has-depth-scene .scope-crt-bezel::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #1a1a1f;
+  border-radius: inherit;
+  background: linear-gradient(145deg, #2a2a2e, #0f0f12);
+  box-shadow: inset 0 1px 0 #ffffff0f;
+  mask-image: var(--bezel-face-mask);
+  mask-size: 100% 100%;
+  pointer-events: none;
+}
+.has-depth-scene .scope-crt-bezel {
+  transform: translateZ(calc(var(--crt-bezel-depth, 20px) * var(--view-depth, 0)));
+  pointer-events: none;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.has-depth-scene .scope-crt-bezel::after {
+  /* The shadow plane is behind the phosphor. Keep it dark while the
+     physical glass becomes opaque, then reveal the warmed renderer. */
+  background: rgb(7 13 9 / var(--panel-skin-opacity, 1));
+}
+.has-depth-scene .scope-crt-glass {
+  --crt-radius-x: var(--crt-corner-x, 6.5%);
+  --crt-radius-y: var(--crt-corner-y, 8%);
+  transform: translateZ(calc((var(--crt-glass-depth, 9px) - var(--crt-bezel-depth, 20px)) * var(--view-depth, 0)));
+  border-radius: var(--crt-radius-x) / var(--crt-radius-y);
+  clip-path: inset(var(--crt-clip, 0px) round var(--crt-radius-x) / var(--crt-radius-y));
+}
+.has-depth-scene .scope-crt-image {
+  filter: var(--crt-image-filter, none);
+  transform: translate(var(--crt-phosphor-x, 0px), var(--crt-phosphor-y, 0px));
+  clip-path: inset(calc(5px * var(--crt-lens-strength, 0)) round var(--crt-radius-x) / var(--crt-radius-y));
+}
+.has-depth-scene :is(.scope-trigger-position-marker, .scope-trigger-marker) {
+  pointer-events: none;
+}
+.scope-trigger-hit {
+  display: none;
+}
+.has-depth-scene .scope-trigger-hit {
+  display: block;
+  position: absolute;
+  inset: -5px;
+  transform: translate(var(--crt-hit-x, 0px), var(--crt-hit-y, 0px));
+  pointer-events: auto;
+}
+.scope-crt-optics {
+  display: block;
+  position: absolute;
+  inset: var(--crt-clip, 0px);
+  z-index: 9;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--crt-fx, 0);
+  background:
+    linear-gradient(178deg, #e2f1ff26, #e2f1ff09 13%, transparent 34%),
+    radial-gradient(ellipse 96% 108% at 50% 46%, transparent 68%, #02090673 100%);
+  box-shadow: inset 0 -2px 3px #000b;
+}
+.scope-crt-optics::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(var(--crt-light-angle, 140deg), #eefbffe0, #c7d9e51a 43%, #c7d9e50a 63%, #c7e8f477);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+.has-depth-scene .scope-knob-stack {
+  transform-style: preserve-3d;
+  transform: translateZ(calc(22.5px * var(--view-depth, 0)));
+}
+.has-depth-scene .scope-knob-ring { transform: translateZ(calc(-17px * var(--view-depth, 0))); }
+.has-depth-scene .scope-bnc-body { transform: translateZ(calc(18.5px * var(--view-depth, 0))); }
+.has-depth-scene .scope-ch-btn,
+.has-depth-scene .scope-power-cluster {
+  translate: 0 0;
+  --scope-button-depth: 18.5px;
+  transform: translateZ(calc(var(--scope-button-depth) * var(--view-depth, 0)));
+  transition: --scope-button-depth 160ms ease, box-shadow 160ms ease;
+}
+.has-depth-scene .scope-ch-btn.active,
+.has-depth-scene .scope-power-cluster[aria-pressed="true"] { --scope-button-depth: 8.5px; }
+.has-depth-scene .scope-ch-btn:active,
+.has-depth-scene .scope-power-cluster:active { --scope-button-depth: 5px; }
+.has-depth-scene .scope-channel-panel .scope-ch-btn {
+  --scope-button-depth: 18.5px;
+  box-shadow: 0 1px 0 #f8faf1 inset;
+}
+.has-depth-scene .scope-channel-panel .scope-ch-btn.active { --scope-button-depth: 18px; }
+.has-depth-scene .scope-channel-panel .scope-ch-btn:active { --scope-button-depth: 17.5px; }
+.scope-view-toolbar {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 12px var(--font-mono, monospace);
+  color: #5b6656;
+  white-space: nowrap;
+}
+.scope-view-toolbar button {
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: #7b8476;
+  cursor: pointer;
+  font: inherit;
+}
+.scope-view-toolbar button[aria-pressed="true"] { color: #263422; }
+.scope-view-toolbar button:focus { outline: none; }
+.scope-view-toolbar button:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.scope-view-toolbar button[aria-disabled="true"] { opacity: .4; cursor: default; }
+.scope-view-load {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #68765f26;
+  transition: box-shadow 240ms ease;
+}
+.scope-view-load > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: hsl(calc(var(--load-progress, 0) * 134) 58% 46%);
+  transform-origin: left;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+.scope-view-load[data-state="ready"] {
+  box-shadow: 0 0 5px #3cbb6866, 0 0 10px #3cbb682b;
+}
+.scope-view-notice {
+  position: absolute;
+  left: calc(100% + 10px);
+  font: 10px var(--font-sans);
+  color: #737b6e;
+}
+@media (max-width: 768px) {
+  .scope-view-toolbar { position: relative; top: auto; left: auto; transform: none; align-self: center; margin: 10px auto; width: max-content; max-width: calc(100% - 20px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scope-view-load,
+  .scope-view-load > span { transition: none; }
+  .has-depth-scene .scope-ch-btn,
+  .has-depth-scene .scope-power-cluster { transition: none; }
 }

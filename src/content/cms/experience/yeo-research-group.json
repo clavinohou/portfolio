@@ -1,0 +1,13 @@
+{
+  "order": 2,
+  "date": "Aug 2026 - Present",
+  "gallery": [{ "src": "/uploads/yeo-research-group-logo.png" }],
+  "galleryIsLogo": true,
+  "location": "Atlanta, GA",
+  "title": "Undergraduate Research Assistant",
+  "tags": [{ "tag": "Wearable Bioelectronics" }, { "tag": "PCB Design" }, { "tag": "RF Signal Integrity" }, { "tag": "KiCad" }],
+  "type": "Research",
+  "id": "yeo-research-group",
+  "description": "* Designed the schematic and layout for a two-layer rigid-flex PCB for wearable core body temperature estimation, integrating ECG, photoplethysmography (PPG), temperature sensing, and Bluetooth Low Energy (BLE) connectivity.\n* Sized the flex dielectric thickness for a 50 Ω controlled-impedance RF trace from the microcontroller to the BLE antenna.\n* Leading development of a wearable 64-channel EMG acquisition PCB in KiCad to collect hand-motion data for training a neural network to reconstruct muscle activity from fewer channels. Designed the analog front end to amplify millivolt-scale EMG signals before multiplexing to limit signal loss.",
+  "company": "Yeo Research Group at Georgia Tech"
+}

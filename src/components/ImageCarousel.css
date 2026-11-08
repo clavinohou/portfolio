@@ -7,7 +7,8 @@
   background: transparent;
 }
 
-.media-carousel--contain {
+.media-carousel--contain,
+.media-carousel--logo {
   background: linear-gradient(145deg, #f4f4f5 0%, #e4e4e7 100%);
 }
 
@@ -36,6 +37,14 @@
   display: block;
   object-fit: cover;
   user-select: none;
+}
+
+.media-carousel--logo .media-carousel__thumb {
+  padding: 12%;
+}
+
+.media-carousel--logo .media-carousel__thumb img {
+  object-fit: contain;
 }
 
 .media-carousel__thumb::after {

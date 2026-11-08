@@ -347,6 +347,7 @@ collections:
         hint: 'Logos, team photos, or work samples shown with this role.'
         fields:
           - { label: Image, name: src, widget: image, choose_url: true }
+      - { label: Fit logos without cropping, name: galleryIsLogo, widget: boolean, required: false, default: false }
       - {
           label: Visible photos,
           name: stackSize,

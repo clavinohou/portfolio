@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
 import { thumbPreloadUrl } from '../utils/imageSources'
@@ -7,7 +7,15 @@ import { ImageCarousel } from './ImageCarousel'
 import { MarkdownBlock } from './MarkdownBlock'
 import { ErrorBoundary } from './ErrorBoundary'
 import { Link } from '../router'
+import { ScopeVectorScreen } from './ScopeVectorScreen'
+import { SIGNALS, triggerScreenY, triggerLevelAtY, triggerForSignal, advanceAcquisition } from './scopeSignals.mjs'
+import { PANEL_SURFACE_CSS } from './panelFinish.mjs'
+import { ROCKER_HEIGHT, ROCKER_INSET, ROCKER_THICKNESS, ROCKER_BODY_DEPTH, ROCKER_FACE_DEPTH, ROCKER_TILT, ROCKER_FLAT_SHEAR, rockerPivotHeight } from './rockerMechanics.mjs'
 import './Oscilloscope.css'
+
+const loadScopeScene = () => import('./ScopeMaterialScene')
+const ScopeMaterialScene = lazy(loadScopeScene)
+const MATERIAL_SCENE_QUERY = '(min-width: 769px) and (min-aspect-ratio: 4/3)'
 
 // Module-level cache of already-preloaded image URLs. Survives component
 // remounts (e.g. hot module replacement, route changes) so images only get
@@ -32,74 +40,12 @@ const CHANNELS = [
 ]
 const MODULE_IDS = ['about', 'projects', 'resume', 'experience', 'contact']
 
-/** Waveform shape per front-panel input (matches physical jacks) */
+/** Waveform shape per front-panel rocker input. */
 const WAVE_INPUTS = [
-  { slug: 'ch1', shapeIndex: 0, label: 'CH1', name: 'Sine' },
-  { slug: 'ch2', shapeIndex: 1, label: 'CH2', name: 'Square' },
-  { slug: 'ext', shapeIndex: 2, label: 'EXT TRIG', name: 'Complex' },
+  { slug: 'ch1', shapeIndex: 0, label: 'CH1', name: 'Sine', color: '#62d487', symbol: 'M1 7C4.5 -.5 8.5 -.5 12 7S19.5 14.5 23 7' },
+  { slug: 'ch2', shapeIndex: 1, label: 'CH2', name: 'Square', color: '#67b7f0', symbol: 'M1 11V3H9V11H17V3H23' },
+  { slug: 'ch3', shapeIndex: 2, label: 'CH3', name: 'Complex', color: '#ff996b', symbol: 'M1 8C4 1 6 12 9 5S13 2 15 7S19 13 23 4' },
 ]
-
-/** Wide X range so horizontal scale + pan never show an obvious “end” of the trace */
-const WAVE_X0 = -520
-const WAVE_X1 = 740
-
-function tileSquareWavePath() {
-  const P = 55
-  const yLo = 78
-  const yHi = 22
-  const x0 = Math.floor(WAVE_X0 / P) * P
-  const x1 = Math.ceil(WAVE_X1 / P) * P
-  const parts = []
-  let ox = x0
-  parts.push(`M${ox},${yLo}`)
-  while (ox < x1) {
-    parts.push(`L${ox + P / 2},${yLo} L${ox + P / 2},${yHi} L${ox + P},${yHi} L${ox + P},${yLo}`)
-    ox += P
-  }
-  return parts.join(' ')
-}
-
-/** Dense sampling + round stroke caps reads as a continuous scope trace (not faceted peaks). */
-function tileSineWavePath() {
-  const P = 24
-  const amp = 23
-  const step = 0.14
-  const parts = []
-  let i = 0
-  for (let x = WAVE_X0; x <= WAVE_X1; x += step) {
-    const y = 50 + amp * Math.sin((x / P) * 2 * Math.PI)
-    const xf = Math.round(x * 100) / 100
-    const yf = Math.round(y * 100) / 100
-    parts.push(i === 0 ? `M${xf},${yf}` : `L${xf},${yf}`)
-    i++
-  }
-  return parts.join(' ')
-}
-
-function tileComplexWavePath() {
-  const step = 0.35
-  const parts = []
-  let i = 0
-  for (let x = WAVE_X0; x <= WAVE_X1; x += step) {
-    const y = complexWaveY(x)
-    const xf = Math.round(x * 100) / 100
-    const yf = Math.round(Math.min(92, Math.max(8, y)) * 100) / 100
-    parts.push(i === 0 ? `M${xf},${yf}` : `L${xf},${yf}`)
-    i++
-  }
-  return parts.join(' ')
-}
-
-function waveformPath(shapeIndex) {
-  switch (shapeIndex) {
-    case 0:
-      return tileSineWavePath()
-    case 1:
-      return tileSquareWavePath()
-    default:
-      return tileComplexWavePath()
-  }
-}
 
 // Front-panel scales run from coarse to fine as the knob turns clockwise,
 // matching the gain/timebase behavior of a real scope.
@@ -138,86 +84,6 @@ function formatVolts(volts) {
   if (magnitude < 0.5e-3) return '0 V'
   if (magnitude < 1) return `${(volts * 1e3).toFixed(magnitude < 10e-3 ? 1 : 0)} mV`
   return `${volts.toFixed(magnitude < 10 ? 1 : 0)} V`
-}
-
-const COMPLEX_PERIOD = 200
-const COMPLEX_COMPONENTS = [
-  { harmonic: 2, amplitude: 15, phase: 0 },
-  { harmonic: 5, amplitude: 7, phase: 0.85 },
-  { harmonic: 11, amplitude: 3.5, phase: -0.4 },
-]
-
-function rawComplexWaveY(x) {
-  let value = 0
-  for (const component of COMPLEX_COMPONENTS) {
-    value +=
-      component.amplitude *
-      Math.sin((x / COMPLEX_PERIOD) * 2 * Math.PI * component.harmonic + component.phase)
-  }
-  return value
-}
-
-let complexPeak = 1
-for (let x = 0; x <= COMPLEX_PERIOD; x += 0.05) {
-  complexPeak = Math.max(complexPeak, Math.abs(rawComplexWaveY(x)))
-}
-const COMPLEX_GAIN = 22 / complexPeak
-
-function complexWaveY(x) {
-  return 50 + rawComplexWaveY(x) * COMPLEX_GAIN
-}
-
-function sampledWaveLimits(waveFn, period) {
-  let min = Number.POSITIVE_INFINITY
-  let max = Number.NEGATIVE_INFINITY
-  for (let x = 0; x <= period; x += 0.02) {
-    const y = waveFn(x)
-    min = Math.min(min, y)
-    max = Math.max(max, y)
-  }
-  return { min, max, period }
-}
-
-const WAVE_LIMITS = [
-  { min: 27, max: 73, period: 24 },
-  { min: 22, max: 78, period: 55 },
-  sampledWaveLimits(complexWaveY, COMPLEX_PERIOD),
-]
-
-/** Find a consistent visually-rising crossing used to lock the trace. */
-function triggerCrossingX(shapeIndex, rawTriggerY) {
-  const limits = WAVE_LIMITS[shapeIndex]
-  const triggerY = Math.min(limits.max, Math.max(limits.min, rawTriggerY))
-
-  if (shapeIndex === 0) {
-    const ratio = Math.min(1, Math.max(-1, (triggerY - 50) / 23))
-    return ((Math.PI - Math.asin(ratio)) / (2 * Math.PI)) * 24
-  }
-  if (shapeIndex === 1) return 55 / 2
-
-  let previousX = 0
-  let previousY = complexWaveY(previousX)
-  let nearestX = previousX
-  let nearestDistance = Math.abs(previousY - triggerY)
-  for (let x = 0.05; x <= COMPLEX_PERIOD; x += 0.05) {
-    const y = complexWaveY(x)
-    const distance = Math.abs(y - triggerY)
-    if (distance < nearestDistance) {
-      nearestDistance = distance
-      nearestX = x
-    }
-    if (previousY >= triggerY && y <= triggerY) {
-      const span = previousY - y || 1
-      return previousX + ((previousY - triggerY) / span) * (x - previousX)
-    }
-    previousX = x
-    previousY = y
-  }
-
-  // At an exact peak or valley the trace touches the level without crossing
-  // it. Lock to that nearest contact so the visible edge still behaves like
-  // a valid trigger point.
-  return nearestX
 }
 
 function voltsGainFromNorm(t) {
@@ -607,10 +473,10 @@ const ExperienceModule = ({
     <ModuleCard title="EXPERIENCE" subtitle="Timeline">
       <div className="experience-list">
         {experience.map((x, idx) => (
-          <div key={x.id} className={`experience-item ${x.images.length > 0 ? 'experience-item--with-media' : ''}`}>
+          <div key={x.id} data-experience={x.id} className={`experience-item ${x.images.length > 0 ? 'experience-item--with-media' : ''}`}>
             {x.images.length > 0 && mediaReady && idx < mediaVisibleCount ? (
               <div className="experience-media">
-                <ImageCarousel images={x.images} altPrefix={x.company} variant="contain" stackSize={x.stackSize} />
+                <ImageCarousel images={x.images} altPrefix={x.company} variant={x.galleryIsLogo ? 'logo' : 'contain'} stackSize={x.stackSize} />
               </div>
             ) : x.images.length > 0 ? (
               <div className="experience-media">
@@ -622,7 +488,12 @@ const ExperienceModule = ({
                 <span className="experience-type">{x.type}</span>
                 <span className="experience-date">{x.date}</span>
               </div>
-              <div className="experience-title">{x.title}</div>
+              <div className="experience-heading">
+                <div className="experience-title">{x.title}</div>
+                {x.status ? <span className={`experience-status experience-status--${x.status}`}>
+                  {x.status === 'future' ? 'Future' : 'Present'}
+                </span> : null}
+              </div>
               <div className="experience-company">
                 {x.company} · {x.location}
               </div>
@@ -754,17 +625,111 @@ export default function Oscilloscope({
   const [powerState, setPowerState] = useState('booting')
   const powerTimerRef = useRef(null)
   const [triggerLevel, setTriggerLevel] = useState(1)
-  const [knobVolts, setKnobVolts] = useState(0.5)
-  const [knobVPos, setKnobVPos] = useState(0.5)
-  const [knobSec, setKnobSec] = useState(0.5)
-  const [knobHPos, setKnobHPos] = useState(0.5)
   const [waveInputSlug, setWaveInputSlug] = useState('ch1')
+  const [enabledInputs, setEnabledInputs] = useState(['ch1'])
+  const triggerSource = waveInputSlug
+  const [waveSettings, setWaveSettings] = useState(() => Object.fromEntries(
+    WAVE_INPUTS.map((input, index) => [input.slug, {
+      knobVolts: 0.5, knobVPos: [0.5, 0.2, 0.8][index], knobSec: 0.5, knobHPos: 0.5,
+    }]),
+  ))
+  const { knobVolts, knobVPos, knobSec, knobHPos } = waveSettings[waveInputSlug]
+  const updateWaveKnob = useCallback((key, next) => {
+    setWaveSettings((settings) => {
+      const current = settings[waveInputSlug]
+      return { ...settings, [waveInputSlug]: {
+        ...current, [key]: typeof next === 'function' ? next(current[key]) : next,
+      } }
+    })
+  }, [waveInputSlug])
+  const setKnobVolts = useCallback((next) => updateWaveKnob('knobVolts', next), [updateWaveKnob])
+  const setKnobVPos = useCallback((next) => updateWaveKnob('knobVPos', next), [updateWaveKnob])
+  const setKnobSec = useCallback((next) => updateWaveKnob('knobSec', next), [updateWaveKnob])
+  const setKnobHPos = useCallback((next) => updateWaveKnob('knobHPos', next), [updateWaveKnob])
+  const toggleInput = (slug) => {
+    const next = enabledInputs.includes(slug)
+      ? enabledInputs.filter((input) => input !== slug)
+      : [...enabledInputs, slug]
+    setEnabledInputs(next)
+  }
   const triggerSlotRef = useRef(null)
+  const screenSurfaceRef = useRef({ pose: { x: 0, y: 0, depth: 1 }, render: null })
+  const scopePlaneRef = useRef(null)
   const scopeChassisRef = useRef(null)
+  const viewPointerRef = useRef(null)
+  const [viewMode, setViewMode] = useState('2d')
+  const [viewNotice, setViewNotice] = useState({ text: '', id: 0 })
+  const [sceneMounted, setSceneMounted] = useState(false)
+  const [spatialActive, setSpatialActive] = useState(false)
+  const [materialReady, setMaterialReady] = useState(false)
+  const [materialProgress, setMaterialProgress] = useState(0)
+  const [materialEnabled, setMaterialEnabled] = useState(() => window.matchMedia(MATERIAL_SCENE_QUERY).matches)
+  const preparationRequested = useRef(false)
+  const reportMaterialProgress = useCallback((progress) => {
+    setMaterialProgress((current) => Math.max(current, Math.min(0.98, progress)))
+  }, [])
+  const handleMaterialReady = useCallback((ready) => {
+    setMaterialReady(ready)
+    setMaterialProgress(ready ? 1 : 0)
+    if (ready) setViewNotice((notice) => notice.text === '3D still loading...' ? { ...notice, text: '' } : notice)
+  }, [])
+  const prepare3D = useCallback(() => {
+    if (!window.matchMedia(MATERIAL_SCENE_QUERY).matches || preparationRequested.current) return
+    preparationRequested.current = true
+    reportMaterialProgress(0.05)
+    loadScopeScene().then(({ preloadScopeMaterials }) => {
+      reportMaterialProgress(0.15)
+      preloadScopeMaterials()
+      setSceneMounted(true)
+    }).catch(() => {
+      preparationRequested.current = false
+      setMaterialProgress(0)
+    })
+  }, [reportMaterialProgress])
+  const viewFeedback = useAnimationControls()
+  const reduceMotion = useReducedMotion()
+  const selectView = useCallback((mode) => {
+    if (mode === '3d' && !window.matchMedia(MATERIAL_SCENE_QUERY).matches) {
+      setViewNotice((notice) => ({ text: 'Screen too small', id: notice.id + 1 }))
+      return
+    }
+    if (mode === '3d' && !materialReady) {
+      setViewNotice((notice) => ({ text: '3D still loading...', id: notice.id + 1 }))
+      prepare3D()
+      return
+    }
+    setViewNotice((notice) => notice.text ? { ...notice, text: '' } : notice)
+    setViewMode(mode)
+  }, [materialReady, prepare3D])
+  useEffect(() => {
+    if (!viewNotice.text) return undefined
+    viewFeedback.stop()
+    if (!reduceMotion) viewFeedback.start({ x: [0, -3, 3, -2, 2, 0], transition: { duration: 0.3 } })
+    const timer = window.setTimeout(() => setViewNotice((notice) => ({ ...notice, text: '' })), 2200)
+    return () => {
+      window.clearTimeout(timer)
+      viewFeedback.stop()
+    }
+  }, [viewNotice, reduceMotion, viewFeedback])
+  useEffect(() => {
+    const record = (event) => {
+      viewPointerRef.current = event.pointerType === 'touch' ? null : { x: event.clientX, y: event.clientY }
+    }
+    const clear = () => { viewPointerRef.current = null }
+    window.addEventListener('pointermove', record, { passive: true })
+    window.addEventListener('pointerdown', record, true)
+    window.addEventListener('blur', clear)
+    document.documentElement.addEventListener('pointerleave', clear)
+    return () => {
+      window.removeEventListener('pointermove', record)
+      window.removeEventListener('pointerdown', record, true)
+      window.removeEventListener('blur', clear)
+      document.documentElement.removeEventListener('pointerleave', clear)
+    }
+  }, [])
   const triggerDraggingRef = useRef(false)
   const triggerPositionDraggingRef = useRef(false)
-  const wavePhaseGroupRef = useRef(null)
-  const streamPhaseRef = useRef(0)
+  const acquisitionRef = useRef({ time: 0, capture: 0, remainder: 0 })
   const [scopeFit, setScopeFit] = useState({ scale: 1, width: 0, height: 0 })
   // Per-project build log counts, shown as a small chip on each project card.
   const blogEntryCountsByProject = useMemo(() => {
@@ -807,14 +772,62 @@ export default function Oscilloscope({
   const preloadCtrlRef = useRef(null)
 
   const isHome = activeChannel == null
+  useEffect(() => {
+    if (!isHome || !materialEnabled || sceneMounted) return undefined
+    let idle = 0
+    const timer = window.setTimeout(() => {
+      const warm = () => { if (document.visibilityState === 'visible') prepare3D() }
+      if ('requestIdleCallback' in window) idle = window.requestIdleCallback(warm, { timeout: 1000 })
+      else idle = window.setTimeout(warm, 500)
+    }, 350)
+    return () => {
+      clearTimeout(timer)
+      if ('cancelIdleCallback' in window) window.cancelIdleCallback(idle)
+      else clearTimeout(idle)
+    }
+  }, [isHome, materialEnabled, sceneMounted, prepare3D])
+  useEffect(() => {
+    if (materialEnabled || !isHome) setViewNotice((notice) => notice.text ? { ...notice, text: '' } : notice)
+  }, [materialEnabled, isHome])
   const isPoweredOn = powerState !== 'off'
   const currentChannel = activeChannel ?? 'about'
 
-  useLayoutEffect(() => {
-    if (!isHome) {
-      setScopeFit({ scale: 1, width: 0, height: 0 })
-      return undefined
+  useEffect(() => {
+    const query = window.matchMedia(MATERIAL_SCENE_QUERY)
+    const update = () => setMaterialEnabled(query.matches)
+    query.addEventListener('change', update)
+    update()
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (viewMode !== '3d') return
+    // Both modes retain the physical instrument after its first reveal.
+    setSceneMounted(true)
+    setSpatialActive(true)
+  }, [viewMode])
+
+  useEffect(() => {
+    if (materialReady && materialEnabled) setSpatialActive(true)
+  }, [materialReady, materialEnabled])
+
+  useEffect(() => {
+    const switchView = (event) => {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return
+      const target = event.target
+      if (target instanceof Element && target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"]')) return
+      if (isHome && (event.key === '2' || event.key === '3')) {
+        event.preventDefault()
+        selectView(event.key === '2' ? '2d' : '3d')
+      }
     }
+    window.addEventListener('keydown', switchView)
+    return () => window.removeEventListener('keydown', switchView)
+  }, [isHome, selectView])
+
+  useLayoutEffect(() => {
+    // Keep the fitted enclosure mounted at its current pose while it exits.
+    if (!isHome) return undefined
 
     const chassis = scopeChassisRef.current
     if (!chassis) return undefined
@@ -829,7 +842,7 @@ export default function Oscilloscope({
         // Portrait layouts intentionally scroll. Landscape layouts keep the
         // complete front panel in one view, using the same uniform scale a
         // browser zoom-out would apply instead of squeezing either axis.
-        if (viewportWidth / viewportHeight <= 4 / 3) {
+        if (viewportWidth / viewportHeight < 4 / 3) {
           setScopeFit({ scale: 1, width: 0, height: 0 })
           return
         }
@@ -842,8 +855,8 @@ export default function Oscilloscope({
         const verticalPadding = Math.min(14, Math.max(6, Math.min(viewportWidth, viewportHeight) * 0.015))
         const scale = Math.min(
           1,
-          (viewportWidth - horizontalPadding * 2) / naturalWidth,
-          (viewportHeight - verticalPadding * 2) / naturalHeight,
+          (viewportWidth - horizontalPadding * 2 - 96) / naturalWidth,
+          (viewportHeight - verticalPadding * 2 - 180) / naturalHeight,
         )
         const next = {
           scale,
@@ -1037,18 +1050,21 @@ export default function Oscilloscope({
     () => WAVE_INPUTS.find((w) => w.slug === waveInputSlug) ?? WAVE_INPUTS[0],
     [waveInputSlug],
   )
-  const waveBase = useMemo(() => waveformPath(selectedWave.shapeIndex), [selectedWave.shapeIndex])
-
-  const waveTransform = useMemo(() => {
-    const vGain = voltsGainFromNorm(knobVolts)
-    const hScale = timeScaleFromNorm(knobSec)
-    const vOff = (knobVPos - 0.5) * 40
-    // Four divisions of pre/post-trigger travel in either direction. This
-    // matches the ±4 div time readout below and places the trigger point from
-    // 10% to 90% across the graticule.
-    const hOff = (knobHPos - 0.5) * 176
-    return { vGain, hScale, vOff, hOff }
-  }, [knobVolts, knobSec, knobVPos, knobHPos])
+  const waves = useMemo(() => WAVE_INPUTS.map((input) => {
+    const settings = waveSettings[input.slug]
+    return { ...input, ...SIGNALS[input.shapeIndex], transform: {
+      vGain: voltsGainFromNorm(settings.knobVolts),
+      hScale: timeScaleFromNorm(settings.knobSec),
+      vOff: (settings.knobVPos - 0.5) * 40,
+      hOff: (settings.knobHPos - 0.5) * 176,
+    } }
+  }), [waveSettings])
+  const visibleWaves = useMemo(() => waves.filter((wave) => enabledInputs.includes(wave.slug)), [waves, enabledInputs])
+  const triggerWave = waves.find((wave) => wave.slug === triggerSource)
+  const triggerTransform = triggerWave.transform
+  const inputControls = useMemo(() => WAVE_INPUTS.map((input) => ({
+    ...input, enabled: enabledInputs.includes(input.slug), selected: waveInputSlug === input.slug,
+  })), [enabledInputs, waveInputSlug])
 
   const glowVar = isPoweredOn ? 0.68 : 0.03
   const voltsLabelIdx = Math.min(
@@ -1063,28 +1079,20 @@ export default function Oscilloscope({
   const timeOption = TIME_DIV_OPTIONS[secLabelIdx]
   const offsetLabel = formatVolts((knobVPos - 0.5) * voltsOption.volts * 8)
   const delayLabel = formatSeconds((knobHPos - 0.5) * timeOption.seconds * 8)
-  const waveLimits = WAVE_LIMITS[selectedWave.shapeIndex]
-  const triggerY = 92 - triggerLevel * 84
-  // The marker lives in screen coordinates while the trace is scaled and
-  // translated inside the SVG. Invert that transform before testing the
-  // waveform, otherwise visible edge contacts are incorrectly marked as
-  // "searching" whenever gain or vertical position changes.
-  const rawTriggerY =
-    50 + (triggerY - waveTransform.vOff - 50) / waveTransform.vGain
-  const triggerX = 10 + knobHPos * 80
-  const triggerEdgeTolerance = 0.35
+  const triggerY = triggerScreenY(triggerLevel)
+  const trigger = useMemo(() => triggerForSignal(triggerWave.shapeIndex, triggerTransform, triggerY),
+    [triggerWave.shapeIndex, triggerTransform, triggerY])
+  const triggerX = 10 + waveSettings[triggerSource].knobHPos * 80
   const triggerLocked =
-    isPoweredOn &&
-    rawTriggerY >= waveLimits.min - triggerEdgeTolerance &&
-    rawTriggerY <= waveLimits.max + triggerEdgeTolerance
-  const lockedPhase = 110 - triggerCrossingX(selectedWave.shapeIndex, rawTriggerY)
+    isPoweredOn && enabledInputs.includes(triggerSource) &&
+    trigger.locked
 
   const updateTriggerFromPointer = useCallback((event) => {
     const rect = triggerSlotRef.current?.getBoundingClientRect()
     if (!rect || rect.height <= 0) return
     const y = Math.min(rect.bottom, Math.max(rect.top, event.clientY))
     const svgY = ((y - rect.top) / rect.height) * 100
-    setTriggerLevel(Math.min(1, Math.max(0, (92 - svgY) / 84)))
+    setTriggerLevel(triggerLevelAtY(svgY))
   }, [])
 
   const startTriggerDrag = useCallback(
@@ -1121,8 +1129,9 @@ export default function Oscilloscope({
     if (!rect || rect.width <= 0) return
     const x = Math.min(rect.right, Math.max(rect.left, event.clientX))
     const screenPosition = (x - rect.left) / rect.width
-    setKnobHPos(Math.min(1, Math.max(0, (screenPosition - 0.1) / 0.8)))
-  }, [])
+    const next = Math.min(1, Math.max(0, (screenPosition - 0.1) / 0.8))
+    setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: next } }))
+  }, [triggerSource])
 
   const startTriggerPositionDrag = useCallback(
     (event) => {
@@ -1153,41 +1162,47 @@ export default function Oscilloscope({
     }
   }, [])
 
-  // A triggered sweep is phase-locked. If the level moves beyond the signal,
-  // update the SVG transform directly on animation frames so the React tree is
-  // not re-rendered continuously while the trace free-runs.
+  // Every displayed record has one timestamp shared by all channels. A
+  // trigger advances records by complete cycles of its source; unrelated
+  // signals keep their own phase at each of those capture times.
   useEffect(() => {
-    const group = wavePhaseGroupRef.current
-    if (!group) return undefined
+    if (!isHome || !enabledInputs.length || !isPoweredOn) return undefined
 
-    if (triggerLocked || !isPoweredOn) {
-      streamPhaseRef.current = lockedPhase
-      group.setAttribute('transform', `translate(${lockedPhase} 0)`)
-      return undefined
-    }
+    const acquisition = acquisitionRef.current
+    const settings = { locked: triggerLocked, crossing: trigger.crossing, period: trigger.period, hScale: triggerTransform.hScale }
+    advanceAcquisition(acquisition, 0, settings)
+    screenSurfaceRef.current.render?.()
 
     let frameId = 0
     let lastTime = performance.now()
-    const period = waveLimits.period
+    let lastDraw = 0
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reducedMotion) {
-      group.setAttribute('transform', `translate(${streamPhaseRef.current} 0)`)
+      screenSurfaceRef.current.render?.()
       return undefined
     }
 
     const tick = (now) => {
+      if (document.hidden) {
+        lastTime = now
+        frameId = window.requestAnimationFrame(tick)
+        return
+      }
+      const interval = Math.max(screenSurfaceRef.current.frameInterval || 0, triggerLocked ? 1000 / 30 : 0)
+      if (now - lastDraw < interval) {
+        frameId = window.requestAnimationFrame(tick)
+        return
+      }
+      lastDraw = now
       const elapsedSeconds = Math.min(0.05, (now - lastTime) / 1000)
       lastTime = now
-      const baseSpeed = 28 / Math.max(0.3, waveTransform.hScale)
-      let nextPhase = streamPhaseRef.current - elapsedSeconds * baseSpeed
-      while (nextPhase < lockedPhase - period) nextPhase += period
-      streamPhaseRef.current = nextPhase
-      group.setAttribute('transform', `translate(${nextPhase.toFixed(3)} 0)`)
+      advanceAcquisition(acquisition, elapsedSeconds, settings)
+      screenSurfaceRef.current.render?.()
       frameId = window.requestAnimationFrame(tick)
     }
     frameId = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frameId)
-  }, [isPoweredOn, lockedPhase, triggerLocked, waveLimits.period, waveTransform.hScale])
+  }, [isHome, isPoweredOn, enabledInputs.length, trigger.crossing, trigger.period, triggerLocked, triggerTransform.hScale])
 
   const { profile, links } = siteContent
 
@@ -1200,12 +1215,27 @@ export default function Oscilloscope({
   const moduleMotionTransition = { duration: 0.24, ease: 'easeOut' }
 
   return (
-    <div className={`bench-stage ${isHome ? 'bench-stage--home' : ''}`}>
+    <div className="bench-stage bench-stage--home">
+      {isHome ? (
+        <div className="scope-view-toolbar" role="group" aria-label="Oscilloscope view">
+          <span className="scope-view-load" role="progressbar" aria-label="3D loading progress"
+            aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(materialProgress * 100)}
+            aria-valuetext={materialReady ? '3D ready' : 'Loading 3D'} hidden={!materialEnabled}
+            style={{ '--load-progress': materialProgress }}
+            data-state={materialReady ? 'ready' : 'loading'}
+          ><span style={{ transform: `scaleX(${materialProgress})` }} /></span>
+          <button type="button" aria-label="2D view" aria-pressed={viewMode === '2d' || !materialEnabled} onClick={() => selectView('2d')}>[2]</button>
+          <motion.button type="button" aria-label="3D view" aria-pressed={viewMode === '3d' && materialEnabled} aria-disabled={!materialEnabled || !materialReady} aria-busy={materialEnabled && !materialReady} animate={viewFeedback} onPointerEnter={prepare3D} onFocus={prepare3D} onClick={() => selectView('3d')}>[3]</motion.button>
+          <span className="scope-view-notice" role="status">{viewNotice.text}</span>
+        </div>
+      ) : null}
       {/* “Table” surface behind everything */}
       <div className="bench-surface" aria-hidden="true" />
 
       <motion.div
         className="scope-rig"
+        data-frozen={isHome ? undefined : "true"}
+        style={{ pointerEvents: isHome ? "auto" : "none" }}
         animate={{ x: 0, y: isHome ? 0 : 'min(78vh, 640px)' }}
         transition={{
           ...scopeTransition,
@@ -1213,22 +1243,51 @@ export default function Oscilloscope({
         }}
       >
         <div
-          className={`scope-fit-frame ${scopeFit.width > 0 ? 'is-fitted' : ''}`}
+          data-material-enabled={materialEnabled}
+          data-material-ready={materialReady}
+          className={`scope-fit-frame ${scopeFit.width > 0 ? 'is-fitted' : ''} ${materialReady && materialEnabled && (viewMode === '3d' || spatialActive) ? 'has-depth-scene' : ''}`}
           style={
             scopeFit.width > 0
               ? { width: scopeFit.width, height: scopeFit.height }
               : undefined
           }
         >
+        {(viewMode === '3d' || sceneMounted) && materialEnabled && scopeFit.width > 0 ? (
+          <Suspense fallback={null}>
+            <ScopeMaterialScene
+              chassisRef={scopeChassisRef}
+              planeRef={scopePlaneRef}
+              surfaceRef={screenSurfaceRef}
+              fit={scopeFit}
+              isPoweredOn={isPoweredOn}
+              inputs={inputControls}
+              active={isHome}
+              threeD={viewMode === '3d'}
+              spatialActive={spatialActive || viewMode === '3d'}
+              pointerRef={viewPointerRef}
+              onReady={handleMaterialReady}
+              onProgress={reportMaterialProgress}
+            />
+          </Suspense>
+        ) : null}
+        <div className="scope-front-plane" ref={scopePlaneRef}>
         <div
           ref={scopeChassisRef}
           className="scope-chassis"
-          style={
-            scopeFit.width > 0
-              ? { transform: `scale(${scopeFit.scale})` }
-              : undefined
-          }
+          style={{
+            '--scope-panel-surface': PANEL_SURFACE_CSS,
+            transform: scopeFit.width > 0 ? `scale3d(${scopeFit.scale}, ${scopeFit.scale}, ${scopeFit.scale})` : undefined,
+          }}
         >
+          <div className="scope-front-hardware" aria-hidden="true">
+            <div className="scope-front-handle">
+              <span className="scope-front-handle-bar" />
+              <span className="scope-front-handle-end is-left"><span className="scope-front-handle-axle" /><span className="scope-front-handle-pad" /></span>
+              <span className="scope-front-handle-end is-right"><span className="scope-front-handle-axle" /><span className="scope-front-handle-pad" /></span>
+            </div>
+            <span className="scope-front-foot is-left" />
+            <span className="scope-front-foot is-right" />
+          </div>
           {/* Top strip: model + power */}
           <div className="scope-chassis-top">
             <div className="scope-model-block">
@@ -1252,14 +1311,28 @@ export default function Oscilloscope({
             {/* CRT assembly */}
             <div className="scope-crt-column">
               <div className="scope-crt-bezel">
+                <span className="scope-crt-recess" aria-hidden="true" />
                 <div className="scope-crt-glass">
+                  <span className="scope-crt-optics" aria-hidden="true" />
+                  <div className="scope-crt-image">
                   <div
                     className={`scope-phosphor state-${powerState}`}
                     style={{
                       '--scope-glow': String(glowVar),
                     }}
                   >
-                    <div className="scope-screen-grid" />
+                    <ScopeVectorScreen
+                      surfaceRef={screenSurfaceRef}
+                      acquisitionRef={acquisitionRef}
+                      waveSlotRef={triggerSlotRef}
+                      waves={visibleWaves}
+                      triggerColor={triggerWave.color}
+                      triggerX={triggerX}
+                      triggerY={triggerY}
+                      triggerLocked={triggerLocked}
+                      triggerSource={triggerSource}
+                      powerState={powerState}
+                    />
                     <div className={`scope-crt-power-overlay state-${powerState}`} aria-hidden="true">
                       <span className="scope-crt-power-line" />
                       <span className="scope-crt-power-dot" />
@@ -1283,26 +1356,7 @@ export default function Oscilloscope({
                         </div>
                       </div>
 
-                      <div className="scope-crt-wave-slot" ref={triggerSlotRef}>
-                        <svg
-                          className="scope-wave"
-                          viewBox="0 0 220 100"
-                          preserveAspectRatio="none"
-                          overflow="visible"
-                          aria-hidden="true"
-                        >
-                          <g transform={`translate(${waveTransform.hOff} ${waveTransform.vOff})`}>
-                            <g transform={`translate(110 50) scale(${waveTransform.hScale} ${waveTransform.vGain}) translate(-110 -50)`}>
-                              <g ref={wavePhaseGroupRef}>
-                                <path
-                                  d={waveBase}
-                                  className={`scope-wave-path ${selectedWave.shapeIndex !== 1 ? 'scope-wave-path--smooth' : ''}`}
-                                  shapeRendering="geometricPrecision"
-                                />
-                              </g>
-                            </g>
-                          </g>
-                        </svg>
+                      <div className="scope-crt-wave-slot" style={{ '--trigger-color': triggerWave.color }} ref={triggerSlotRef}>
                         <span
                           className={`scope-trigger-guide scope-trigger-position-guide ${triggerLocked ? 'is-locked' : 'is-searching'}`}
                           style={{ left: `${triggerX}%` }}
@@ -1321,21 +1375,22 @@ export default function Oscilloscope({
                           onPointerUp={endTriggerPositionDrag}
                           onPointerCancel={endTriggerPositionDrag}
                           onLostPointerCapture={endTriggerPositionDrag}
-                          onDoubleClick={() => setKnobHPos(0.5)}
+                          onDoubleClick={() => setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: 0.5 } }))}
                           onKeyDown={(event) => {
                             const step = event.shiftKey ? 0.05 : 0.02
                             if (event.key === 'ArrowRight') {
                               event.preventDefault()
-                              setKnobHPos((value) => Math.min(1, value + step))
+                              setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: Math.min(1, settings[triggerSource].knobHPos + step) } }))
                             } else if (event.key === 'ArrowLeft') {
                               event.preventDefault()
-                              setKnobHPos((value) => Math.max(0, value - step))
+                              setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: Math.max(0, settings[triggerSource].knobHPos - step) } }))
                             } else if (event.key === 'Home') {
                               event.preventDefault()
-                              setKnobHPos(0.5)
+                              setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: 0.5 } }))
                             }
                           }}
                         >
+                          <span className="scope-trigger-hit" aria-hidden="true" />
                           <span className="scope-trigger-position-label mono">T</span>
                           <span className="scope-trigger-position-caret" aria-hidden="true" />
                         </button>
@@ -1364,12 +1419,16 @@ export default function Oscilloscope({
                             }
                           }}
                         >
+                          <span className="scope-trigger-hit" aria-hidden="true" />
                           <svg viewBox="0 0 18 14" aria-hidden="true">
                             <path d="M17 7H7M11 2 6 7l5 5" />
                           </svg>
                           <span className="scope-trigger-marker-label mono">T</span>
                         </button>
-                        <span className="scope-crt-trace-badge mono">{selectedWave.name}</span>
+                        <span className="scope-crt-trace-badge mono">
+                          {visibleWaves.map((wave) => <span key={wave.slug} style={{ color: wave.color }}>{wave.label} {wave.name}</span>)}
+                          {!visibleWaves.length ? 'INPUTS OFF' : null}
+                        </span>
                       </div>
 
                       <div className="scope-crt-lower">
@@ -1384,7 +1443,8 @@ export default function Oscilloscope({
                       </div>
                     </div>
 
-                    <div className="scope-crt-hint mono">CH1–CH4: PAGES · JACKS: WAVEFORM</div>
+                    <div className="scope-crt-hint mono">CH1–CH4: PAGES · SWITCHES: WAVEFORMS</div>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -1394,7 +1454,7 @@ export default function Oscilloscope({
                   {voltsOption.label}/div
                 </span>
                 <span className={`scope-hscale-center ${triggerLocked ? 'is-locked' : 'is-searching'}`}>
-                  {triggerLocked ? 'TRIG’D' : 'AUTO · SCANNING'} · {selectedWave.label}
+                  {triggerLocked ? 'TRIG’D' : 'AUTO · SCANNING'} · {triggerWave.label}
                 </span>
                 <span>
                   {timeOption.label}/div
@@ -1405,8 +1465,8 @@ export default function Oscilloscope({
             {/* Right control column */}
             <div className="scope-controls-column">
               <div className="scope-controls-section scope-controls-section--trigger">
-                <span className="scope-section-label mono">TRIGGER</span>
-                <div className="scope-knob-grid scope-knob-grid--single">
+                <span className="scope-section-label mono">TRIGGER · {selectedWave.label}</span>
+                <div className="scope-trigger-row">
                   <ScopeKnobDial
                     label="LEVEL"
                     value={triggerLevel}
@@ -1419,7 +1479,7 @@ export default function Oscilloscope({
               </div>
 
               <div className="scope-controls-section scope-controls-section--vertical">
-                <span className="scope-section-label mono">VERTICAL</span>
+                <span className="scope-section-label mono">VERTICAL · {selectedWave.label}</span>
                 <div className="scope-knob-grid">
                   <ScopeKnobDial
                     label="SCALE"
@@ -1439,7 +1499,7 @@ export default function Oscilloscope({
               </div>
 
               <div className="scope-controls-section scope-controls-section--horizontal">
-                <span className="scope-section-label mono">HORIZONTAL</span>
+                <span className="scope-section-label mono">HORIZONTAL · {selectedWave.label}</span>
                 <div className="scope-knob-grid scope-knob-grid-2">
                   <ScopeKnobDial
                     label="SCALE"
@@ -1461,26 +1521,61 @@ export default function Oscilloscope({
 
               <div className="scope-controls-section scope-controls-section--input scope-input-section">
                 <span className="scope-section-label mono">INPUTS · WAVEFORM</span>
-                <div className="scope-bnc-grid">
-                  {WAVE_INPUTS.map((inp) => {
-                    const active = waveInputSlug === inp.slug
-                    return (
-                      <button
-                        key={inp.slug}
-                        type="button"
-                        className={`scope-bnc scope-bnc-selectable ${active ? 'active' : ''}`}
-                        onClick={() => setWaveInputSlug(inp.slug)}
-                        aria-pressed={active}
-                        aria-label={`${inp.label} — ${inp.name}`}
+                <div className="scope-input-grid">
+                  {WAVE_INPUTS.map((input) => {
+                    const enabled = enabledInputs.includes(input.slug)
+                    const selected = waveInputSlug === input.slug
+                    return <div
+                      key={input.slug}
+                      className={`scope-input-bank ${selected ? 'is-selected' : ''} ${enabled ? 'is-enabled' : ''}`}
+                      style={{ '--input-color': input.color }}
+                    >
+                      <button type="button" className="scope-input-select"
+                        data-channel={input.slug}
+                        aria-label={`Control and trigger ${input.label} ${input.name}`}
+                        aria-pressed={selected}
+                        onClick={() => setWaveInputSlug(input.slug)}
+                      >{input.label}</button>
+                      <button type="button" role="switch" className="scope-input-rocker"
+                        data-input={input.slug}
+                        style={{
+                          '--rocker-height': `${ROCKER_HEIGHT}px`,
+                          '--rocker-inset': `${ROCKER_INSET}px`,
+                          '--rocker-half-depth': `${ROCKER_THICKNESS / 2}px`,
+                          '--rocker-face-depth': `${ROCKER_FACE_DEPTH}px`,
+                          '--rocker-body-depth': `${ROCKER_BODY_DEPTH}px`,
+                          '--rocker-side-depth': `${ROCKER_BODY_DEPTH + ROCKER_FACE_DEPTH}px`,
+                          '--rocker-flat-shear': ROCKER_FLAT_SHEAR,
+                          '--rocker-pivot': `${rockerPivotHeight(ROCKER_HEIGHT)}px`,
+                          '--rocker-tilt': `${ROCKER_TILT}rad`,
+                        }}
+                        aria-label={`${input.label} ${input.name} input`}
+                        aria-checked={enabled}
+                        onClick={() => toggleInput(input.slug)}
                       >
-                        <span className="scope-bnc-top">
-                          <span className="scope-bnc-body" />
-                          <span className={`scope-bnc-led ${active ? 'on' : ''}`} aria-hidden />
+                        <span className="scope-rocker-seat" aria-hidden="true">
+                          <span className="scope-rocker-lamp" />
+                          <span className="scope-rocker-hinge" />
                         </span>
-                        <span className="scope-bnc-label mono">{inp.label}</span>
-                        <span className="scope-bnc-shape">{inp.name}</span>
+                        <span className="scope-rocker-spill" aria-hidden="true" />
+                        <span className="scope-rocker-paddle" aria-hidden="true">
+                          <span className="scope-rocker-side scope-rocker-side--left" />
+                          <span className="scope-rocker-side scope-rocker-side--right" />
+                          <span className="scope-rocker-edge scope-rocker-edge--top" />
+                          <span className="scope-rocker-edge scope-rocker-edge--bottom" />
+                          <span className="scope-rocker-face">
+                            <span className="scope-rocker-on">ON</span>
+                            <span className="scope-rocker-grip" />
+                            <svg className="scope-rocker-symbol" viewBox="0 0 24 14">
+                              <path d={input.symbol} />
+                            </svg>
+                            <span className="scope-rocker-grip" />
+                            <span className="scope-rocker-off">OFF</span>
+                          </span>
+                        </span>
                       </button>
-                    )
+                      <span className="scope-input-name">{input.name}</span>
+                    </div>
                   })}
                 </div>
               </div>
@@ -1508,6 +1603,9 @@ export default function Oscilloscope({
                 </button>
               )
             })}
+            <div className="scope-channel-shadows" aria-hidden="true">
+              {CHANNELS.map(({ id }) => <span key={id} />)}
+            </div>
             </div>
 
             <div className="scope-chassis-foot mono">
@@ -1546,6 +1644,7 @@ export default function Oscilloscope({
           </div>
           </div>
           </div>
+        </div>
         </div>
       </motion.div>
 

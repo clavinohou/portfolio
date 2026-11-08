@@ -1,0 +1,12 @@
+{
+  "order": 1,
+  "date": "Spring 2027",
+  "gallery": [{ "src": "/uploads/tesla-logo.png" }],
+  "galleryIsLogo": true,
+  "location": "Palo Alto, CA",
+  "title": "Vehicle Engineering Intern",
+  "type": "Incoming Internship",
+  "id": "tesla",
+  "description": "* Joining the Low Voltage Test team in Spring 2027.",
+  "company": "Tesla"
+}

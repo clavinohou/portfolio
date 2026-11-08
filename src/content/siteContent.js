@@ -159,9 +159,12 @@ function buildExperience() {
         company: ex.company ?? '',
         location: ex.location ?? '',
         date: ex.date ?? '',
+        status: /\bincoming\b/i.test(ex.type ?? '') ? 'future'
+          : /\b(present|current)\b/i.test(ex.date ?? '') ? 'present' : '',
         description: ex.description ?? '',
         tags: flatList(ex.tags, 'tag'),
         images: flatList(ex.gallery, 'src'),
+        galleryIsLogo: ex.galleryIsLogo === true,
         stackSize: normalizeStackSize(ex.stackSize),
       }
     })
