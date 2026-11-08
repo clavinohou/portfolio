@@ -1,3 +1,4 @@
+import { trackEvent } from '../lib/analytics'
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { siteContent } from '../content/siteContent'
@@ -265,7 +266,7 @@ export default function BlogHome() {
           <span className="bloghome-foot-sep" aria-hidden>·</span>
           {links.email ? (
             <a
-              href={`mailto:${links.email}`}
+              href={`mailto:${links.email}`} onClick={() => trackEvent('contact_click', { contact_method: 'email' })}
               className="bloghome-foot-link"
             >
               {links.email}
@@ -275,7 +276,7 @@ export default function BlogHome() {
             <>
               <span className="bloghome-foot-sep" aria-hidden>·</span>
               <a
-                href={links.github}
+                href={links.github} onClick={() => trackEvent('contact_click', { contact_method: 'github' })}
                 className="bloghome-foot-link"
                 target="_blank"
                 rel="noopener noreferrer"

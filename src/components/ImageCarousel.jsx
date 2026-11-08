@@ -1,3 +1,4 @@
+import { trackEvent } from '../lib/analytics'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -188,6 +189,7 @@ function ImageCarouselBase({ images, altPrefix = 'Photo', variant = 'cover', sta
 
   const openAt = (event, index) => {
     swallowClick(event)
+    trackEvent('media_open', { media_index: index + 1 })
     returnFocusRef.current = event.currentTarget
     setI(index)
     setExpanded(true)

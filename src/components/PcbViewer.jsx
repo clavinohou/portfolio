@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import './ImageCarousel.css'
 import './PcbViewer.css'
+import { trackEvent } from '../lib/analytics'
 
 export function PcbViewer({ viewer, projectTitle }) {
   const [opened, setOpened] = useState(false)
@@ -75,7 +76,7 @@ export function PcbViewer({ viewer, projectTitle }) {
           </svg>
           <h3>Take a closer look.</h3>
           <p>Pan, zoom, and inspect the actual design.</p>
-          <button type="button" className="projectlog-cta projectlog-cta--primary" onClick={() => setOpened(true)}>Explore PCB <span aria-hidden>→</span></button>
+          <button type="button" className="projectlog-cta projectlog-cta--primary" onClick={() => { trackEvent('pcb_viewer_open'); setOpened(true) }}>Explore PCB <span aria-hidden>→</span></button>
           <span className="pcb-viewer-note">Interactive viewer powered by Altium 365</span>
         </div>
       )}

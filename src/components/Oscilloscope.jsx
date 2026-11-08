@@ -1,5 +1,6 @@
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion'
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { trackEvent, createAdjustmentTracker } from '../lib/analytics'
 import { siteContent } from '../content/siteContent'
 import { publicUrl } from '../utils/publicUrl'
 import { thumbPreloadUrl } from '../utils/imageSources'
@@ -94,12 +95,29 @@ function timeScaleFromNorm(t) {
   return 0.3 + t * 1.7
 }
 
+function useAdjustmentTracker(control, channel) {
+  const tracker = useMemo(() => createAdjustmentTracker(control, channel), [control, channel])
+  useEffect(() => () => tracker.flush(), [tracker])
+  return tracker
+}
+
 /** Continuous 0–1 knob: drag to rotate (analog-style) */
-function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel }) {
+function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel, control, channel }) {
   const buttonRef = useRef(null)
   const stackRef = useRef(null)
   const dragging = useRef(false)
   const lastAngle = useRef(null)
+
+  const valueRef = useRef(value)
+  valueRef.current = value
+  const tracker = useAdjustmentTracker(control, channel)
+  const changeValue = useCallback((next, method) => {
+    const previous = valueRef.current
+    const updated = typeof next === 'function' ? next(previous) : next
+    valueRef.current = updated
+    tracker.record(previous, updated, method, method !== 'drag')
+    onChange(updated)
+  }, [onChange, tracker])
 
   const rotationDeg = -135 + value * 270
 
@@ -122,12 +140,13 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel 
 
       const fullRange = (270 * Math.PI) / 180
       const deltaNorm = delta / fullRange
-      onChange((v) => Math.min(1, Math.max(0, v + deltaNorm * 1.35)))
+      changeValue((v) => Math.min(1, Math.max(0, v + deltaNorm * 1.35)), 'drag')
     },
-    [onChange],
+    [changeValue],
   )
 
   const endDrag = useCallback((e) => {
+    if (dragging.current) tracker.flush()
     dragging.current = false
     lastAngle.current = null
     try {
@@ -137,7 +156,7 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel 
     } catch {
       /* ignore */
     }
-  }, [])
+  }, [tracker])
 
   const startDrag = useCallback((e) => {
     e.preventDefault()
@@ -163,9 +182,9 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel 
       const magnitude = Math.abs(rawDelta * modeScale)
       const step = Math.min(0.04, Math.max(0.005, magnitude * 0.0005))
       const direction = rawDelta < 0 ? 1 : -1
-      onChange((current) => Math.min(1, Math.max(0, current + direction * step)))
+      changeValue((current) => Math.min(1, Math.max(0, current + direction * step)), 'wheel')
     },
-    [onChange],
+    [changeValue],
   )
 
   useEffect(() => {
@@ -190,15 +209,15 @@ function ScopeKnobDial({ label, value, valueLabel, onChange, onReset, ariaLabel 
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       onLostPointerCapture={endDrag}
-      onDoubleClick={onReset}
+      onDoubleClick={onReset ? () => { tracker.record(valueRef.current, 0.5, 'reset'); tracker.flush(); onReset() } : undefined}
       onKeyDown={(e) => {
         const step = e.shiftKey ? 0.05 : 0.02
         if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
           e.preventDefault()
-          onChange((v) => Math.min(1, v + step))
+          changeValue((v) => Math.min(1, v + step), 'keyboard')
         } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
           e.preventDefault()
-          onChange((v) => Math.max(0, v - step))
+          changeValue((v) => Math.max(0, v - step), 'keyboard')
         }
       }}
     >
@@ -384,6 +403,7 @@ const ProjectsModule = ({
                 {cardInner}
                 <a
                   href={p.link}
+                  onClick={() => trackEvent('project_open', { project_id: p.id, link_location: 'external' })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="project-card-hitarea"
@@ -434,7 +454,7 @@ const ResumeModule = () => {
               </div>
             ))}
           </div>
-          <a className="module-cta" href={pdfSrc || resume.downloadUrl || '#'} {...(pdfSrc ? { download: true } : {})}>
+          <a onClick={() => trackEvent('resume_download')} className="module-cta" href={pdfSrc || resume.downloadUrl || '#'} {...(pdfSrc ? { download: true } : {})}>
             {resume.downloadLabel} →
           </a>
         </div>
@@ -447,7 +467,7 @@ const ResumeModule = () => {
               </div>
               <p className="resume-preview-hint">
                 Preview not loading?{' '}
-                <a href={pdfSrc} target="_blank" rel="noopener noreferrer">
+                <a onClick={() => trackEvent('resume_open')} href={pdfSrc} target="_blank" rel="noopener noreferrer">
                   Open PDF in a new tab
                 </a>
                 .
@@ -532,6 +552,7 @@ const ContactModule = () => {
       `Name: ${name}\nFrom: ${from}\n\nMessage:\n${message}`,
     )
 
+    trackEvent('contact_email_compose', { contact_method: 'email', link_location: 'contact_form' })
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
   }
 
@@ -541,13 +562,13 @@ const ContactModule = () => {
         <div className="contact-module-left">
           <div className="module-section-label">DIRECT</div>
           <div className="contact-module-list">
-            <a href={`mailto:${email}`} className="contact-module-link">
+            <a href={`mailto:${email}`} onClick={() => trackEvent('contact_click', { contact_method: 'email', link_location: 'contact_section' })} className="contact-module-link">
               <span className="contact-module-label">Email</span>
               <span className="contact-module-value">{email}</span>
             </a>
             {links.linkedin && (
               <a
-                href={links.linkedin}
+                href={links.linkedin} onClick={() => trackEvent('contact_click', { contact_method: 'linkedin', link_location: 'contact_section' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-module-link"
@@ -558,7 +579,7 @@ const ContactModule = () => {
             )}
             {links.github && (
               <a
-                href={links.github}
+                href={links.github} onClick={() => trackEvent('contact_click', { contact_method: 'github', link_location: 'contact_section' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-module-link"
@@ -569,7 +590,7 @@ const ContactModule = () => {
             )}
             {links.instagram && (
               <a
-                href={links.instagram}
+                href={links.instagram} onClick={() => trackEvent('contact_click', { contact_method: 'instagram', link_location: 'contact_section' })}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-module-link"
@@ -650,6 +671,7 @@ export default function Oscilloscope({
     const next = enabledInputs.includes(slug)
       ? enabledInputs.filter((input) => input !== slug)
       : [...enabledInputs, slug]
+    trackEvent('scope_input_toggle', { scope_channel: slug, input_state: next.includes(slug) ? 'on' : 'off' })
     setEnabledInputs(next)
   }
   const triggerSlotRef = useRef(null)
@@ -699,8 +721,9 @@ export default function Oscilloscope({
       return
     }
     setViewNotice((notice) => notice.text ? { ...notice, text: '' } : notice)
+    if (mode !== viewMode) trackEvent('scope_view_change', { view_mode: mode })
     setViewMode(mode)
-  }, [materialReady, prepare3D])
+  }, [materialReady, prepare3D, viewMode])
   useEffect(() => {
     if (!viewNotice.text) return undefined
     viewFeedback.stop()
@@ -902,6 +925,7 @@ export default function Oscilloscope({
       powerTimerRef.current = null
     }
 
+    trackEvent('scope_power_toggle', { power_state: powerState === 'on' ? 'off' : 'on' })
     if (powerState === 'on') {
       setPowerState('turning-off')
       powerTimerRef.current = setTimeout(() => {
@@ -1087,6 +1111,11 @@ export default function Oscilloscope({
     isPoweredOn && enabledInputs.includes(triggerSource) &&
     trigger.locked
 
+  const levelTracker = useAdjustmentTracker('trigger_level', waveInputSlug)
+  const positionTracker = useAdjustmentTracker('horizontal_position', waveInputSlug)
+  const triggerStart = useRef(0)
+  const positionStart = useRef(0)
+
   const updateTriggerFromPointer = useCallback((event) => {
     const rect = triggerSlotRef.current?.getBoundingClientRect()
     if (!rect || rect.height <= 0) return
@@ -1098,11 +1127,12 @@ export default function Oscilloscope({
   const startTriggerDrag = useCallback(
     (event) => {
       event.preventDefault()
+      triggerStart.current = triggerLevel
       triggerDraggingRef.current = true
       event.currentTarget.setPointerCapture(event.pointerId)
       updateTriggerFromPointer(event)
     },
-    [updateTriggerFromPointer],
+    [updateTriggerFromPointer, triggerLevel],
   )
 
   const moveTrigger = useCallback(
@@ -1114,6 +1144,10 @@ export default function Oscilloscope({
   )
 
   const endTriggerDrag = useCallback((event) => {
+    if (triggerDraggingRef.current) {
+      levelTracker.record(triggerStart.current, triggerLevel, 'drag', false)
+      levelTracker.flush()
+    }
     triggerDraggingRef.current = false
     try {
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -1122,7 +1156,7 @@ export default function Oscilloscope({
     } catch {
       /* Pointer capture may already have been released by the browser. */
     }
-  }, [])
+  }, [levelTracker, triggerLevel])
 
   const updateTriggerPositionFromPointer = useCallback((event) => {
     const rect = triggerSlotRef.current?.getBoundingClientRect()
@@ -1136,11 +1170,12 @@ export default function Oscilloscope({
   const startTriggerPositionDrag = useCallback(
     (event) => {
       event.preventDefault()
+      positionStart.current = knobHPos
       triggerPositionDraggingRef.current = true
       event.currentTarget.setPointerCapture(event.pointerId)
       updateTriggerPositionFromPointer(event)
     },
-    [updateTriggerPositionFromPointer],
+    [updateTriggerPositionFromPointer, knobHPos],
   )
 
   const moveTriggerPosition = useCallback(
@@ -1152,6 +1187,10 @@ export default function Oscilloscope({
   )
 
   const endTriggerPositionDrag = useCallback((event) => {
+    if (triggerPositionDraggingRef.current) {
+      positionTracker.record(positionStart.current, knobHPos, 'drag', false)
+      positionTracker.flush()
+    }
     triggerPositionDraggingRef.current = false
     try {
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -1160,7 +1199,7 @@ export default function Oscilloscope({
     } catch {
       /* Pointer capture may already have been released by the browser. */
     }
-  }, [])
+  }, [positionTracker, knobHPos])
 
   // Every displayed record has one timestamp shared by all channels. A
   // trigger advances records by complete cycles of its source; unrelated
@@ -1375,9 +1414,13 @@ export default function Oscilloscope({
                           onPointerUp={endTriggerPositionDrag}
                           onPointerCancel={endTriggerPositionDrag}
                           onLostPointerCapture={endTriggerPositionDrag}
-                          onDoubleClick={() => setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: 0.5 } }))}
+                          onDoubleClick={() => { positionTracker.record(knobHPos, 0.5, 'reset'); positionTracker.flush(); setKnobHPos(0.5) }}
                           onKeyDown={(event) => {
                             const step = event.shiftKey ? 0.05 : 0.02
+                            if (['ArrowRight', 'ArrowLeft', 'Home'].includes(event.key)) {
+                              const next = event.key === 'Home' ? 0.5 : Math.min(1, Math.max(0, knobHPos + (event.key === 'ArrowRight' ? step : -step)))
+                              positionTracker.record(knobHPos, next, 'keyboard')
+                            }
                             if (event.key === 'ArrowRight') {
                               event.preventDefault()
                               setWaveSettings((settings) => ({ ...settings, [triggerSource]: { ...settings[triggerSource], knobHPos: Math.min(1, settings[triggerSource].knobHPos + step) } }))
@@ -1407,9 +1450,13 @@ export default function Oscilloscope({
                           onPointerUp={endTriggerDrag}
                           onPointerCancel={endTriggerDrag}
                           onLostPointerCapture={endTriggerDrag}
-                          onDoubleClick={() => setTriggerLevel(0.5)}
+                          onDoubleClick={() => { levelTracker.record(triggerLevel, 0.5, 'reset'); levelTracker.flush(); setTriggerLevel(0.5) }}
                           onKeyDown={(event) => {
                             const step = event.shiftKey ? 0.05 : 0.02
+                            if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
+                              const next = Math.min(1, Math.max(0, triggerLevel + (event.key === 'ArrowUp' ? step : -step)))
+                              levelTracker.record(triggerLevel, next, 'keyboard')
+                            }
                             if (event.key === 'ArrowUp') {
                               event.preventDefault()
                               setTriggerLevel((value) => Math.min(1, value + step))
@@ -1469,6 +1516,8 @@ export default function Oscilloscope({
                 <div className="scope-trigger-row">
                   <ScopeKnobDial
                     label="LEVEL"
+                    control="trigger_level"
+                    channel={waveInputSlug}
                     value={triggerLevel}
                     valueLabel={`${Math.round(triggerLevel * 100)}%`}
                     onChange={setTriggerLevel}
@@ -1483,6 +1532,8 @@ export default function Oscilloscope({
                 <div className="scope-knob-grid">
                   <ScopeKnobDial
                     label="SCALE"
+                    control="volts_per_division"
+                    channel={waveInputSlug}
                     value={knobVolts}
                     valueLabel={`${voltsOption.label}/div`}
                     onChange={setKnobVolts}
@@ -1490,6 +1541,8 @@ export default function Oscilloscope({
                   />
                   <ScopeKnobDial
                     label="OFFSET"
+                    control="vertical_offset"
+                    channel={waveInputSlug}
                     value={knobVPos}
                     valueLabel={offsetLabel}
                     onChange={setKnobVPos}
@@ -1503,6 +1556,8 @@ export default function Oscilloscope({
                 <div className="scope-knob-grid scope-knob-grid-2">
                   <ScopeKnobDial
                     label="SCALE"
+                    control="seconds_per_division"
+                    channel={waveInputSlug}
                     value={knobSec}
                     valueLabel={`${timeOption.label}/div`}
                     onChange={setKnobSec}
@@ -1510,6 +1565,8 @@ export default function Oscilloscope({
                   />
                   <ScopeKnobDial
                     label="POSITION"
+                    control="horizontal_position"
+                    channel={waveInputSlug}
                     value={knobHPos}
                     valueLabel={delayLabel}
                     onChange={setKnobHPos}
@@ -1534,7 +1591,10 @@ export default function Oscilloscope({
                         data-channel={input.slug}
                         aria-label={`Control and trigger ${input.label} ${input.name}`}
                         aria-pressed={selected}
-                        onClick={() => setWaveInputSlug(input.slug)}
+                        onClick={() => {
+                          if (input.slug !== waveInputSlug) trackEvent('scope_channel_select', { scope_channel: input.slug })
+                          setWaveInputSlug(input.slug)
+                        }}
                       >{input.label}</button>
                       <button type="button" role="switch" className="scope-input-rocker"
                         data-input={input.slug}
@@ -1609,22 +1669,22 @@ export default function Oscilloscope({
             </div>
 
             <div className="scope-chassis-foot mono">
-            <a href={`mailto:${links.email}`} className="scope-foot-link">
+            <a href={`mailto:${links.email}`} onClick={() => trackEvent('contact_click', { contact_method: 'email', link_location: 'footer' })} className="scope-foot-link">
               {links.email}
             </a>
             <span className="scope-foot-sep">·</span>
-            <a href={links.github} target="_blank" rel="noopener noreferrer" className="scope-foot-link">
+            <a href={links.github} onClick={() => trackEvent('contact_click', { contact_method: 'github', link_location: 'footer' })} target="_blank" rel="noopener noreferrer" className="scope-foot-link">
               GitHub
             </a>
             <span className="scope-foot-sep">·</span>
-            <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="scope-foot-link">
+            <a href={links.linkedin} onClick={() => trackEvent('contact_click', { contact_method: 'linkedin', link_location: 'footer' })} target="_blank" rel="noopener noreferrer" className="scope-foot-link">
               LinkedIn
             </a>
             {links.instagram && (
               <>
                 <span className="scope-foot-sep">·</span>
                 <a
-                  href={links.instagram}
+                  href={links.instagram} onClick={() => trackEvent('contact_click', { contact_method: 'instagram', link_location: 'footer' })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="scope-foot-link"

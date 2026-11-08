@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { trackEvent } from './lib/analytics'
 
 /**
  * Minimal zero-dep client-side router.
@@ -69,6 +70,13 @@ export function Link({ to, onClick, children, replace, scrollToTop, ...rest }) {
   const handleClick = (e) => {
     if (onClick) onClick(e)
     if (e.defaultPrevented) return
+    const destination = normalizePath(to)
+    if (destination === '/log') trackEvent('build_log_open')
+    else if (destination.startsWith('/log/')) {
+      let projectId = destination.slice(5)
+      try { projectId = decodeURIComponent(projectId) } catch { /* retain malformed ID */ }
+      trackEvent('project_open', { project_id: projectId, link_location: 'internal' })
+    }
     // Let the browser handle: non-primary clicks, modified clicks, or target="_blank"
     if (e.button !== 0) return
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return

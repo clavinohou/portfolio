@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './ImageCarousel.css'
 import './SpreadsheetLink.css'
+import { trackEvent } from '../lib/analytics'
 
 const loading = <p className="spreadsheet-message" role="status">Loading workbook…</p>
 const unavailable = <p className="spreadsheet-message" role="alert">The preview could not open this workbook. You can download the Excel file above.</p>
@@ -77,6 +78,7 @@ export function SpreadsheetLink({ href, title, ...props }) {
           if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
           event.preventDefault()
           event.stopPropagation()
+          trackEvent('workbook_open')
           setOpen(true)
         }}
       />

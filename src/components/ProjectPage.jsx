@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
+import { trackEvent } from '../lib/analytics'
 import { siteContent } from '../content/siteContent'
 import { ImageCarousel } from './ImageCarousel'
 import { MarkdownBlock } from './MarkdownBlock'
@@ -161,6 +162,7 @@ export default function ProjectPage({ projectId }) {
                   <a
                     className="projectlog-cta projectlog-cta--primary"
                     href={project.link}
+                    onClick={() => trackEvent('project_open', { project_id: project.id, link_location: 'external' })}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

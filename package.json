@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "cms": "node scripts/cmsServer.mjs",
     "test:cms": "node --test scripts/cmsGitSync.test.mjs scripts/studioSave.test.mjs",
+    "test:analytics": "node --test scripts/analytics.test.mjs",
     "test:pcb": "node --test scripts/pcbViewer.test.mjs"
   },
   "dependencies": {

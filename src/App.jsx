@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { trackEvent } from './lib/analytics'
 import Oscilloscope from './components/Oscilloscope'
 import ProjectPage from './components/ProjectPage'
 import BlogHome from './components/BlogHome'
@@ -49,11 +50,12 @@ function OscilloscopeApp() {
     setDirection(nextIndex > currentIndex ? 1 : -1)
     setActiveChannel(nextId)
     if (nextIndex !== -1 && nextId !== activeChannel) {
-      window.gtag?.('event', 'portfolio_channel_select', { portfolio_channel: nextId })
+      trackEvent('portfolio_channel_select', { portfolio_channel: nextId })
     }
   }
 
   const handleHome = () => {
+    if (activeChannel) trackEvent('portfolio_home_return', { portfolio_channel: activeChannel })
     setActiveChannel(null)
   }
 
