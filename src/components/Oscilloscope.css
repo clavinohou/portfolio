@@ -80,7 +80,9 @@
   will-change: transform;
 }
 
-.scope-rig[data-frozen="true"] * {
+.scope-rig[data-frozen="true"] *,
+.scope-rig[data-frozen="true"] .scope-chassis::before,
+.scope-rig[data-frozen="true"] .scope-crt-bezel::after {
   animation-play-state: paused !important;
 }
 
@@ -100,7 +102,6 @@
   z-index: -1;
   pointer-events: none;
   user-select: none;
-  opacity: var(--panel-skin-opacity, 1);
 }
 /* Front projection of the physical housing: 7px side lips, 9px rolled
    edges, a 49%-wide bow, and pads centered 38% either side of the case. */
@@ -226,6 +227,8 @@
   left: calc((100% - 100vw) / 2);
   top: calc((100% - 100dvh) / 2);
   pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
 }
 
 .scope-material-scene canvas {
@@ -285,7 +288,6 @@
 .scope-chassis {
   position: relative;
   --crt-fx: .45;
-  --crt-lens-strength: 1;
   --knob-contact-shadow: 2px 4px 6px -1px #29312626;
   --key-contact-shadow: 1.5px 2.5px 4px -1px #29312621;
   --scope-accent-orange: #ff6b35;
@@ -303,20 +305,6 @@
   border: 1px solid transparent;
   box-shadow: none;
   color: var(--gray-900, #18181b);
-}
-
-/* The lightweight initial view owns this shadow. It fades once when the
-   physical renderer is adopted, then both camera views keep its lighting. */
-.scope-chassis::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  z-index: 0;
-  border-radius: inherit;
-  box-shadow: none;
-  opacity: var(--case-shadow-opacity, 1);
-  transform: translateZ(.1px);
-  pointer-events: none;
 }
 
 .scope-chassis-top {
@@ -492,6 +480,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  filter: var(--crt-image-filter, none);
+  transform: var(--crt-phosphor-offset, none);
   clip-path: inset(5px round var(--crt-corner-x, 6.5%) / var(--crt-corner-y, 8%));
 }
 
@@ -2927,6 +2917,29 @@
 }
 
 /* The physical front-panel design stays mounted in both camera views. */
+.has-depth-scene { --view-depth: 1; }
+.has-depth-scene .scope-material-scene {
+  animation: scopeMaterialReveal 240ms ease-in-out both;
+}
+.has-depth-scene .scope-front-hardware,
+.has-depth-scene .scope-chassis::before {
+  animation: scopePanelReveal 240ms ease-in-out both;
+}
+
+/* Fill in the physical renderer behind the HTML before removing its skin. */
+@keyframes scopeMaterialReveal {
+  0% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+@keyframes scopePanelReveal {
+  0%, 50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes scopeGlassReveal {
+  0%, 50% { background-color: #070d09; }
+  100% { background-color: #070d0900; }
+}
+
 .has-depth-scene .scope-front-plane,
 .has-depth-scene .scope-chassis,
 .has-depth-scene .scope-chassis-top,
@@ -2956,7 +2969,6 @@
   border: 1px solid rgba(65, 70, 60, .24);
   border-radius: 6px;
   background: var(--scope-panel-surface);
-  opacity: var(--panel-skin-opacity, 1);
   mask-image: var(--panel-face-mask, linear-gradient(#fff, #fff));
   mask-size: 100% 100%;
   transform: translateZ(-.1px);
@@ -2984,7 +2996,7 @@
 .has-depth-scene .scope-crt-bezel::after {
   /* The shadow plane is behind the phosphor. Keep it dark while the
      physical glass becomes opaque, then reveal the warmed renderer. */
-  background: rgb(7 13 9 / var(--panel-skin-opacity, 1));
+  animation: scopeGlassReveal 240ms ease-in-out both;
 }
 .has-depth-scene .scope-crt-glass {
   --crt-radius-x: var(--crt-corner-x, 6.5%);
@@ -2992,11 +3004,6 @@
   transform: translateZ(calc((var(--crt-glass-depth, 9px) - var(--crt-bezel-depth, 20px)) * var(--view-depth, 0)));
   border-radius: var(--crt-radius-x) / var(--crt-radius-y);
   clip-path: inset(var(--crt-clip, 0px) round var(--crt-radius-x) / var(--crt-radius-y));
-}
-.has-depth-scene .scope-crt-image {
-  filter: var(--crt-image-filter, none);
-  transform: translate(var(--crt-phosphor-x, 0px), var(--crt-phosphor-y, 0px));
-  clip-path: inset(calc(5px * var(--crt-lens-strength, 0)) round var(--crt-radius-x) / var(--crt-radius-y));
 }
 .has-depth-scene :is(.scope-trigger-position-marker, .scope-trigger-marker) {
   pointer-events: none;
@@ -3121,6 +3128,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .has-depth-scene .scope-material-scene,
+  .has-depth-scene .scope-front-hardware,
+  .has-depth-scene .scope-chassis::before,
+  .has-depth-scene .scope-crt-bezel::after { animation-duration: 1ms; }
   .scope-view-load,
   .scope-view-load > span { transition: none; }
   .has-depth-scene .scope-ch-btn,

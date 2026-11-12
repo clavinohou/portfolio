@@ -681,11 +681,11 @@ export default function Oscilloscope({
   const viewPointerRef = useRef(null)
   const [viewMode, setViewMode] = useState('2d')
   const [viewNotice, setViewNotice] = useState({ text: '', id: 0 })
-  const [sceneMounted, setSceneMounted] = useState(false)
-  const [spatialActive, setSpatialActive] = useState(false)
+  const [sceneRequested, setSceneRequested] = useState(false)
   const [materialReady, setMaterialReady] = useState(false)
   const [materialProgress, setMaterialProgress] = useState(0)
   const [materialEnabled, setMaterialEnabled] = useState(() => window.matchMedia(MATERIAL_SCENE_QUERY).matches)
+  const spatialActive = materialReady && materialEnabled
   const preparationRequested = useRef(false)
   const reportMaterialProgress = useCallback((progress) => {
     setMaterialProgress((current) => Math.max(current, Math.min(0.98, progress)))
@@ -702,7 +702,7 @@ export default function Oscilloscope({
     loadScopeScene().then(({ preloadScopeMaterials }) => {
       reportMaterialProgress(0.15)
       preloadScopeMaterials()
-      setSceneMounted(true)
+      setSceneRequested(true)
     }).catch(() => {
       preparationRequested.current = false
       setMaterialProgress(0)
@@ -796,19 +796,21 @@ export default function Oscilloscope({
 
   const isHome = activeChannel == null
   useEffect(() => {
-    if (!isHome || !materialEnabled || sceneMounted) return undefined
+    if (!isHome || !materialEnabled || sceneRequested) return undefined
     let idle = 0
+    const warm = () => { if (!document.hidden) prepare3D() }
     const timer = window.setTimeout(() => {
-      const warm = () => { if (document.visibilityState === 'visible') prepare3D() }
       if ('requestIdleCallback' in window) idle = window.requestIdleCallback(warm, { timeout: 1000 })
       else idle = window.setTimeout(warm, 500)
     }, 350)
+    document.addEventListener('visibilitychange', warm)
     return () => {
+      document.removeEventListener('visibilitychange', warm)
       clearTimeout(timer)
       if ('cancelIdleCallback' in window) window.cancelIdleCallback(idle)
       else clearTimeout(idle)
     }
-  }, [isHome, materialEnabled, sceneMounted, prepare3D])
+  }, [isHome, materialEnabled, sceneRequested, prepare3D])
   useEffect(() => {
     if (materialEnabled || !isHome) setViewNotice((notice) => notice.text ? { ...notice, text: '' } : notice)
   }, [materialEnabled, isHome])
@@ -822,17 +824,6 @@ export default function Oscilloscope({
     update()
     return () => query.removeEventListener('change', update)
   }, [])
-
-  useEffect(() => {
-    if (viewMode !== '3d') return
-    // Both modes retain the physical instrument after its first reveal.
-    setSceneMounted(true)
-    setSpatialActive(true)
-  }, [viewMode])
-
-  useEffect(() => {
-    if (materialReady && materialEnabled) setSpatialActive(true)
-  }, [materialReady, materialEnabled])
 
   useEffect(() => {
     const switchView = (event) => {
@@ -1284,14 +1275,15 @@ export default function Oscilloscope({
         <div
           data-material-enabled={materialEnabled}
           data-material-ready={materialReady}
-          className={`scope-fit-frame ${scopeFit.width > 0 ? 'is-fitted' : ''} ${materialReady && materialEnabled && (viewMode === '3d' || spatialActive) ? 'has-depth-scene' : ''}`}
+          className={`scope-fit-frame ${scopeFit.width > 0 ? 'is-fitted' : ''} ${spatialActive ? 'has-depth-scene' : ''}`}
           style={
             scopeFit.width > 0
               ? { width: scopeFit.width, height: scopeFit.height }
               : undefined
           }
         >
-        {(viewMode === '3d' || sceneMounted) && materialEnabled && scopeFit.width > 0 ? (
+        {/* Fetch the assets during boot, then initialize WebGL after the phosphor settles. */}
+        {sceneRequested && materialEnabled && scopeFit.width > 0 && powerState !== 'booting' ? (
           <Suspense fallback={null}>
             <ScopeMaterialScene
               chassisRef={scopeChassisRef}
@@ -1302,7 +1294,7 @@ export default function Oscilloscope({
               inputs={inputControls}
               active={isHome}
               threeD={viewMode === '3d'}
-              spatialActive={spatialActive || viewMode === '3d'}
+              spatialActive={spatialActive}
               pointerRef={viewPointerRef}
               onReady={handleMaterialReady}
               onProgress={reportMaterialProgress}

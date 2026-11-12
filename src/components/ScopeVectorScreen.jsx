@@ -118,11 +118,11 @@ export function ScopeVectorScreen({ surfaceRef, acquisitionRef, waveSlotRef, wav
     const phosphor = svg?.parentElement
     const image = phosphor?.parentElement
     if (!svg || !image || !waveSlotRef.current) return undefined
-    image.style.setProperty('--crt-image-filter', `url("#${filterId}")`)
     const positionMarker = waveSlotRef.current.querySelector('.scope-trigger-position-marker')
     const levelMarker = waveSlotRef.current.querySelector('.scope-trigger-marker')
     let size = null
     let lastGridPose = ''
+    let refracting = false
     let lastCapture = NaN
     let lastBlend = NaN
     const lastPhases = new Map()
@@ -133,9 +133,18 @@ export function ScopeVectorScreen({ surfaceRef, acquisitionRef, waveSlotRef, wav
       const gridPose = `${pose.x.toFixed(6)},${pose.y.toFixed(6)},${(pose.depth ?? 0).toFixed(6)}`
       if (gridPose !== lastGridPose) {
         const strength = pose.depth ?? 0
+        const angle = Math.hypot(pose.x, pose.y) * strength
+        // The front-facing phosphor needs no displacement. Keep the same
+        // paint path through startup and add refraction as the camera tilts.
+        const angled = angle > 0.000001
+        if (angled !== refracting) {
+          if (angled) image.style.setProperty('--crt-image-filter', `url("#${filterId}")`)
+          else image.style.removeProperty('--crt-image-filter')
+          refracting = angled
+        }
         warpXRef.current.setAttribute('slope', -pose.x * strength)
         warpYRef.current.setAttribute('slope', -pose.y * strength)
-        rimWarpRef.current.setAttribute('scale', rimMapRef.current?.url ? 5 * strength : 0)
+        rimWarpRef.current.setAttribute('scale', rimMapRef.current?.url ? 5 * strength * Math.min(1, angle / 0.04) : 0)
         for (const [marker, x, y] of [
           [positionMarker, slot.x + slot.width * triggerX / 100, slot.y],
           [levelMarker, slot.x + slot.width - 17, slot.y + slot.height * triggerY / 100],
@@ -144,10 +153,10 @@ export function ScopeVectorScreen({ surfaceRef, acquisitionRef, waveSlotRef, wav
           marker?.style.setProperty('--crt-hit-x', `${depth * pose.x}px`)
           marker?.style.setProperty('--crt-hit-y', `${depth * pose.y}px`)
         }
+        svg.dataset.projectionX = pose.x.toFixed(6)
+        svg.dataset.projectionY = pose.y.toFixed(6)
         lastGridPose = gridPose
       }
-      const guideX = slot.x + slot.width * triggerX / 100
-      guideRef.current.setAttribute('d', `M${guideX},${slot.y}v${slot.height}`)
       const acquisition = acquisitionRef.current
       const capture = acquisition.capture
       const blend = acquisition.remainder
@@ -171,12 +180,10 @@ export function ScopeVectorScreen({ surfaceRef, acquisitionRef, waveSlotRef, wav
         svg.dataset.captureTime = capture.toFixed(9)
         svg.dataset.captureBlend = blend.toFixed(9)
       }
-      svg.dataset.projectionX = pose.x.toFixed(6)
-      svg.dataset.projectionY = pose.y.toFixed(6)
     }
     const measure = () => {
       size = measureScreenLayout(waveSlotRef.current, phosphor)
-      const { width, height } = size
+      const { width, height, slot } = size
       if (!width || !height) { size = null; return }
       if (rimMapRef.current?.width !== width || rimMapRef.current?.height !== height) {
         rimMapRef.current = { width, height, url: makeRimMap(width, height) }
@@ -189,6 +196,8 @@ export function ScopeVectorScreen({ surfaceRef, acquisitionRef, waveSlotRef, wav
       for (let y = 0; y <= height; y += 24) horizontal.push(`M0,${y}h${width}`)
       horizontalRef.current.setAttribute('d', horizontal.join(''))
       verticalRef.current.setAttribute('d', vertical.join(''))
+      const guideX = slot.x + slot.width * triggerX / 100
+      guideRef.current.setAttribute('d', `M${guideX},${slot.y}v${slot.height}`)
       const rise = surfaceDepth(width / 2, height / 2, width, height)
       warpRef.current.setAttribute('scale', rise * REFRACTION)
       svg.dataset.surfaceRise = rise.toFixed(3)

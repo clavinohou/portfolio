@@ -19,7 +19,6 @@ export function useScopeCarry({ carryRef, stageRef, instrumentRef, handleHitRef,
       const pause = carry.pausedAt === null ? 0 : performance.now() - carry.pausedAt
       const state = motion.current
       if (state.transition?.start != null) state.transition.start += pause
-      if (state.presentationStart !== null) state.presentationStart += pause
       carry.pose = carry.recovery = null
       carry.pausedAt = null
       carry.finished = false

@@ -1,4 +1,4 @@
-import { Component, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Component, Suspense, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { RoundedBox as DetailBox } from '@react-three/drei/core/RoundedBox'
 import { Environment } from '@react-three/drei/core/Environment'
@@ -212,9 +212,11 @@ function PanelFaceMaterial({ width, height, scale }) {
     toneMapped={false} onBeforeCompile={compile} />
 }
 
-function Studio() {
+// Keep the studio fixed across progress updates and capture it on a render
+// frame, after the geometry has mounted.
+const Studio = memo(function Studio() {
   return (
-    <Environment resolution={128} frames={1}>
+    <Environment resolution={128} frames={2}>
       <mesh>
         <sphereGeometry args={[30, 16, 16]} />
         <meshBasicMaterial color="#a5aaa7" side={1} />
@@ -224,7 +226,7 @@ function Studio() {
       <Lightformer position={[0, -10, 5]} scale={[14, 2]} intensity={0.35} />
     </Environment>
   )
-}
+})
 
 function makeFrontHousing(width, height, scale) {
   const depth = 108 * scale
@@ -841,11 +843,11 @@ function PanelDepth({ fit, layout, isPoweredOn, inputs, chassisRef, spatialActiv
   </>
 }
 
-function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, interaction, planeRef, chassisRef, surfaceRef, threeD, spatialActive, pointerRef, progressRef, sceneRef, handleRaised, shadowLightRef, carryRef, stageRef, instrumentRef, handleHitRef, setHandleRaised }) {
+function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, interaction, planeRef, chassisRef, surfaceRef, threeD, presented, pointerRef, progressRef, handleRaised, shadowLightRef, carryRef, stageRef, instrumentRef, handleHitRef, setHandleRaised }) {
   const { camera, size, gl, scene, invalidate, setDpr } = useThree()
-  const warmup = useRef({ generation: 0, raf: 0 })
+  const warmup = useRef({ generation: 0, raf: 0, phase: 'pending', fence: null })
   const points = useMemo(() => Array.from({ length: 4 }, () => new Vector3()), [])
-  const motion = useRef({ x: 0, y: 0, orbitX: 0, orbitY: 220, handleFraming: 0, ready: false, frames: 0, seconds: 0, transition: null, presentation: 0, presentationStart: null })
+  const motion = useRef({ x: 0, y: 0, orbitX: 0, orbitY: 220, handleFraming: 0, frames: 0, seconds: 0, lowerQuality: false, transition: null })
   const worldOrigin = useMemo(() => new Vector3(), [])
   const followCamera = useMemo(() => camera.clone(), [camera])
   const shadowPosition = useMemo(() => new Vector3(NaN, NaN, NaN), [])
@@ -853,7 +855,7 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
   const reducedMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)'), [])
   const finePointer = useMemo(() => window.matchMedia('(hover: hover) and (pointer: fine)'), [])
 
-  useEffect(() => { if (spatialActive) invalidate() }, [spatialActive, invalidate])
+  useEffect(() => { if (presented) invalidate() }, [presented, invalidate])
 
   useEffect(() => {
     const state = motion.current
@@ -869,7 +871,8 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
         state.orbitY = 220 + state.y * 420
       }
     }
-    state.transition = { from, to: threeD ? 1 : 0, start: null, duration: Math.max(180, 900 * Math.abs((threeD ? 1 : 0) - from)) }
+    const to = threeD ? 1 : 0
+    state.transition = from === to ? null : { from, to, start: null, duration: Math.max(180, 900 * Math.abs(to - from)) }
     invalidate()
   }, [threeD, progressRef, pointerRef, finePointer, reducedMotion, invalidate])
 
@@ -911,6 +914,7 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
       invalidate()
     }
     const reset = () => { carryRef.current.api?.end(null, true); state.x = state.y = 0; invalidate() }
+    const resume = () => { if (!document.hidden) invalidate() }
     const down = (event) => { if (chassisRef.current?.contains(event.target)) interaction.current = true }
     const up = (event) => { carryRef.current.api?.end(event.pointerId, event.type === 'pointercancel', event.timeStamp); interaction.current = false; invalidate() }
     window.addEventListener('pointerdown', down, true)
@@ -918,6 +922,7 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
     window.addEventListener('pointercancel', up)
     window.addEventListener('pointermove', move, { passive: true })
     window.addEventListener('blur', reset)
+    document.addEventListener('visibilitychange', resume)
     document.documentElement.addEventListener('pointerleave', reset)
     reduced.addEventListener('change', reset)
     invalidate()
@@ -927,23 +932,30 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
       window.removeEventListener('pointercancel', up)
       window.removeEventListener('pointermove', move)
       window.removeEventListener('blur', reset)
+      document.removeEventListener('visibilitychange', resume)
       document.documentElement.removeEventListener('pointerleave', reset)
       reduced.removeEventListener('change', reset)
     }
   }, [active, threeD, interaction, invalidate, chassisRef, camera, progressRef, carryRef])
 
   useLayoutEffect(() => {
-    motion.current.ready = false
-    motion.current.warming = false
-    warmup.current.generation += 1
+    const preparation = warmup.current
+    preparation.phase = 'pending'
+    preparation.generation += 1
     invalidate()
     const plane = planeRef.current
     const chassis = chassisRef.current
     chassis?.style.setProperty('--crt-corner-x', `${CRT_CORNER_X * 100}%`)
     chassis?.style.setProperty('--crt-corner-y', `${CRT_CORNER_Y * 100}%`)
+    chassis?.style.setProperty('--crt-bezel-depth', `${BEZEL_DEPTH}px`)
+    chassis?.style.setProperty('--crt-glass-depth', `${GLASS_DEPTH}px`)
     return () => {
-      warmup.current.generation += 1
-      cancelAnimationFrame(warmup.current.raf)
+      preparation.generation += 1
+      cancelAnimationFrame(preparation.raf)
+      if (preparation.fence) {
+        gl.getContext().deleteSync(preparation.fence)
+        preparation.fence = null
+      }
       plane?.style.removeProperty('transform')
       chassis?.style.removeProperty('--crt-clip')
       chassis?.style.removeProperty('--crt-bezel-depth')
@@ -951,13 +963,7 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
       chassis?.style.removeProperty('--crt-corner-x')
       chassis?.style.removeProperty('--crt-corner-y')
       chassis?.style.removeProperty('--crt-light-angle')
-      chassis?.style.removeProperty('--crt-fx')
-      chassis?.style.removeProperty('--crt-lens-strength')
-      chassis?.style.removeProperty('--crt-phosphor-x')
-      chassis?.style.removeProperty('--crt-phosphor-y')
-      chassis?.style.removeProperty('--view-depth')
-      chassis?.style.removeProperty('--panel-skin-opacity')
-      chassis?.style.removeProperty('--case-shadow-opacity')
+      chassis?.style.removeProperty('--crt-phosphor-offset')
       surfaceRef.current.pose = { x: 0, y: 0, depth: 1 }
       surfaceRef.current.render?.()
       onReady(false)
@@ -970,27 +976,18 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
     const carry = carryRef.current
     const locked = Boolean(carry.pose)
     const transition = state.transition
-    const now = performance.now()
-    // Adopt the physical renderer once, while the camera is still front-on.
-    // From then on both view buttons keep the same geometry and materials.
-    let presenting = false
-    if (!locked && state.ready && spatialActive && state.presentation < 1) {
-      if (state.presentationStart === null) state.presentationStart = now
-      const t = reducedMotion.matches ? 1 : Math.min(1, (now - state.presentationStart) / 240)
-      state.presentation = t * t * (3 - 2 * t)
-      presenting = t < 1
-    }
     let transitioning = false
-    if (!locked && state.ready && state.presentation === 1 && transition) {
+    if (!locked && presented && transition) {
+      const now = performance.now()
       if (transition.start === null) transition.start = now
       const t = reducedMotion.matches ? 1 : Math.min(1, (now - transition.start) / transition.duration)
       // Only the camera moves. Its velocity reaches zero at either view.
       const eased = t * t * t * (t * (t * 6 - 15) + 10)
       progressRef.current = MathUtils.lerp(transition.from, transition.to, eased)
       transitioning = t < 1
+      if (!transitioning) state.transition = null
     }
     const view = progressRef.current
-    const presentation = state.presentation
     const x = state.x * 1100
     const y = 220 + state.y * 420
     if (!locked && !interaction.current && threeD) {
@@ -1042,15 +1039,6 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
         Math.sin(t * Math.PI * 11) * 5.5 * force, 0).applyQuaternion(camera.quaternion)
       camera.position.add(carry.cameraShakeOffset)
     }
-    // These change only during the first renderer adoption, never on a view
-    // change. In the front view the real Z depths simply project straight on.
-    chassisRef.current?.style.setProperty('--view-depth', presentation.toFixed(6))
-    chassisRef.current?.style.setProperty('--crt-lens-strength', '1')
-    chassisRef.current?.style.setProperty('--case-shadow-opacity', (1 - presentation).toFixed(6))
-    chassisRef.current?.style.setProperty('--panel-skin-opacity', (1 - MathUtils.smoothstep(presentation, 0.5, 1)).toFixed(6))
-    if (sceneRef.current) {
-      sceneRef.current.style.opacity = String(MathUtils.smoothstep(presentation, 0, 0.5))
-    }
     camera.updateProjectionMatrix()
     camera.updateMatrixWorld()
     stageRef.current?.updateMatrixWorld(true)
@@ -1085,22 +1073,21 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
       y: (forward.y * right.x - forward.x * right.y) / determinant,
       depth: 1,
     }
-    const dx = pose.x * (BEZEL_DEPTH - GLASS_DEPTH)
-    const dy = pose.y * (BEZEL_DEPTH - GLASS_DEPTH)
-    chassisRef.current?.style.setProperty('--crt-bezel-depth', `${BEZEL_DEPTH}px`)
-    chassisRef.current?.style.setProperty('--crt-glass-depth', `${GLASS_DEPTH}px`)
-    chassisRef.current?.style.setProperty('--crt-clip', `${Math.max(0, dy)}px ${Math.max(0, -dx)}px ${Math.max(0, -dy)}px ${Math.max(0, dx)}px`)
     const oldPose = surfaceRef.current.pose
     const poseChanged = Math.abs(pose.x - oldPose.x) + Math.abs(pose.y - oldPose.y) + Math.abs(pose.depth - (oldPose.depth ?? 0)) > 0.000001
     if (poseChanged) {
-      chassisRef.current?.style.setProperty('--crt-light-angle', `${140 + pose.x * 96 - pose.y * 34}deg`)
-      chassisRef.current?.style.setProperty('--crt-phosphor-x', `${-pose.x * GLASS_THICKNESS}px`)
-      chassisRef.current?.style.setProperty('--crt-phosphor-y', `${-pose.y * GLASS_THICKNESS}px`)
+      const style = chassisRef.current?.style
+      const dx = pose.x * (BEZEL_DEPTH - GLASS_DEPTH)
+      const dy = pose.y * (BEZEL_DEPTH - GLASS_DEPTH)
+      style?.setProperty('--crt-clip', `${Math.max(0, dy)}px ${Math.max(0, -dx)}px ${Math.max(0, -dy)}px ${Math.max(0, dx)}px`)
+      style?.setProperty('--crt-light-angle', `${140 + pose.x * 96 - pose.y * 34}deg`)
+      if (pose.x || pose.y) style?.setProperty('--crt-phosphor-offset', `translate(${-pose.x * GLASS_THICKNESS}px, ${-pose.y * GLASS_THICKNESS}px)`)
+      else style?.removeProperty('--crt-phosphor-offset')
       surfaceRef.current.pose = pose
       surfaceRef.current.render?.()
     }
     gl.domElement.dataset.viewProgress = view.toFixed(6)
-    gl.domElement.dataset.presentation = presentation.toFixed(6)
+    gl.domElement.dataset.presentation = presented ? '1.000000' : '0.000000'
     gl.domElement.dataset.orbitX = camera.position.x.toFixed(2)
     gl.domElement.dataset.orbitY = camera.position.y.toFixed(2)
     gl.domElement.dataset.carryState = carry.phase
@@ -1108,53 +1095,96 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
     const cursorAligned = !threeD || !carry.followCursor ||
       Math.abs(carry.followOrbitX - state.x * 1100) + Math.abs(carry.followOrbitY - (220 + state.y * 420)) < 0.1
     if (carry.finished && locked && cursorAligned) carry.api?.unlock()
-    if (!state.ready && !state.warming) {
-      state.warming = true
-      onProgress(0.82)
-      const generation = warmup.current.generation
-      // Let the hidden first frame upload buffers, capture the studio, and
-      // allocate shadows. Finish shader compilation before starting the reveal.
-      warmup.current.raf = requestAnimationFrame(() => {
-        const finish = () => {
-          if (generation !== warmup.current.generation) return
-          state.ready = true
-          onReady(true)
-          invalidate()
-        }
-        const fail = () => {
-          if (generation === warmup.current.generation) onReady(false)
-        }
-        const uploaded = () => {
-          if (generation !== warmup.current.generation) return
-          onProgress(0.96)
-          // Draw the compiled scene once while hidden, then enable the view
-          // on the following frame. No upload work starts with the reveal.
-          invalidate()
-          warmup.current.raf = requestAnimationFrame(() => {
-            if (generation !== warmup.current.generation) return
-            warmup.current.raf = requestAnimationFrame(finish)
-          })
-        }
-        onProgress(0.9)
-        const compilation = gl.extensions.has('KHR_parallel_shader_compile')
-          ? gl.compileAsync(scene, camera)
-          : Promise.resolve(gl.compile(scene, camera))
-        compilation.then(uploaded, fail)
-      })
-    }
     const moving = !locked && threeD && view === 1 && !interaction.current && Math.abs(state.orbitX - x) + Math.abs(state.orbitY - y) > 0.1
     if ((moving || transitioning) && !lowQuality) {
-      state.frames += 1
-      state.seconds += Math.min(delta, 0.25)
+      // The first delta includes the time the on-demand renderer was idle.
+      if (state.frames > 0) state.seconds += Math.min(delta, 0.25)
       if (state.frames >= 6 && state.seconds >= 0.35) {
-        if (state.seconds / state.frames > 1 / 38) onSlow()
+        if (state.seconds / state.frames > 1 / 38) state.lowerQuality = true
         state.frames = state.seconds = 0
       }
+      state.frames += 1
     } else { state.frames = state.seconds = 0 }
-    if (moving || presenting || transitioning || (!locked && (state.handleFraming !== framingTarget ||
-      (state.ready && spatialActive && state.presentation < 1) ||
-      (state.ready && state.presentation === 1 && transition && transition.start === null)))) invalidate()
+    // Reallocating the canvas and shadow map would interrupt the camera move.
+    if (state.lowerQuality && !transitioning) {
+      state.lowerQuality = false
+      onSlow()
+    }
+    if (moving || transitioning || (!locked && state.handleFraming !== framingTarget)) invalidate()
   }, -1)
+
+  // Take over drawing so the first render cannot force shader compilation
+  // before the asynchronous warm-up has finished.
+  useFrame(() => {
+    if (!active || document.hidden) return
+    const preparation = warmup.current
+    if (preparation.phase === 'ready') {
+      gl.render(scene, camera)
+      return
+    }
+
+    const generation = preparation.generation
+    const fail = () => {
+      if (generation !== preparation.generation) return
+      preparation.phase = 'failed'
+      onReady(false)
+    }
+    if (preparation.phase === 'pending') {
+      preparation.phase = 'compiling'
+      onProgress(0.82)
+      preparation.raf = requestAnimationFrame(async () => {
+        if (generation !== preparation.generation) return
+        try {
+          if (gl.extensions.has('KHR_parallel_shader_compile')) await gl.compileAsync(scene, camera)
+          else gl.compile(scene, camera)
+          if (generation !== preparation.generation) return
+          preparation.phase = 'compiled'
+          invalidate()
+        } catch {
+          fail()
+        }
+      })
+    } else if (preparation.phase === 'compiled') {
+      preparation.phase = 'drawing'
+      const context = gl.getContext()
+      try {
+        gl.render(scene, camera)
+        preparation.fence = context.fenceSync(context.SYNC_GPU_COMMANDS_COMPLETE, 0)
+        context.flush()
+      } catch {
+        fail()
+        return
+      }
+      onProgress(0.96)
+
+      // The first hidden draw uploads geometry and textures and fills the
+      // shadow map. Keep the HTML front visible until that draw completes.
+      const reveal = () => {
+        if (generation !== preparation.generation) return
+        if (preparation.fence) {
+          const status = context.clientWaitSync(preparation.fence, 0, 0)
+          if (status === context.TIMEOUT_EXPIRED) {
+            preparation.raf = requestAnimationFrame(reveal)
+            return
+          }
+          context.deleteSync(preparation.fence)
+          preparation.fence = null
+          if (status === context.WAIT_FAILED) {
+            fail()
+            return
+          }
+        }
+        if (context.isContextLost()) {
+          fail()
+          return
+        }
+        preparation.phase = 'ready'
+        onReady(true)
+        invalidate()
+      }
+      preparation.raf = requestAnimationFrame(reveal)
+    }
+  }, 1)
 
   const bounds = Math.max(fit.width, fit.height) * 1.2
   return (
@@ -1170,7 +1200,7 @@ function CameraLight({ fit, active, onReady, onProgress, lowQuality, onSlow, int
   )
 }
 
-export default function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, fit, active, threeD, spatialActive, pointerRef, onReady, onProgress, isPoweredOn, inputs }) {
+export default memo(function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, fit, active, threeD, spatialActive, pointerRef, onReady, onProgress, isPoweredOn, inputs }) {
   const assetProgress = useProgress((state) => state.progress)
   useEffect(() => { onProgress(0.18 + assetProgress / 100 * 0.57) }, [assetProgress, onProgress])
   const layout = usePanelLayout(chassisRef, fit.scale)
@@ -1189,8 +1219,8 @@ export default function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, f
   }, [chassisRef, fit, layout])
   const interaction = useRef(false)
   const progressRef = useRef(0)
-  const sceneRef = useRef(null)
   const shadowLightRef = useRef(null)
+  const [presented, setPresented] = useState(false)
   const [lowQuality, setLowQuality] = useState(() =>
     (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4,
   )
@@ -1217,7 +1247,9 @@ export default function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, f
   if (lost) return <span hidden data-material-status="context-lost" />
   return (
     <MaterialBoundary onReady={onReady}>
-      <div ref={sceneRef} className="scope-material-scene" style={{ opacity: 0 }}>
+      <div className="scope-material-scene" onAnimationEnd={(event) => {
+        if (event.target === event.currentTarget && event.animationName === 'scopeMaterialReveal') setPresented(true)
+      }}>
         <Canvas
           aria-hidden="true"
           ref={canvasRef}
@@ -1241,11 +1273,11 @@ export default function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, f
             <shadowMaterial transparent opacity={0.18} />
           </mesh>
           <CarryAir carryRef={carryRef} fit={fit} stageRef={stageRef} />
-          {layout ? <CameraLight threeD={threeD} spatialActive={spatialActive} pointerRef={pointerRef} progressRef={progressRef} sceneRef={sceneRef} surfaceRef={surfaceRef} planeRef={planeRef} chassisRef={chassisRef} fit={fit} active={active} onReady={onReady} onProgress={onProgress} lowQuality={lowQuality} onSlow={reduceQuality} interaction={interaction} handleRaised={handleRaised} shadowLightRef={shadowLightRef} carryRef={carryRef} stageRef={stageRef} instrumentRef={instrumentRef} handleHitRef={handleHitRef} setHandleRaised={setHandleRaised} /> : null}
+          {layout ? <CameraLight threeD={threeD} presented={presented} pointerRef={pointerRef} progressRef={progressRef} surfaceRef={surfaceRef} planeRef={planeRef} chassisRef={chassisRef} fit={fit} active={active} onReady={onReady} onProgress={onProgress} lowQuality={lowQuality} onSlow={reduceQuality} interaction={interaction} handleRaised={handleRaised} shadowLightRef={shadowLightRef} carryRef={carryRef} stageRef={stageRef} instrumentRef={instrumentRef} handleHitRef={handleHitRef} setHandleRaised={setHandleRaised} /> : null}
           </group>
           </Suspense>
         </Canvas>
-        {spatialActive && active ? (
+        {spatialActive && presented && active ? (
           <svg className="scope-handle-hit">
             <path
               ref={handleHitRef}
@@ -1283,4 +1315,4 @@ export default function ScopeMaterialScene({ chassisRef, planeRef, surfaceRef, f
       </div>
     </MaterialBoundary>
   )
-}
+})
