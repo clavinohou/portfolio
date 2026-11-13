@@ -1,5 +1,6 @@
+import { capturePostHogEvent } from './posthog.js'
+
 // Only explicit, non-personal interaction metadata belongs in custom events.
-// The Google tag is installed only on the production domain (see main.jsx).
 const parameters = new Set([
   'portfolio_channel', 'project_id', 'contact_method', 'link_location',
   'view_mode', 'power_state', 'media_index',
@@ -7,7 +8,7 @@ const parameters = new Set([
 ])
 
 export function trackEvent(name, details = {}) {
-  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
+  if (typeof window === 'undefined') return
   const safeDetails = { page_path: window.location.pathname }
   for (const [key, value] of Object.entries(details)) {
     if (!parameters.has(key)) continue
@@ -15,10 +16,11 @@ export function trackEvent(name, details = {}) {
     else if (typeof value === 'number' && Number.isFinite(value)) safeDetails[key] = value
   }
   try {
-    window.gtag('event', name, safeDetails)
+    window.gtag?.('event', name, safeDetails)
   } catch {
-    // Analytics must never prevent navigation, downloads, or contact actions.
+    // A failing GA4 tag must not interrupt the action or PostHog.
   }
+  capturePostHogEvent(name, safeDetails)
 }
 
 // Batch wheel/keyboard bursts; pointer drags flush when released. Values are

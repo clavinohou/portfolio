@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.css'
 import App from './App.jsx'
+import { startPostHog } from './lib/posthog.js'
 
 // SPA fallback: if /404.html bounced us here with a stashed deep-link, restore
 // the original URL before React mounts so the router sees the right path.
@@ -45,3 +46,5 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+startPostHog()

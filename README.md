@@ -13,9 +13,3 @@ Design inspired by Teenage Engineering design language. (my favorite!)
 - CSS Modules
 - Github Pages
 - Decap CMS
-
-## Analytics
-
-GA4 interaction events and the remaining dashboard setup are documented in
-[docs/analytics.md](docs/analytics.md). Run `npm run test:analytics` to check
-interaction batching and exclusion of personal form data.
