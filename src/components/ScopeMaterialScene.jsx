@@ -13,6 +13,7 @@ import { CRT_CORNER_X, CRT_CORNER_Y, surfaceDepth } from './crtSurface.mjs'
 import { ROCKER_INSET, ROCKER_THICKNESS, ROCKER_BEVEL, ROCKER_TILT, rockerPivotHeight, rockerSideProfile } from './rockerMechanics.mjs'
 import { PANEL_SURFACE, BEZEL_RADIUS_X, BEZEL_RADIUS_Y, panelFaceMask, bezelFaceMask } from './panelFinish.mjs'
 import { CarryAir, createScopeCarry, useScopeCarry } from './ScopeCarry'
+import { recordsCanvas } from '../lib/posthog.js'
 import { carryHandleProfile, HANDLE_HALF_SPAN, HANDLE_GRIP_WIDTH, HANDLE_THICKNESS, HANDLE_EDGE_RADIUS, HANDLE_PIVOT_LIFT, HANDLE_PIVOT_Z } from './scopeHardware.mjs'
 
 RectAreaLightUniformsLib.init()
@@ -1258,7 +1259,10 @@ export default memo(function ScopeMaterialScene({ chassisRef, planeRef, surfaceR
           dpr={renderDpr(lowQuality, window.innerWidth, window.innerHeight)}
           frameloop={active ? 'demand' : 'never'}
           shadows="variance"
-          gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
+          // Session replay snapshots this canvas between on-demand frames, and
+          // without a preserved buffer the recorder clears it. Only pages that
+          // record canvas frames pay for preserving it.
+          gl={{ alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: recordsCanvas() }}
           fallback={null}
         >
           <Suspense fallback={null}>

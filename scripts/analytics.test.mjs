@@ -61,3 +61,36 @@ test('wheel bursts aggregate and returning to the original value is ignored', (t
   tracker.flush()
   assert.equal(events.length, 1)
 })
+
+function device(t, { cores = 8, memory = 8, pointer = 'fine', connection } = {}) {
+  const originals = { window: globalThis.window, navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator') }
+  globalThis.window = { matchMedia: (query) => ({ matches: query === `(pointer: ${pointer})` }) }
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true, value: { hardwareConcurrency: cores, deviceMemory: memory, connection },
+  })
+  t.after(() => {
+    globalThis.window = originals.window
+    if (originals.navigator) Object.defineProperty(globalThis, 'navigator', originals.navigator)
+    else delete globalThis.navigator
+  })
+}
+
+test('canvas replay runs only on capable desktops without a slow or data-saving link', async (t) => {
+  const { canvasReplayAllowed } = await import('../src/lib/posthog.js')
+  const cases = [
+    [{}, true],
+    [{ connection: { effectiveType: '4g', downlink: 1.5 } }, true],
+    [{ connection: { saveData: true, effectiveType: '4g' } }, false],
+    [{ connection: { effectiveType: '3g' } }, false],
+    [{ connection: { effectiveType: 'slow-2g' } }, false],
+    [{ cores: 4 }, false],
+    [{ memory: 4 }, false],
+    [{ pointer: 'coarse' }, false],
+  ]
+  for (const [setup, expected] of cases) {
+    await t.test(JSON.stringify(setup), (st) => {
+      device(st, setup)
+      assert.equal(canvasReplayAllowed(), expected)
+    })
+  }
+})
